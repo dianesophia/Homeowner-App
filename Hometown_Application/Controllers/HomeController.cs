@@ -1,9 +1,11 @@
 using Hometown_Application.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace Hometown_Application.Controllers
 {
+    [Authorize(Roles = "Admin , HomeOwner")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -18,6 +20,7 @@ namespace Hometown_Application.Controllers
             return View();
         }
 
+        //[Authorize(Roles = "Staff")]
         public IActionResult Privacy()
         {
             return View();
