@@ -7,7 +7,6 @@
 <a asp-controller="UserManagement" asp-action="ChangeRole" class="btn btn-secondary">Change Role</a>
 
 
-
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -31,42 +30,3 @@
         }
     </tbody>
 </table>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Username</th>
-            <th>Role</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.User.FirstName</td>
-                <td>@item.User.LastName</td>
-                <td>@item.User.Email</td>
-                <td>@item.User.UserName</td>
-                <td>
-                    <form asp-action="ChangeRole" method="post" class="d-flex align-items-center gap-2">
-                        <input type="hidden" name="userId" value="@item.User.Id" />
-
-                        <select name="newRole" class="form-select">
-                            <option selected>@item.Role</option>
-                            <option value="Staff">Staff</option>
-                            <option value="Admin">Admin</option>
-                            <option value="HomeOwner">HomeOwner</option>
-                        </select>
-
-                        <button type="submit" class="btn btn-primary">Change</button>
-                    </form>
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-

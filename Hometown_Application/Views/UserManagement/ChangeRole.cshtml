@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<(Hometown_Application.Areas.Identity.Data.ApplicationUser User, string Role)>
 
 <h1>Change User Role</h1>
+<a asp-controller="UserManagement" asp-action="Index" class="btn btn-secondary">Back</a>
+
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -38,3 +40,4 @@
         }
     </tbody>
 </table>
+

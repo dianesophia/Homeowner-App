@@ -32,23 +32,25 @@ namespace Hometown_Application.Controllers
             return View(usersWithRoles);
         }
 
+        public async Task<IActionResult> ChangeRole()
+        {
+            var users = _userManager.Users.ToList();
+            var usersWithRoles = new List<(ApplicationUser User, string Role)>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault() ?? "No Role";
+                usersWithRoles.Add((user, role));
+            }
+
+            return View(usersWithRoles);
+        }
+
         [Authorize(Roles = "Admin")]
+        [HttpPost] // Ensure this is POST
         public async Task<IActionResult> ChangeRole(string userId, string newRole)
         {
-            /* if (string.IsNullOrEmpty(userId))
-                 return NotFound();
-
-             var user = await _userManager.FindByIdAsync(userId);
-             if (user == null) return NotFound();
-
-             var roles = await _userManager.GetRolesAsync(user);
-             var userRole = roles.FirstOrDefault() ?? "No Role";
-
-             ViewBag.UserId = user.Id;
-             ViewBag.CurrentRole = userRole;
-
-             return View(); // Return the form view*/
-
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return NotFound();
 
@@ -60,11 +62,13 @@ namespace Hometown_Application.Controllers
                 await _userManager.AddToRoleAsync(user, newRole); // Assign new role
             }
 
-            return RedirectToAction("UserManagement"); // Reload the page to show updated roles
-
-
-
+            return RedirectToAction("Index"); // Redirect to UserManagement Index
         }
 
-        }
+
+
+
+
+
+    }
 }
