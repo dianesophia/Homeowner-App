@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Hometown_Application.Controllers
 {
-    [Authorize(Roles = "Admin , HomeOwner")]
+    //[Authorize(Roles = "Admin , HomeOwner")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
