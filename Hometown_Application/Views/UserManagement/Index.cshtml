@@ -2,7 +2,10 @@
 
 <h1>User Management</h1>
 
-<a asp-controller="DashboardController" asp-action="ChangeRole" class="btn btn-secondary">Change Role</a>
+<h1>Admin Access Only</h1>
+
+<a asp-controller="UserManagement" asp-action="ChangeRole" class="btn btn-secondary">Change Role</a>
+
 
 
 <table class="table table-bordered">
@@ -52,9 +55,10 @@
                         <input type="hidden" name="userId" value="@item.User.Id" />
 
                         <select name="newRole" class="form-select">
-                            <option value="Admin">Admin</option>
+                            <option selected>@item.Role</option>
                             <option value="Staff">Staff</option>
-                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                            <option value="HomeOwner">HomeOwner</option>
                         </select>
 
                         <button type="submit" class="btn btn-primary">Change</button>
