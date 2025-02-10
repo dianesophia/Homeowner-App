@@ -29,15 +29,40 @@ namespace Hometown_Application.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UserManagement()
         {
-            var users = await _userManager.Users.ToListAsync(); // Fetch all users
+            var users = _userManager.Users.ToList();
+            var usersWithRoles = new List<(ApplicationUser User, string Role)>();
 
             foreach (var user in users)
             {
-                var roles = await _userManager.GetRolesAsync(user); // Fetch roles for each user
-                user.PhoneNumber = roles.FirstOrDefault() ?? "No Role"; // Store role in an unused field (e.g., PhoneNumber)
+                var roles = await _userManager.GetRolesAsync(user); // Fetch role
+                var role = roles.FirstOrDefault() ?? "No Role"; 
+                usersWithRoles.Add((user, role)); 
             }
 
-            return View(users);
+            return View(usersWithRoles);
         }
+
+         [Authorize(Roles = "Admin")]
+        
+        public async Task<IActionResult> ChangeRole(string userId, string newRole)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound();
+
+            var oldRoles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, oldRoles); // Remove old role
+
+            if (!string.IsNullOrEmpty(newRole))
+            {
+                await _userManager.AddToRoleAsync(user, newRole); // Assign new role
+            }
+
+            return RedirectToAction("UserManagement"); // Reload the page to show updated roles
+        }
+        
+
+        
+
+
     }
 }
