@@ -1,4 +1,5 @@
 ﻿using Hometown_Application.Areas.Identity.Data;
+using Hometown_Application.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -19,4 +20,6 @@ public class AuthDBContext : IdentityDbContext<ApplicationUser>
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
     }
+
+    public DbSet<EventModel> Events { get; set; }
 }
