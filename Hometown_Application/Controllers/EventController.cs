@@ -1,22 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Hometown_Application.Data;
 using Hometown_Application.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System.Linq;
+using Hometown_Application.Areas.Identity.Data;
 
+[Authorize] 
 public class EventController : Controller
 {
     private readonly ApplicationDBContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public EventController(ApplicationDBContext context)
+    public EventController(ApplicationDBContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     public IActionResult Index()
     {
         return View();
     }
-    /*
+
     [HttpGet]
     public JsonResult GetEvents()
     {
@@ -24,7 +30,7 @@ public class EventController : Controller
             .Where(e => !e.IsDeleted)
             .Select(e => new
             {
-                id = e.Id, 
+                id = e.Id,
                 title = e.Title,
                 start = e.DateTimeStart,
                 end = e.DateTimeEnd,
@@ -37,13 +43,36 @@ public class EventController : Controller
     [HttpPost]
     public IActionResult AddEvent([FromBody] EventModel newEvent)
     {
-        if (ModelState.IsValid)
+        try
         {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid event data.");
+
+          //  var adminId = _userManager.GetUserId(User); // Get admin's user ID
+            //newEvent.AddedBy = adminId; 
+
             _context.Events.Add(newEvent);
             _context.SaveChanges();
+
             return Json(new { success = true, message = "Event added successfully!" });
         }
-        return BadRequest("Invalid event data");
-    }*/
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { success = false, message = "Error saving event.", error = ex.Message });
+        }
+    }
 
+
+    [HttpDelete]
+    public IActionResult DeleteEvent(int id)
+    {
+        var eventToDelete = _context.Events.Find(id);
+        if (eventToDelete == null)
+            return NotFound();
+
+        eventToDelete.IsDeleted = true;
+        _context.SaveChanges();
+
+        return Json(new { success = true, message = "Event deleted successfully!" });
+    }
 }
