@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using Hometown_Application.Areas.Identity.Data;
 
-[Authorize] 
+[Authorize]
+
 public class EventController : Controller
 {
     private readonly ApplicationDBContext _context;
@@ -41,15 +42,43 @@ public class EventController : Controller
     }
 
     [HttpPost]
+    [Route("Event/AddEvent")]
     public IActionResult AddEvent([FromBody] EventModel newEvent)
     {
         try
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid event data.");
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage);
+                return BadRequest(new { success = false, message = "Invalid event data.", errors });
+            }
 
-          //  var adminId = _userManager.GetUserId(User); // Get admin's user ID
-            //newEvent.AddedBy = adminId; 
+            var adminUser = _userManager.GetUserAsync(User).Result;
+            if (adminUser != null)
+            {
+                newEvent.AddedBy = adminUser.Id;
+            }
+            else
+            {
+                return Unauthorized(new { success = false, message = "Unauthorized request." });
+            }
+
+            if (newEvent == null || string.IsNullOrEmpty(newEvent.Title) || string.IsNullOrEmpty(newEvent.AddedBy))
+            {
+                return BadRequest(new { success = false, message = "Invalid event data." });
+            }
+
+            if (string.IsNullOrEmpty(newEvent.UpdatedBy))
+            {
+                newEvent.UpdatedBy = null;
+                newEvent.UpdatedOn = null;
+            }
+            else
+            {
+                // If UpdatedBy is provided, update the UpdatedOn timestamp
+                newEvent.UpdatedOn = DateTime.UtcNow;
+            }
 
             _context.Events.Add(newEvent);
             _context.SaveChanges();

@@ -18,6 +18,12 @@ public class Program
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDBContext>();
 
+        builder.Services.AddControllers().AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat;
+        });
+
+
         // Add services to the container.
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();

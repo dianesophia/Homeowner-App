@@ -101,19 +101,18 @@
             })
             .catch(error => console.error('Error fetching holidays:', error));
 
-        //  Save 
+        //  Save
         $("#saveEvent").click(function () {
             var newEvent = {
-                title: $("#eventTitle").val(),
-                dateTimeStart: $("#eventStart").val(),
-                dateTimeEnd: $("#eventEnd").val() || null,
-                location: $("#eventLocation").val()
+                Title: $("#eventTitle").val(),
+                DateTimeStart: $("#eventStart").val(),
+                DateTimeEnd: $("#eventEnd").val() || null,
+                Location: $("#eventLocation").val(),
+                AddedBy: "Admin", 
+                UpdatedBy:"Admin"
             };
 
-            if (!newEvent.title || !newEvent.dateTimeStart) {
-                alert("Please fill in the required fields!");
-                return;
-            }
+            console.log("Sending data:", JSON.stringify(newEvent)); 
 
             $.ajax({
                 url: "/Event/AddEvent",
@@ -121,17 +120,17 @@
                 contentType: "application/json",
                 data: JSON.stringify(newEvent),
                 success: function (response) {
+                    console.log("Response:", response);
                     if (response.success) {
                         alert(response.message);
-                        calendar.refetchEvents();
-                        $("#eventModal").modal("hide");
-                        $("#eventForm")[0].reset(); 
+                        location.reload();
                     } else {
-                        alert("Failed to save event.");
+                        alert("Failed to save event: " + response.message);
                     }
                 },
-                error: function () {
-                    alert("Error saving event.");
+                error: function (xhr) {
+                    console.error("AJAX Error:", xhr.responseText);
+                    alert("Error saving event: " + (xhr.responseText || "Unknown error."));
                 }
             });
         });
