@@ -55,11 +55,11 @@ namespace Hometown_Application.Controllers
             if (user == null) return NotFound();
 
             var oldRoles = await _userManager.GetRolesAsync(user);
-            await _userManager.RemoveFromRolesAsync(user, oldRoles); // Remove old role
+            await _userManager.RemoveFromRolesAsync(user, oldRoles); //  old role
 
             if (!string.IsNullOrEmpty(newRole))
             {
-                await _userManager.AddToRoleAsync(user, newRole); // Assign new role
+                await _userManager.AddToRoleAsync(user, newRole); //  new role
             }
 
             return RedirectToAction("Index"); // Redirect to UserManagement Index

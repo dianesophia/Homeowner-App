@@ -5,9 +5,9 @@ using System.Linq;
 
 public class EventController : Controller
 {
-    private readonly AuthDBContext _context;
+    private readonly ApplicationDBContext _context;
 
-    public EventController(AuthDBContext context)
+    public EventController(ApplicationDBContext context)
     {
         _context = context;
     }

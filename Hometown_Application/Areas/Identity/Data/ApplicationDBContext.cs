@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hometown_Application.Data;
 
-public class AuthDBContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
 {
-    public AuthDBContext(DbContextOptions<AuthDBContext> options)
+    public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
         : base(options)
     {
     }

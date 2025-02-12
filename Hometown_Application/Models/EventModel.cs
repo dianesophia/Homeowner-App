@@ -21,7 +21,7 @@ namespace Hometown_Application.Models
         [StringLength(255)]
         public string Location { get; set; }
 
-        public int Organizer { get; set; } // FK to users or another table
+     //   public int Organizer { get; set; } 
 
         public DateTime AddedOn { get; set; } = DateTime.UtcNow;
 

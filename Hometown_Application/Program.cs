@@ -12,11 +12,11 @@ public class Program
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-        builder.Services.AddDbContext<AuthDBContext>(options => options.UseSqlServer(connectionString));
+        builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(connectionString));
 
         builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<AuthDBContext>();
+            .AddEntityFrameworkStores<ApplicationDBContext>();
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
