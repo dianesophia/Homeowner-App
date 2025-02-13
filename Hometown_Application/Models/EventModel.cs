@@ -15,7 +15,7 @@ namespace Hometown_Application.Models
 
         [Required]
         public DateTime DateTimeStart { get; set; }
-
+            
         public DateTime? DateTimeEnd { get; set; }
 
         [StringLength(255)]
