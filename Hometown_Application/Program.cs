@@ -21,6 +21,7 @@ public class Program
         builder.Services.AddControllers().AddNewtonsoftJson(options =>
         {
             options.SerializerSettings.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat;
+
         });
 
 

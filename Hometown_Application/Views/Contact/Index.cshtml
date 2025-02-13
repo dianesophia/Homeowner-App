@@ -1,0 +1,38 @@
+﻿@model List<Hometown_Application.Models.ContactModel>
+
+@{
+    ViewData["Title"] = "Contact List";
+    bool isAdmin = ViewData["IsAdmin"] != null && (bool)ViewData["IsAdmin"];
+}
+
+<h2>Contact List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Contact Type</th>
+            <th>Description</th>
+            @if (isAdmin)
+            {
+                    <th>Actions</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contact in Model)
+        {
+                <tr>
+                    <td>@contact.AddedBy</td>
+                    <td>@contact.ContactType</td>
+                    <td>@contact.Description</td>
+                @if (isAdmin)
+                {
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@contact.Id" class="btn btn-warning">Edit</a>
+                            </td>
+                }
+                </tr>
+        }
+    </tbody>
+</table>
