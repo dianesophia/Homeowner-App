@@ -33,12 +33,12 @@ namespace Hometown_Application.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var contact = _context.Contacts.Find(id);
             if (contact == null) return NotFound();
 
-            return View(contact);
+            return RedirectToAction("Contact");
         }
 
         [HttpPost]

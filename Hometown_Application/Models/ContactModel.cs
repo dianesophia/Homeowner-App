@@ -17,6 +17,9 @@ namespace Hometown_Application.Models
         [StringLength(255)]
         public string Description { get; set; }
 
+        [StringLength(10)]
+        public string Number { get; set; }
+
         public DateTime AddedOn { get; set; } = DateTime.UtcNow;
 
         [StringLength(50)]
