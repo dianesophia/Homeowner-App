@@ -1,40 +1,50 @@
-﻿@model List<Hometown_Application.Models.ContactModel>
+﻿@model IEnumerable<Hometown_Application.Models.ContactModel>
 
 @{
     ViewData["Title"] = "Contact List";
-    bool isAdmin = ViewData["IsAdmin"] != null && (bool)ViewData["IsAdmin"];
 }
 
 <h2>Contact List</h2>
 
+@if (User.IsInRole("Admin"))
+{
+    <a asp-action="Edit" asp-route-id="0" class="btn btn-primary">Add Contact</a>
+
+
+
+}
+
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
+            <th>User ID</th>
             <th>Contact Type</th>
             <th>Description</th>
             <th>Number</th>
-            @if (isAdmin)
+            @if (User.IsInRole("Admin"))
             {
-                    <th>Actions</th>
+                <th>Actions</th>
             }
         </tr>
     </thead>
     <tbody>
         @foreach (var contact in Model)
         {
-                <tr>
-                    <td>@contact.AddedBy</td>
-                    <td>@contact.ContactType</td>
-                    <td>@contact.Description</td>
-                    <td>@contact.Number</td>
-                @if (isAdmin)
+            <tr>
+                <td>@contact.UserId</td>
+                <td>@contact.ContactType</td>
+                <td>@contact.Description</td>
+                <td>@contact.Number</td>
+                @if (User.IsInRole("Admin"))
                 {
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@contact.Id" class="btn btn-warning">Edit</a>
-                            </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@contact.Id" class="btn btn-warning">Edit</a>
+                        <form asp-action="Delete" asp-route-id="@contact.Id" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
                 }
-                </tr>
+            </tr>
         }
     </tbody>
 </table>
