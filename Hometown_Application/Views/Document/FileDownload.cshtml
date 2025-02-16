@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Hometown_Application.Models.DocumentModel>
+
+@{
+    ViewData["Title"] = "File Upload and Download";
+}
+<table class="table table-bordered" width="100%">
+    <h2>Download File </h2>
+    <thead>
+        <tr>
+            <th>Document Name</th>
+            <th>File Size</th>
+            <th>Document Type</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.DocumentName</td>
+                    <td>@item.FileSize KB</td>
+                    <td>@item.DocumentType</td>
+                    <td>
+                        <a href="@Url.Action("Download", "Document", new { fileName = item.DocumentName })">
+                            Download
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" style="text-align: center; color: red;">
+                    No files uploaded yet.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

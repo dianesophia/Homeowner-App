@@ -31,7 +31,7 @@ namespace Hometown_Application.Models
         public DateTime? UpdatedOn { get; set; }
 
         [StringLength(50)]
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
         public bool IsDeleted { get; set; } = false;
     }

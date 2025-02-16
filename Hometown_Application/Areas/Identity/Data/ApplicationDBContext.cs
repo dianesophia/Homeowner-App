@@ -22,4 +22,5 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<EventModel> Events { get; set; }
+    public DbSet<DocumentModel> Documents { get; set; }
 }

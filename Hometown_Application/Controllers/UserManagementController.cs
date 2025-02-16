@@ -48,21 +48,21 @@ namespace Hometown_Application.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost] // Ensure this is POST
+        [HttpPost] 
         public async Task<IActionResult> ChangeRole(string userId, string newRole)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return NotFound();
 
             var oldRoles = await _userManager.GetRolesAsync(user);
-            await _userManager.RemoveFromRolesAsync(user, oldRoles); //  old role
+            await _userManager.RemoveFromRolesAsync(user, oldRoles); 
 
             if (!string.IsNullOrEmpty(newRole))
             {
-                await _userManager.AddToRoleAsync(user, newRole); //  new role
+                await _userManager.AddToRoleAsync(user, newRole); 
             }
 
-            return RedirectToAction("Index"); // Redirect to UserManagement Index
+            return RedirectToAction("Index"); 
         }
 
 
