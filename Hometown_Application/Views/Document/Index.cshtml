@@ -1,0 +1,79 @@
+﻿@model IEnumerable<Hometown_Application.Models.DocumentModel>
+
+@{
+    ViewData["Title"] = "File Upload and Download";
+}
+
+
+
+<div>
+    @using (Html.BeginForm("UploadFiles", "Document", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        if (TempData["Message"] != null)
+        {
+            <p style="font-family: Arial; font-size: 16px; font-weight: 200; color: red">
+                @TempData["Message"]
+            </p>
+        }
+
+        <table>
+            <tr>
+                <td  colspan="3">
+                    <h2 >FILE UPLOAD </h2>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 50px;">
+                    <b >File:</b>
+                </td>
+                <td>
+                    <input type="file" name="files" id="files" multiple />
+                </td>
+                <td>
+                    <input type="submit" class="btn" style="background-color:gray; color: white" ; value="Upload" />
+                </td>
+            </tr>
+        </table>
+    }
+
+    <br />
+
+    <table class="table table-bordered" width="100%">
+        <thead>
+            <tr>
+                <th>Document Name</th>
+                <th>File Size</th>
+                <th>Document Type</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.DocumentName</td>
+                        <td>@item.FileSize KB</td>
+                        <td>@item.DocumentType</td>
+                        <td>
+                            <a href="@Url.Action("Download", "Document", new { fileName = item.DocumentName })">
+                                Download
+                            </a>
+                            <a asp-action="DeleteDocument" asp-route-id="@item.Id">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">
+                        No files uploaded yet.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<a asp-controller="Document" asp-action="FileDownload" class="btn btn-secondary">download</a>

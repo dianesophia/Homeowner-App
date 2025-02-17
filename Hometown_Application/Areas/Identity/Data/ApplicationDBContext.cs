@@ -21,9 +21,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         // Add your customizations after calling base.OnModelCreating(builder);
     }
 
-    public DbSet<EventModel> Events { get; set; }
-    public DbSet<ContactModel> Contacts { get; set; }
-
-
-
+   		 public DbSet<EventModel> Events { get; set; }
+		   public DbSet<ContactModel> Contacts { get; set; }
+			 public DbSet<DocumentModel> Documents { get; set; }
 }

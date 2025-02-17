@@ -15,7 +15,7 @@ namespace Hometown_Application.Models
 
         [Required]
         public DateTime DateTimeStart { get; set; }
-
+            
         public DateTime? DateTimeEnd { get; set; }
 
         [StringLength(255)]
@@ -31,7 +31,7 @@ namespace Hometown_Application.Models
         public DateTime? UpdatedOn { get; set; }
 
         [StringLength(50)]
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
         public bool IsDeleted { get; set; } = false;
     }

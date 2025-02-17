@@ -42,24 +42,7 @@ namespace Hometown_Application.Controllers
             return View(usersWithRoles);
         }
 
-         [Authorize(Roles = "Admin")]
-        
-        public async Task<IActionResult> ChangeRole(string userId, string newRole)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return NotFound();
-
-            var oldRoles = await _userManager.GetRolesAsync(user);
-            await _userManager.RemoveFromRolesAsync(user, oldRoles); // Remove old role
-
-            if (!string.IsNullOrEmpty(newRole))
-            {
-                await _userManager.AddToRoleAsync(user, newRole); // Assign new role
-            }
-
-            return RedirectToAction("UserManagement"); // Reload the page to show updated roles
-        }
-        
+       
 
         
 
