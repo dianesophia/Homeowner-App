@@ -24,4 +24,6 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<EventModel> Events { get; set; }
     public DbSet<ContactModel> Contacts { get; set; }
 
+
+
 }

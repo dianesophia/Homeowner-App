@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250215183849_yan")]
+    [Migration("20250216160035_yan")]
     partial class yan
     {
         /// <inheritdoc />

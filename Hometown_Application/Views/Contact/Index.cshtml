@@ -8,16 +8,12 @@
 
 @if (User.IsInRole("Admin"))
 {
-    <a asp-action="Edit" asp-route-id="0" class="btn btn-primary">Add Contact</a>
-
-
-
+    <a asp-action="CreateEditContact" class="btn btn-primary">Add Contact</a>
 }
 
 <table class="table">
     <thead>
         <tr>
-            <th>User ID</th>
             <th>Contact Type</th>
             <th>Description</th>
             <th>Number</th>
@@ -31,15 +27,14 @@
         @foreach (var contact in Model)
         {
             <tr>
-                <td>@contact.UserId</td>
                 <td>@contact.ContactType</td>
                 <td>@contact.Description</td>
                 <td>@contact.Number</td>
                 @if (User.IsInRole("Admin"))
                 {
                     <td>
-                        <a asp-action="Edit" asp-route-id="@contact.Id" class="btn btn-warning">Edit</a>
-                        <form asp-action="Delete" asp-route-id="@contact.Id" method="post" style="display:inline;">
+                        <a asp-action="CreateEditContact" asp-route-id="@contact.Id" class="btn btn-warning">Edit</a>
+                        <form asp-action="DeleteContact" asp-route-id="@contact.Id" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </td>

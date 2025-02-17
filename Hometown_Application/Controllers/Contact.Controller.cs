@@ -1,13 +1,13 @@
-﻿using Hometown_Application.Areas.Identity.Data;
-using Hometown_Application.Data;
-using Hometown_Application.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Hometown_Application.Data;
+using Hometown_Application.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Hometown_Application.Areas.Identity.Data;
 
 namespace Hometown_Application.Controllers
 {
@@ -23,85 +23,96 @@ namespace Hometown_Application.Controllers
             _userManager = userManager;
         }
 
-        // GET: Contact
         public async Task<IActionResult> Index()
         {
             var contacts = await _context.Contacts
-                .Where(c => !c.IsDeleted) // Only show active contacts
+                .Where(c => !c.IsDeleted)
                 .OrderBy(c => c.ContactType)
                 .ToListAsync();
             return View(contacts);
         }
 
-        // GET: Contact/Edit/{id}
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> CreateEditContact(int? id)
         {
-            if (id == 0)
+            if (id != null)
             {
-                // Creating a new contact
-                return View(new ContactModel());
+                // Edit existing contact
+                var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == id);
+                if (contactInDb == null)
+                {
+                    return NotFound();
+                }
+                return View(contactInDb);
             }
 
-            var contact = await _context.Contacts.FindAsync(id);
-            if (contact == null)
-            {
-                return NotFound();
-            }
-            return View(contact);
+            // Create new contact
+            return View(new ContactModel());
         }
 
-        // POST: Contact/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,ContactType,Description,Number,AddedBy,UpdatedBy")] ContactModel contact)
+        public async Task<IActionResult> CreateEditContactForm(ContactModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(contact);
+                // Log validation errors
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                }
+                return View("CreateEditContact", model);
             }
 
-            if (id == 0)
+            if (model.Id == 0)
             {
-                // New Contact
-                contact.AddedOn = DateTime.UtcNow;
-                _context.Add(contact);
+                // Create new contact
+                model.UserId = _userManager.GetUserId(User);
+                model.AddedBy = User.Identity.Name;
+                model.AddedOn = DateTime.UtcNow;
+                _context.Contacts.Add(model);
             }
             else
             {
-                // Update Existing Contact
-                var existingContact = await _context.Contacts.FindAsync(id);
-                if (existingContact == null)
+                // Edit existing contact
+                var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == model.Id);
+                if (contactInDb == null)
                 {
                     return NotFound();
                 }
 
-                existingContact.UserId = contact.UserId;
-                existingContact.ContactType = contact.ContactType;
-                existingContact.Description = contact.Description;
-                existingContact.Number = contact.Number;
-                existingContact.UpdatedOn = DateTime.UtcNow;
-                existingContact.UpdatedBy = contact.UpdatedBy;
-
-                _context.Update(existingContact);
+                contactInDb.UserId = model.UserId;
+                contactInDb.ContactType = model.ContactType;
+                contactInDb.Description = model.Description;
+                contactInDb.Number = model.Number;
+                contactInDb.UpdatedOn = DateTime.UtcNow;
+                contactInDb.UpdatedBy = User.Identity.Name;
+                _context.Contacts.Update(contactInDb);
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error saving to database: {ex.Message}");
+                ModelState.AddModelError("", "An error occurred while saving the contact.");
+                return View("CreateEditContact", model);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
-
-        // POST: Contact/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // Only Admins can delete
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteContact(int id)
         {
-            var contact = await _context.Contacts.FindAsync(id);
-            if (contact != null)
+            var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == id);
+            if (contactInDb != null)
             {
-                contact.IsDeleted = true;
+                contactInDb.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
