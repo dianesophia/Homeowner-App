@@ -1,5 +1,4 @@
 ﻿@using Hometown_Application.Areas.Identity.Data
-@inject UserManager<ApplicationUser> UserManager
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -10,6 +9,7 @@
     {
     <h3>Admin Dashboard</h3>
         <a asp-controller="UserManagement" asp-action="Index" class="btn btn-secondary">User Management</a>
+         
     }
 
     else if (SignInManager.IsSignedIn(User) && User.IsInRole("Staff"))
@@ -17,6 +17,7 @@
         <h3>Staff Dashboard</h3>
     }
 
+    <a asp-controller="Contact" asp-action="Index" class="btn btn-secondary">View Contacts</a>
     <a asp-controller="Event" asp-action="Index" class="btn btn-secondary">Calendar</a>
     <a asp-controller="Document" asp-action="Index" class="btn btn-secondary">Upload File</a>
     <a asp-controller="Document" asp-action="FileDownload" class="btn btn-secondary">Download File</a>

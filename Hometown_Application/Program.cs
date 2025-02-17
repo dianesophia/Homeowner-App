@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Hometown_Application.Data;
 using Hometown_Application.Areas.Identity.Data;
+using System.ComponentModel;
 
-public class Program 
+public class Program
 {
     public static async Task Main(string[] args)
     {
@@ -21,6 +22,7 @@ public class Program
         builder.Services.AddControllers().AddNewtonsoftJson(options =>
         {
             options.SerializerSettings.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat;
+
         });
 
 
@@ -42,6 +44,8 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseAuthentication();
 
         app.UseAuthorization();
 
@@ -71,7 +75,7 @@ public class Program
 
             if (await userManager.FindByEmailAsync(email) == null)
             {
-                var user = new ApplicationUser 
+                var user = new ApplicationUser
                 {
                     UserName = email,
                     Email = email,
@@ -83,12 +87,11 @@ public class Program
 
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(user, "Admin"); 
+                    await userManager.AddToRoleAsync(user, "Admin");
                 }
             }
         }
 
             app.Run();
     } 
-
 }

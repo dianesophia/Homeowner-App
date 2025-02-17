@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Hometown_Application.Models.ContactModel>
+
+@{
+    ViewData["Title"] = "Contact List";
+}
+
+<h2>Contact List</h2>
+
+@if (User.IsInRole("Admin"))
+{
+    <a asp-action="CreateEditContact" class="btn btn-primary">Add Contact</a>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Contact Type</th>
+            <th>Description</th>
+            <th>Number</th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th>Actions</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contact in Model)
+        {
+            <tr>
+                <td>@contact.ContactType</td>
+                <td>@contact.Description</td>
+                <td>@contact.Number</td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        <a asp-action="CreateEditContact" asp-route-id="@contact.Id" class="btn btn-warning">Edit</a>
+                        <form asp-action="DeleteContact" asp-route-id="@contact.Id" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

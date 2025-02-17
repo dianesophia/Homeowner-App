@@ -26,5 +26,5 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .OnDelete(DeleteBehavior.Cascade);
     }
 
-   
+
 }
