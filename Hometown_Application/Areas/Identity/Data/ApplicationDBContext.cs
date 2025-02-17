@@ -12,16 +12,19 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+    public DbSet<FeedbackComplaintModel> FeedbackComplaints { get; set; }
+    public DbSet<EventModel> Events { get; set; }
+    public DbSet<DocumentModel> Documents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        // Customize the ASP.NET Identity model and override the defaults if needed.
-        // For example, you can rename the ASP.NET Identity table names and more.
-        // Add your customizations after calling base.OnModelCreating(builder);
+        builder.Entity<FeedbackComplaintModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
     }
 
-   		 public DbSet<EventModel> Events { get; set; }
-		   public DbSet<ContactModel> Contacts { get; set; }
-			 public DbSet<DocumentModel> Documents { get; set; }
+
 }

@@ -15,9 +15,9 @@ namespace Hometown_Application.Models
         public string DocumentType { get; set; }
 
         [Required]
-        public string FilePath { get; set; } // Store file location instead of IFormFile
+        public string FilePath { get; set; } 
 
-        public long FileSize { get; set; } // File size in KB
+        public long FileSize { get; set; } 
 
         public DateTime UploadedOn { get; set; } = DateTime.Now;
 
