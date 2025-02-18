@@ -43,7 +43,8 @@
 
         [HttpPost]
         [Route("Event/AddEvent")]
-        public IActionResult AddEvent([FromBody] EventModel newEvent)
+    [Authorize(Roles = "Admin")]
+    public IActionResult AddEvent([FromBody] EventModel newEvent)
         {
             try
             {
@@ -93,7 +94,8 @@
 
 
         [HttpDelete]
-        public IActionResult DeleteEvent(int id)
+    [Authorize(Roles = "Admin")]
+    public IActionResult DeleteEvent(int id)
         {
             var eventToDelete = _context.Events.Find(id);
             if (eventToDelete == null)

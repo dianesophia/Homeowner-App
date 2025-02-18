@@ -4,6 +4,7 @@ using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250218172347_ava")]
+    partial class ava
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -326,26 +329,21 @@ namespace Hometown_Application.Migrations
                         new
                         {
                             StatusId = 2,
-                            StatusName = "Unavailable"
-                        },
-                        new
-                        {
-                            StatusId = 3,
                             StatusName = "Pending"
                         },
                         new
                         {
-                            StatusId = 4,
+                            StatusId = 3,
                             StatusName = "In Progress"
                         },
                         new
                         {
-                            StatusId = 5,
+                            StatusId = 4,
                             StatusName = "Resolved"
                         },
                         new
                         {
-                            StatusId = 6,
+                            StatusId = 5,
                             StatusName = "Closed"
                         });
                 });
