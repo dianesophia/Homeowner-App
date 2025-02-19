@@ -6,7 +6,11 @@
 <h1>Feedback or Complaint</h1>
 
 
+@if (User.IsInRole("Admin"))
+{
+    <a asp-controller="FeedbackComplaint" asp-action="AdminView" class="btn btn-secondary">Admin</a>
+}
+
 <a asp-controller="FeedbackComplaint" asp-action="Feedback" class="btn btn-secondary">Feedback</a>
 <a asp-controller="FeedbackComplaint" asp-action="Complaint" class="btn btn-secondary">Complaint</a>
-<a asp-controller="FeedbackComplaint" asp-action="AdminView" class="btn btn-secondary">Admin</a>
 <a asp-controller="FeedbackComplaint" asp-action="FCStatusReport" class="btn btn-secondary">Status</a>

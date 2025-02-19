@@ -3,6 +3,12 @@
 @{
     ViewData["Title"] = "File Upload and Download";
 }
+
+@if (User.IsInRole("Admin"))
+{
+    <a asp-controller="Document" asp-action="Index" class="btn btn-secondary">Upload File / Delete</a>
+}
+
 <table class="table table-bordered" width="100%">
     <h2>Download File </h2>
     <thead>

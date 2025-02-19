@@ -22,7 +22,16 @@ namespace Hometown_Application.Controllers
             _userManager = userManager;
         }
 
-        
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Feedback()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> FeedbackForm(FeedbackComplaintModel model, IFormFile Image)
         {
@@ -55,29 +64,42 @@ namespace Hometown_Application.Controllers
         }
 
       
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        
-        public IActionResult Feedback()
-        {
-            return View();
-        }
-
-      
         public IActionResult Complaint()
         {
             return View();
         }
 
-       
-        public IActionResult AdminView()
-        {
-            return View();
-        }
 
+        [HttpPost]
+        public async Task<IActionResult> ComplaintForm(FeedbackComplaintModel model, IFormFile Image)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null)
+            {
+
+                model.UserId = user.Id;
+                model.AddedBy = user.Id;
+                model.AddedOn = DateTime.UtcNow;
+                model.Type = "Feedback";
+
+
+                if (Image != null && Image.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await Image.CopyToAsync(memoryStream);
+                        model.Image = memoryStream.ToArray();
+                    }
+                }
+
+
+                _context.FeedbackComplaints.Add(model);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("FCStatusReport");
+        }
        
         public async  Task<IActionResult> FCStatusReport()
         {
@@ -85,14 +107,20 @@ namespace Hometown_Application.Controllers
 
             if (user != null)
             {
-                var feedbackList = await _context.FeedbackComplaints
+                var list = await _context.FeedbackComplaints
                                                   .Where(f => f.UserId == user.Id && !f.IsDeleted)
                                                   .ToListAsync();
 
-                return View(feedbackList);
+                return View(list);
             }
 
-            return RedirectToAction("Feedback");
+            // return RedirectToAction("Feedback");
+            return View();
+        }
+
+        public IActionResult AdminView()
+        {
+            return View();
         }
     }
 }

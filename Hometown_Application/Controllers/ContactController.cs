@@ -25,97 +25,172 @@ namespace Hometown_Application.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var contacts = await _context.Contacts
-                .Where(c => !c.IsDeleted)
-                .OrderBy(c => c.ContactType)
-                .ToListAsync();
-            return View(contacts);
+             var contacts = await _context.Contacts
+                 .Where(c => !c.IsDeleted)
+                 .OrderBy(c => c.ContactType)
+                 .ToListAsync();
+             return View(contacts);
+
+            
         }
 
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateEditContact(int? id)
+      //  [Authorize(Roles = "Admin")]
+        /*public async Task<IActionResult> CreateEditContact(int? id)
         {
-            if (id != null)
-            {
-                // Edit existing contact
-                var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == id);
-                if (contactInDb == null)
-                {
-                    return NotFound();
-                }
-                return View(contactInDb);
-            }
+             if (id != null)
+             {
+                 // Edit existing contact
+                 var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == id);
+                 if (contactInDb == null)
+                 {
+                     return NotFound();
+                 }
+                 return View(contactInDb);
+             }
 
-            // Create new contact
-            return View(new ContactModel());
-        }
+             // Create new contact
+             return View(new ContactModel());
+            
+
+            var allData = _context.Contacts.ToList();
+            return View(allData);
+        }*/
+
+        /*  [HttpPost]
+          [ValidateAntiForgeryToken]
+          [Authorize(Roles = "Admin")]
+          public async Task<IActionResult> CreateEditContactForm(ContactModel model)
+          {
+              if (!ModelState.IsValid)
+              {
+                  // Log validation errors
+                  foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                  {
+                      Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                  }
+                  return View("CreateEditContact", model);
+              }
+
+              if (model.Id == 0)
+              {
+                  // Create new contact
+                  model.UserId = _userManager.GetUserId(User);
+                  model.AddedBy = User.Identity.Name;
+                  model.AddedOn = DateTime.UtcNow;
+                  _context.Contacts.Add(model);
+              }
+              else
+              {
+                  // Edit existing contact
+                  var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == model.Id);
+                  if (contactInDb == null)
+                  {
+                      return NotFound();
+                  }
+
+                  contactInDb.UserId = model.UserId;
+                  contactInDb.ContactType = model.ContactType;
+                  contactInDb.Description = model.Description;
+                  contactInDb.Number = model.Number;
+                  contactInDb.UpdatedOn = DateTime.UtcNow;
+                  contactInDb.UpdatedBy = User.Identity.Name;
+                  _context.Contacts.Update(contactInDb);
+              }
+
+              try
+              {
+                  await _context.SaveChangesAsync();
+              }
+              catch (Exception ex)
+              {
+                  // Log the exception
+                  Console.WriteLine($"Error saving to database: {ex.Message}");
+                  ModelState.AddModelError("", "An error occurred while saving the contact.");
+                  return View("CreateEditContact", model);
+              }
+
+              return RedirectToAction(nameof(Index));
+          }*/
+
+ 
+
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateEditContactForm(ContactModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                // Log validation errors
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine($"Validation Error: {error.ErrorMessage}");
-                }
-                return View("CreateEditContact", model);
-            }
+            var user = await _userManager.GetUserAsync(User);
+            var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == model.Id);
 
-            if (model.Id == 0)
+            if (contactInDb == null)
             {
-                // Create new contact
-                model.UserId = _userManager.GetUserId(User);
-                model.AddedBy = User.Identity.Name;
-                model.AddedOn = DateTime.UtcNow;
-                _context.Contacts.Add(model);
+                model.AddedOn = DateTime.Now;
+                model.AddedBy = user.Id;
+
+                _context.Contacts.Add(model); 
             }
             else
             {
-                // Edit existing contact
-                var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == model.Id);
-                if (contactInDb == null)
-                {
-                    return NotFound();
-                }
-
-                contactInDb.UserId = model.UserId;
                 contactInDb.ContactType = model.ContactType;
                 contactInDb.Description = model.Description;
                 contactInDb.Number = model.Number;
-                contactInDb.UpdatedOn = DateTime.UtcNow;
-                contactInDb.UpdatedBy = User.Identity.Name;
-                _context.Contacts.Update(contactInDb);
+
+                _context.Contacts.Update(contactInDb); 
             }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error saving to database: {ex.Message}");
-                ModelState.AddModelError("", "An error occurred while saving the contact.");
-                return View("CreateEditContact", model);
-            }
-
-            return RedirectToAction(nameof(Index));
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
         }
+
+    
+
+
+
+    [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateEditContact(int? id)
+        {
+            if (id == null) 
+            {
+                return View(new ContactModel());
+            }
+
+            var contactInDb = await _context.Contacts.FindAsync(id);
+            if (contactInDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(contactInDb); 
+        }
+
+        /* [Authorize(Roles = "Admin")]
+         public async Task<IActionResult> DeleteContact(int id)
+         {
+             var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == id);
+             if (contactInDb != null)
+             {
+                 contactInDb.IsDeleted = true;
+                 await _context.SaveChangesAsync();
+             }}
+             return RedirectToAction(nameof(Index));
+         }*/
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteContact(int id)
         {
-            var contactInDb = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == id);
-            if (contactInDb != null)
+            var contactInDb = await _context.Contacts.FindAsync(id);
+            if (contactInDb == null)
             {
-                contactInDb.IsDeleted = true;
-                await _context.SaveChangesAsync();
+                TempData["Message"] = "Contact not found.";
+                return RedirectToAction(nameof(Index));
             }
+
+            _context.Contacts.Remove(contactInDb);
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Contact deleted successfully!";
             return RedirectToAction(nameof(Index));
         }
+
     }
 }

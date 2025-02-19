@@ -8,16 +8,13 @@ namespace Hometown_Application.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, StringLength(50)]
-        public string UserId { get; set; }
-
         [Required, StringLength(50)]    
         public string ContactType { get; set; }
 
         [StringLength(255)]
         public string Description { get; set; }
 
-        [StringLength(10)]
+        [StringLength(17)]
         public string Number { get; set; }
 
         public DateTime AddedOn { get; set; } = DateTime.UtcNow;
@@ -25,10 +22,10 @@ namespace Hometown_Application.Models
         [StringLength(50)]
         public string AddedBy { get; set; }
 
-        public DateTime? UpdatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
 
         [StringLength(50)]
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
         public bool IsDeleted { get; set; } = false;
     }

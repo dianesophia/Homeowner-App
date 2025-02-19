@@ -28,12 +28,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
 
 
         builder.Entity<StatusModel>().HasData(
-      new StatusModel { StatusId = 1, StatusName = "Available" },
-      new StatusModel { StatusId = 2, StatusName = "Unavailable" },
-      new StatusModel { StatusId = 3, StatusName = "Pending" },
-      new StatusModel { StatusId = 4, StatusName = "In Progress" },
-      new StatusModel { StatusId = 5, StatusName = "Resolved" },
-      new StatusModel { StatusId = 6, StatusName = "Closed" }
+            new StatusModel { StatusId = 1, StatusName = "Available" },
+            new StatusModel { StatusId = 2, StatusName = "Unavailable" },
+            new StatusModel { StatusId = 3, StatusName = "Pending" },
+            new StatusModel { StatusId = 4, StatusName = "In Progress" },
+            new StatusModel { StatusId = 5, StatusName = "Resolved" },
+            new StatusModel { StatusId = 6, StatusName = "Closed" }
   );
 
 

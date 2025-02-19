@@ -1,6 +1,84 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Microsoft.AspNetCore.Identity
+@using Hometown_Application.Areas.Identity.Data
+@inject UserManager<ApplicationUser> UserManager
+
+@model IEnumerable<Hometown_Application.Models.FeedbackComplaintModel>
+
 @{
+    var user = await UserManager.GetUserAsync(User);
 }
+
 <h1>Complaint</h1>
+
+
+<form id="ComplaintForm" asp-action="FeedbackForm" asp-controller="FeedbackComplaint" enctype="multipart/form-data" onsubmit="return validateForm()">
+    <input hidden class="form-control" type="number" name="FeedbackComplaintId" />
+    <input type="hidden" name="UserId" value="@user?.Id" />
+    <input hidden class="form-control" value="Feedback" />
+
+    <input class="form-control" type="text" placeholder="Title" name="Title" required />
+
+    <select id="SubjectSelect" name="Subject" class="form-select" onchange="toggleOtherInput()" required>
+        <option value="" selected disabled>Choose a subject</option>
+        <option value="Maintenance">Maintenance</option>
+        <option value="Security">Security</option>
+        <option value="Noise">Noise</option>
+        <option value="Other">Other</option>
+    </select>
+
+    <input id="OtherSubjectInput" class="form-control mt-2" type="text" name="OtherSubject" placeholder="Please specify" style="display:none;" />
+
+    <textarea class="form-control" placeholder="Comment" name="Message" required></textarea>
+
+    <input class="form-control" type="file" name="Image" id="ImageUpload" accept="image/*" />
+
+    <button class="btn btn-primary mt-4" type="submit">Submit Feedback</button>
+</form>
+
+<script>
+    function toggleOtherInput() {
+        var select = document.getElementById('SubjectSelect');
+        var input = document.getElementById('OtherSubjectInput');
+
+        if (select.value === "Other") {
+            input.style.display = "block";
+            input.setAttribute("required", "true");
+        } else {
+            input.style.display = "none";
+            input.removeAttribute("required");
+        }
+    }
+
+    function validateForm() {
+        var title = document.querySelector('input[name="Title"]').value.trim();
+        var subject = document.getElementById('SubjectSelect').value;
+        var otherSubject = document.getElementById('OtherSubjectInput').value.trim();
+        var message = document.querySelector('textarea[name="Message"]').value.trim();
+        var fileInput = document.getElementById("ImageUpload");
+        var allowedExtensions = ["jpg", "jpeg", "png", "gif"];
+
+
+        if (title === "" || subject === "" || message === "") {
+            alert("Please fill out all required fields.");
+            return false;
+        }
+
+        if (subject === "Other" && otherSubject === "") {
+            alert("Please specify the subject.");
+            return false;
+        }
+
+
+        if (fileInput.files.length > 0) {
+            var fileName = fileInput.files[0].name;
+            var fileExtension = fileName.split('.').pop().toLowerCase();
+
+            if (!allowedExtensions.includes(fileExtension)) {
+                alert("Invalid file type! Please upload an image (JPG, JPEG, PNG, GIF).");
+                return false;
+            }
+        }
+
+        return true;
+    }
+</script>

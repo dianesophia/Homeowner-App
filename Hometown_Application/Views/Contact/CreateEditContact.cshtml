@@ -22,11 +22,45 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="Number"></label>
-        <input asp-for="Number" class="form-control" />
+        <label asp-for="Number">Phone Number</label>
+        <input asp-for="Number" class="form-control" id="phoneNumber" type="text"
+               pattern="\+63\s\d{3}\s\d{3}\s\d{4}"
+               title="Must be in the format +63 XXX XXX XXXX"
+               placeholder="+63 XXX XXX XXXX" required
+               maxlength="15" oninput="formatPhoneNumber(this)" />
         <span asp-validation-for="Number" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-success">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
+
+<script>
+    function formatPhoneNumber(input) {
+        let value = input.value.replace(/[^0-9+]/g, ''); // Remove non-numeric except "+"
+
+        if (!value.startsWith("+63")) {
+            value = "+63";
+        }
+
+        // Ensure a single space after "+63"
+        value = value.replace(/\+63\s?/g, "+63 ");
+
+        // Remove existing spaces before formatting
+        value = value.replace(/\s+/g, '');
+
+        // Insert spaces at the correct positions
+        if (value.length > 3) {
+            value = value.slice(0, 3) + " " + value.slice(3);
+        }
+        if (value.length > 7) {
+            value = value.slice(0, 7) + " " + value.slice(7);
+        }
+        if (value.length > 11) {
+            value = value.slice(0, 11) + " " + value.slice(11, 16);
+        }
+
+        // Ensure maxlength is not exceeded
+        input.value = value.slice(0, 16);
+    }
+</script>
