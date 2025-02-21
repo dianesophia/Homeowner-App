@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<(Hometown_Application.Areas.Identity.Data.ApplicationUser User, string Role)>
 
 <h1>Change User Role</h1>
-<a asp-controller="UserManagement" asp-action="Index" class="btn btn-secondary">Back</a>
+<a asp-controller="ManageUsers" asp-action="Index" class="btn btn-secondary">Back</a>
 
 <table class="table table-bordered">
     <thead>
@@ -22,18 +22,30 @@
                 <td>@item.User.Email</td>
                 <td>@item.User.UserName</td>
                 <td>
+               
                     <form asp-action="ChangeRole" method="post" class="d-flex align-items-center gap-2">
                         <input type="hidden" name="userId" value="@item.User.Id" />
 
                         <select name="newRole" class="form-select">
-                            <option selected>@item.Role</option>
-                            <option value="Staff">Staff</option>
-                            <option value="Admin">Admin</option>
-                            <option value="HomeOwner">Home Owner</option>
+                            <option selected disabled>@item.Role</option>
+                                @if (item.Role != "Staff")
+                                {
+                                <option value="Staff">Staff</option>
+                                }
+                                @if (item.Role != "Admin")
+                                {
+                                <option value="Admin">Admin</option>
+                                }
+                                @if (item.Role != "HomeOwner")
+                                {
+                                <option value="HomeOwner">Home Owner</option>
+                                }
                         </select>
 
                         <button type="submit" class="btn btn-primary">Change</button>
                     </form>
+               
+
 
                 </td>
             </tr>

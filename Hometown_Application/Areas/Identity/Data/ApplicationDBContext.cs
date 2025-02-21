@@ -20,11 +20,6 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.Entity<FeedbackComplaintModel>()
-           .HasOne(fc => fc.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(fc => fc.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
 
 
         builder.Entity<StatusModel>().HasData(
@@ -34,10 +29,20 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             new StatusModel { StatusId = 4, StatusName = "In Progress" },
             new StatusModel { StatusId = 5, StatusName = "Resolved" },
             new StatusModel { StatusId = 6, StatusName = "Closed" }
-  );
+        );
+
+        builder.Entity<FeedbackComplaintModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
 
 
-
+        builder.Entity<FeedbackComplaintModel>()
+        .HasOne(fc => fc.Status)
+        .WithMany()
+        .HasForeignKey(fc => fc.StatusId)
+        .OnDelete(DeleteBehavior.Restrict);
 
 
     }

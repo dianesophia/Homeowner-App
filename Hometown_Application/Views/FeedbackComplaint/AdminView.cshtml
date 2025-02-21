@@ -1,6 +1,28 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model List<Hometown_Application.Models.FeedbackComplaintModel>
+
+<h1>Feedback & Complaints Management</h1>
+
+@foreach (var item in Model)
+{
+    <div class="feedback-item">
+        <h3>Feedback Details</h3>
+        <p><strong>User ID:</strong> @item.UserId</p>
+        <p><strong>Category:</strong> @item.Type</p>
+        <p><strong>Status:</strong> @item.Status?.StatusName</p>
+        <p><strong>Message:</strong> @item.Message</p>
+
+        @if (!string.IsNullOrEmpty(item.AdminReply))
+        {
+            <p><strong>Admin Response:</strong> @item.AdminReply</p>
+        }
+
+        <form asp-controller="FeedbackComplaint" asp-action="ReplyToFeedback" method="post">
+            <input type="hidden" name="id" value="@item.UserId" />
+
+            <label for="replyMessage"><strong>Admin Reply:</strong></label>
+            <textarea id="replyMessage" name="replyMessage" placeholder="Enter your response here..." required></textarea>
+
+            <button type="submit">Send Response</button>
+        </form>
+    </div>
 }
-<h1>Admin View</h1>

@@ -19,10 +19,6 @@ namespace Hometown_Application.Models
         [Required]
         public string Type { get; set; } // "Feedback" or "Complaint"
 
-        [Required]
-
-        [StringLength(100)]
-        public string Subject { get; set; }// Feedback or complaint about
 
         [Required]
         [StringLength(255)]
@@ -34,7 +30,15 @@ namespace Hometown_Application.Models
         [StringLength(5000)]
         public string Message { get; set; }
 
-        public string Status { get; set; } = "Pending";
+        [Required]
+        [ForeignKey("StatusModel")]
+        public int? StatusId { get; set; } = 3;  
+
+        public StatusModel Status { get; set; }
+
+        public string? AdminReply { get; set; }
+
+        public string? AdminNote { get; set; }
 
         public string AddedBy { get; set; } 
         public DateTime AddedOn { get; set; } = DateTime.UtcNow; 

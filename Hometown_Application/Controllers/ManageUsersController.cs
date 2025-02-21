@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hometown_Application.Controllers
 {
-    public class UserManagementController : Controller
+    public class ManageUsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserManagementController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public ManageUsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;

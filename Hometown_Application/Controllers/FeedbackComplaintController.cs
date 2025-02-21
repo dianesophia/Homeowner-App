@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Hometown_Application.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 using Hometown_Application.Data;
 using Hometown_Application.Models;
 using System;
@@ -45,7 +46,10 @@ namespace Hometown_Application.Controllers
                 model.AddedOn = DateTime.UtcNow;
                 model.Type = "Feedback";
 
-                
+
+                var pendingStatus = await _context.Status.FirstOrDefaultAsync(s => s.StatusName == "Pending");
+                model.StatusId = pendingStatus?.StatusId;
+
                 if (Image != null && Image.Length > 0)
                 {
                     using (var memoryStream = new MemoryStream())
@@ -81,8 +85,10 @@ namespace Hometown_Application.Controllers
                 model.UserId = user.Id;
                 model.AddedBy = user.Id;
                 model.AddedOn = DateTime.UtcNow;
-                model.Type = "Feedback";
+                model.Type = "Complaint";
 
+                var pendingStatus = await _context.Status.FirstOrDefaultAsync(s => s.StatusName == "Pending");
+                model.StatusId = pendingStatus?.StatusId;
 
                 if (Image != null && Image.Length > 0)
                 {
@@ -109,18 +115,62 @@ namespace Hometown_Application.Controllers
             {
                 var list = await _context.FeedbackComplaints
                                                   .Where(f => f.UserId == user.Id && !f.IsDeleted)
+                                                  .Include(f => f.Status)
                                                   .ToListAsync();
 
                 return View(list);
             }
 
-            // return RedirectToAction("Feedback");
+            
             return View();
         }
 
-        public IActionResult AdminView()
+      public async Task<IActionResult> AdminView()
         {
-            return View();
+            var feedbackComplaints = await _context.FeedbackComplaints
+                .Include(f => f.Status) 
+                .ToListAsync();
+
+            return View(feedbackComplaints); 
         }
+     
+
+     /*   [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminView(int? id)
+        {
+            if (id == null)
+            {
+                return View(new FeedbackComplaintModel());
+            }
+
+            var issueInDb = await _context.FeedbackComplaints.FindAsync(id);
+            if (issueInDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(issueInDb);
+        }*/
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Optional but recommended for security
+        [Route("FeedbackComplaint/ReplyToFeedback")]
+        public async Task<IActionResult> ReplyToFeedback(int id, string replyMessage)
+        {
+            var feedback = await _context.FeedbackComplaints.FindAsync(id);
+
+            if (feedback == null)
+            {
+                return NotFound(); // Return 404 if no feedback found
+            }
+
+            feedback.AdminReply = replyMessage;
+            await _context.SaveChangesAsync(); // Save the reply
+
+            return RedirectToAction("AdminView"); // Redirect back to admin view
+        }
+
+
     }
 }

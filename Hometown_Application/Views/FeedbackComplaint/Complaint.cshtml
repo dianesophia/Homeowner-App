@@ -11,7 +11,7 @@
 <h1>Complaint</h1>
 
 
-<form id="ComplaintForm" asp-action="FeedbackForm" asp-controller="FeedbackComplaint" enctype="multipart/form-data" onsubmit="return validateForm()">
+<form id="ComplaintForm" asp-action="ComplaintForm" asp-controller="FeedbackComplaint" enctype="multipart/form-data" onsubmit="return validateForm()">
     <input hidden class="form-control" type="number" name="FeedbackComplaintId" />
     <input type="hidden" name="UserId" value="@user?.Id" />
     <input hidden class="form-control" value="Feedback" />

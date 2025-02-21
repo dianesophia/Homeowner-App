@@ -8,7 +8,7 @@
 @{  if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
     {
     <h3>Admin Dashboard</h3>
-        <a asp-controller="UserManagement" asp-action="Index" class="btn btn-secondary">User Management</a>
+        <a asp-controller="ManageUsers" asp-action="Index" class="btn btn-secondary">Manage Users</a>
          
     }
 
