@@ -23,10 +23,19 @@ namespace Hometown_Application.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var feedbackComplaints = await _context.FeedbackComplaints
+                .Include(f => f.Status)
+                .Include(f => f.ApplicationUser)
+                .ToListAsync();
+
+            var statuses = await _context.Status.ToListAsync();
+            ViewBag.Statuses = statuses;
+
+            return View(feedbackComplaints);
         }
+
 
         public IActionResult Feedback()
         {
@@ -128,48 +137,85 @@ namespace Hometown_Application.Controllers
       public async Task<IActionResult> AdminView()
         {
             var feedbackComplaints = await _context.FeedbackComplaints
-                .Include(f => f.Status) 
+                .Include(f => f.Status)
+                .Include(f => f.ApplicationUser)
+                 .Include(f => f.Status)
                 .ToListAsync();
 
             return View(feedbackComplaints); 
         }
-     
 
-     /*   [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AdminView(int? id)
-        {
-            if (id == null)
-            {
-                return View(new FeedbackComplaintModel());
-            }
 
-            var issueInDb = await _context.FeedbackComplaints.FindAsync(id);
-            if (issueInDb == null)
-            {
-                return NotFound();
-            }
+        /*   [Authorize(Roles = "Admin")]
+           public async Task<IActionResult> AdminView(int? id)
+           {
+               if (id == null)
+               {
+                   return View(new FeedbackComplaintModel());
+               }
 
-            return View(issueInDb);
-        }*/
+               var issueInDb = await _context.FeedbackComplaints.FindAsync(id);
+               if (issueInDb == null)
+               {
+                   return NotFound();
+               }
+
+               return View(issueInDb);
+           }*/
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // Optional but recommended for security
-        [Route("FeedbackComplaint/ReplyToFeedback")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReplyToFeedback(int id, string replyMessage)
         {
             var feedback = await _context.FeedbackComplaints.FindAsync(id);
 
             if (feedback == null)
             {
-                return NotFound(); // Return 404 if no feedback found
+                return NotFound(); 
             }
 
             feedback.AdminReply = replyMessage;
-            await _context.SaveChangesAsync(); // Save the reply
+            feedback.UpdatedOn = DateTime.UtcNow;
+            feedback.StatusId = 4;
 
-            return RedirectToAction("AdminView"); // Redirect back to admin view
+            _context.Update(feedback); 
+            await _context.SaveChangesAsync(); 
+
+            return RedirectToAction("AdminView"); 
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateStatus(int id, string status)
+        {
+            var fcDb = await _context.FeedbackComplaints.FindAsync(id);
+            if (fcDb == null) return NotFound();
+
+            var statusEntity = await _context.Status.FirstOrDefaultAsync(s => s.StatusName == status);
+            if (statusEntity == null) return BadRequest("Invalid status.");
+
+            fcDb.StatusId = statusEntity.StatusId;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+
+
+
+        [HttpPost]
+        public IActionResult AddNote(int id, string note)
+        {
+            var feedback = _context.FeedbackComplaints.Find(id);
+            if (feedback != null)
+            {
+                feedback.AdminNote = note;
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
+
 
 
     }
