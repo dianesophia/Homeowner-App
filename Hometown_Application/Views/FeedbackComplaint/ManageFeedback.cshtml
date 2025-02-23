@@ -1,0 +1,185 @@
+﻿@model List<Hometown_Application.Models.FeedbackComplaintModel>
+
+@{
+    ViewData["Title"] = "Feedback Management";
+}
+
+
+<h1 class="text-center mb-4">Feedback Management</h1>
+
+<div class="container">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="feedbackTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab">Pending</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="onprogress-tab" data-bs-toggle="tab" href="#onprogress" role="tab">In Progress</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="resolved-tab" data-bs-toggle="tab" href="#resolved" role="tab">Resolved</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="canceled-tab" data-bs-toggle="tab" href="#canceled" role="tab">Closed</a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="feedbackTabContent">
+        @foreach (var status in new[] { "Pending", "In Progress", "Resolved", "Closed" })
+        {
+            string tabId = status switch
+            {
+                "In Progress" => "onprogress",
+                "Closed" => "canceled",
+                _ => status.ToLower().Replace(" ", "")
+            };
+
+            <div class="tab-pane fade @(status == "Pending" ? "show active" : "")" id="@tabId" role="tabpanel">
+                <h2 class="mb-3">@status Feedback</h2>
+
+                @foreach (var item in Model.Where(f => f.Status.StatusName == status && f.Type == "Feedback"))
+                {
+                    <div class="card border-primary mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">@item.Title</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>User:</strong> @(item.ApplicationUser != null ? $"{item.ApplicationUser.FirstName} {item.ApplicationUser.LastName}" : "Unknown")</p>
+                            <p class="card-text"><small class="text-muted"> @item.AddedOn.ToString("MMMM dd, yyyy")</small></p>
+                            <p class="card-text">@item.Message</p>
+                            <p><strong>@item.Status?.StatusName</strong></p>
+
+                            @if (item.Image != null)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.Image)" alt="Feedback Image" width="100" height="100" />
+                            }
+                            else
+                            {
+                                <span>No Image</span>
+                            }
+
+                            <!-- Admin Reply -->
+                            @if (!string.IsNullOrEmpty(item.AdminReply))
+                            {
+                                <div class="alert alert-info p-2 mt-3">
+                                    <strong>Admin Reply:</strong> @item.AdminReply
+                                </div>
+                            }
+
+                            <!-- Admin Note -->
+                            @if (!string.IsNullOrEmpty(item.AdminNote))
+                            {
+                                <div class="alert alert-warning p-2 mt-3">
+                                    <strong>Admin Note:</strong> @item.AdminNote
+                                </div>
+                            }
+
+                            <hr />
+
+                            <!-- Status Update Form -->
+                            <form asp-action="FeedbackUpdateStatus" asp-controller="FeedbackComplaint" method="post" class="status-form">
+                                <input type="hidden" name="id" value="@item.FeedbackComplaintId" />
+                                <div class="form-group mb-3">
+                                    <label class="fw-bold">Change Status:</label>
+                                    <select class="form-control form-control-sm status-dropdown" name="newStatus" required>
+                                        <option value="Pending" selected="@(item.Status.StatusName == "Pending")">Pending</option>
+                                        <option value="In Progress" selected="@(item.Status.StatusName == "In Progress")">In Progress</option>
+                                        <option value="Resolved" selected="@(item.Status.StatusName == "Resolved")">Resolved</option>
+                                        <option value="Closed" selected="@(item.Status.StatusName == "Closed")">Closed</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
+                            </form>
+
+                            <!-- Open Reply Modal Button -->
+                            <button type="button" class="btn btn-success btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#replyModal-@item.FeedbackComplaintId">
+                                Reply
+                            </button>
+
+                            <!-- Open Note Modal Button -->
+                            <button type="button" class="btn btn-warning btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#noteModal-@item.FeedbackComplaintId">
+                                Add Note
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reply Modal -->
+                    <div class="modal fade" id="replyModal-@item.FeedbackComplaintId" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Admin Reply</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form asp-action="ReplyToFeedback" asp-controller="FeedbackComplaint" method="post">
+                                        <input type="hidden" name="id" value="@item.FeedbackComplaintId" />
+                                        <div class="form-group">
+                                            <label class="fw-bold">Admin Reply:</label>
+                                            <textarea class="form-control" name="replyMessage" required>@item.AdminReply</textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success mt-2">Send Reply</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Note Modal -->
+                    <div class="modal fade" id="noteModal-@item.FeedbackComplaintId" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Admin Note</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form asp-action="FeedbackAddNote" asp-controller="FeedbackComplaint" method="post">
+                                        <input type="hidden" name="id" value="@item.FeedbackComplaintId" />
+                                        <div class="form-group">
+                                            <label class="fw-bold">Admin Note:</label>
+                                            <textarea class="form-control" name="note">@item.AdminNote</textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-warning mt-2">Add Note</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (!Model.Any(f => f.Status.StatusName == status && f.Type == "Feedback"))
+                {
+                    <p class="text-muted">No @status feedback available.</p>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Script to switch to the updated tab -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let statusForms = document.querySelectorAll(".status-form");
+        statusForms.forEach(form => {
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                let selectedStatus = this.querySelector(".status-dropdown").value;
+                let tabId = selectedStatus.toLowerCase().replace(" ", "");
+                if (selectedStatus === "In Progress") tabId = "onprogress";
+                if (selectedStatus === "Closed") tabId = "canceled";
+
+                // Set active tab
+                document.querySelector('.nav-link.active').classList.remove('active');
+                document.querySelector(`#${tabId}-tab`).classList.add('active');
+
+                // Show corresponding tab content
+                document.querySelector('.tab-pane.show.active').classList.remove('show', 'active');
+                document.querySelector(`#${tabId}`).classList.add('show', 'active');
+
+                // Submit form
+                form.submit();
+            });
+        });
+    });
+</script>

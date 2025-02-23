@@ -9,7 +9,8 @@
     {
     <h3>Admin Dashboard</h3>
         <a asp-controller="ManageUsers" asp-action="Index" class="btn btn-secondary">Manage Users</a>
-         
+        <a asp-controller="FeedbackComplaint" asp-action="ManageFeedback" class="btn btn-secondary">Manage Feedback</a>
+        <a asp-controller="FeedbackComplaint" asp-action="ManageComplaint" class="btn btn-secondary">Manage Complaint</a>
     }
 
     else if (SignInManager.IsSignedIn(User) && User.IsInRole("Staff"))
@@ -20,7 +21,9 @@
     <a asp-controller="Contact" asp-action="Index" class="btn btn-secondary">View Contacts</a>
     <a asp-controller="Event" asp-action="Index" class="btn btn-secondary">Calendar</a>
     <a asp-controller="Document" asp-action="FileDownload" class="btn btn-secondary">File</a>
-    <a asp-controller="FeedbackComplaint" asp-action="Index" class="btn btn-secondary">Issues</a>
+    //<a asp-controller="FeedbackComplaint" asp-action="Index" class="btn btn-secondary">Issues</a>
+    <a asp-controller="FeedbackComplaint" asp-action="Feedback" class="btn btn-secondary">Feedback</a>
+    <a asp-controller="FeedbackComplaint" asp-action="Complaint" class="btn btn-secondary">Complaint</a>
 
 
 }

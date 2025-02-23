@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class feedback : Migration
+    public partial class Orange : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -247,6 +247,8 @@ namespace Hometown_Application.Migrations
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Message = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
+                    AdminReply = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdminNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -267,7 +269,7 @@ namespace Hometown_Application.Migrations
                         column: x => x.StatusId,
                         principalTable: "Status",
                         principalColumn: "StatusId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
