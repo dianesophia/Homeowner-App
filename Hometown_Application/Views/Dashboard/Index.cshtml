@@ -1,29 +1,407 @@
-﻿@using Hometown_Application.Areas.Identity.Data
+﻿<!--DASHBOARD INDEX-->
+
+@model Hometown_Application.Models.DashboardViewModel
+@using Hometown_Application.Areas.Identity.Data
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<h1>Dashboard</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6F754E;
+            --primary-light: #8a916a;
+            --secondary-color: #A08D67;
+            --background-color: #E6DDC4;
+            --text-color: #2F3A31;
+            --card-bg: #FFFFFF;
+            --danger-color: #dc3545;
+            --success-color: #198754;
+            --border-radius: 16px;
+            --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-@{  if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
-    {
-    <h3>Admin Dashboard</h3>
-        <a asp-controller="ManageUsers" asp-action="Index" class="btn btn-secondary">Manage Users</a>
-        <a asp-controller="FeedbackComplaint" asp-action="ManageFeedback" class="btn btn-secondary">Manage Feedback</a>
-        <a asp-controller="FeedbackComplaint" asp-action="ManageComplaint" class="btn btn-secondary">Manage Complaint</a>
-    }
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            min-height: 100px;
+            padding: 15px 20px;
+            font-family: 'Marcellus', serif;
+        }
 
-    else if (SignInManager.IsSignedIn(User) && User.IsInRole("Staff"))
-    {
-        <h3>Staff Dashboard</h3>
-    }
+        .navbar-brand {
+            font-size: 1.2rem;
+            font-weight: normal;
+            color: white;
+        }
 
-    <a asp-controller="Contact" asp-action="Index" class="btn btn-secondary">View Contacts</a>
-    <a asp-controller="Event" asp-action="Index" class="btn btn-secondary">Calendar</a>
-    <a asp-controller="Document" asp-action="FileDownload" class="btn btn-secondary">File</a>
-    //<a asp-controller="FeedbackComplaint" asp-action="Index" class="btn btn-secondary">Issues</a>
-    <a asp-controller="FeedbackComplaint" asp-action="Feedback" class="btn btn-secondary">Feedback</a>
-    <a asp-controller="FeedbackComplaint" asp-action="Complaint" class="btn btn-secondary">Complaint</a>
+            .navbar-brand:hover {
+                transform: scale(1.05);
+            }
+
+        .navbar-nav .nav-link {
+            color: white;
+            font-weight: 500;
+            margin: 0 10px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+            .navbar-nav .nav-link:hover {
+                background: var(--primary-light);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .user-info {
+            background: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+            .user-info i {
+                font-size: 1.2rem;
+            }
+
+        .content {
+            flex: 1;
+        }
+
+        /* Prevent content from being hidden under the fixed header */
+        body {
+            padding-top: 100px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Marcellus', serif;
+            min-height: 100vh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
 
-}
+        .dashboard-header {
+            margin-top: 150px;
+            margin-bottom: 40px;
+
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+
+        .dashboard-subtitle {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.15);
+            }
+
+        .stat-icon {
+            background: rgba(111, 117, 78, 0.1);
+            height: 80px;
+            width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .trend-up {
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            color: var(--danger-color);
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+
+        .quick-actions {
+            margin-top: 60px;
+            margin-bottom: 150px;
+            padding: 0 25px;
+        }
+
+            .quick-actions h2 {
+                font-size: 2.2rem;
+                color: var(--text-color);
+                margin-bottom: 30px;
+                position: relative;
+                display: inline-block;
+                padding-bottom: 10px;
+            }
+                .quick-actions h2:after {
+                    content: '';
+                    bottom: 0;
+                    left: 0;
+                    left: 0;
+                    width: 60px;
+                    height: 3px;
+                    background-color: var(--primary-color);
+                }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+            .action-card:before {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: var(--primary-color);
+                transform: scaleX(0);
+                transition: transform 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+                transform-origin: right;
+            }
+
+            .action-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+                color: var(--text-color);
+            }
+
+                .action-card:hover:before {
+                    transform: scaleX(1);
+                    transform-origin: left;
+                }
+
+                .action-card:hover .action-icon {
+                    color: var(--primary-color);
+                    transform: translateY(-5px) scale(1.1);
+                }
+
+        .action-icon {
+            font-size: 2.4rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+            height: 60px;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-card h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 0;
+            transition: var(--transition);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-home me-2"></i>
+                Golden Haven
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var user = await UserManager.GetUserAsync(User);
+                        if (user != null)
+                        {
+                            <li class="nav-item">
+                                <div class="user-info">
+                                    <i class="fas fa-user"></i>
+                                    <span>@user.FirstName @user.LastName</span>
+                                </div>
+                            </li>
+                        }
+                    }
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="UserManagement" asp-action="Index"><i class="fas fa-users-cog me-2"></i>User Management</a></li>
+                        }
+                    }
+                    <li class="nav-item"><a class="nav-link" asp-controller="Contact" asp-action="Index"><i class="fas fa-address-book me-2"></i>Contacts</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Event" asp-action="Index"><i class="fas fa-calendar me-2"></i>Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="Index"><i class="fas fa-upload me-2"></i>Upload</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="FileDownload"><i class="fas fa-download me-2"></i>Download</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="FeedbackComplaint" asp-action="Index"><i class="fas fa-exclamation-circle me-2"></i>Issues</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Welcome Back!</h1>
+            <p class="dashboard-subtitle">Here's your dashboard overview</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <i class="fas fa-users stat-icon"></i>
+                <div class="stat-number">@Model.TotalUsers</div>
+                <div class="stat-label">Total Users</div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12% this month</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-exclamation-circle stat-icon"></i>
+                <div class="stat-number">@Model.ActiveIssues</div>
+                <div class="stat-label">Active Issues</div>
+                <div class="stat-trend trend-down">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>5% this week</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-file-alt stat-icon"></i>
+                <div class="stat-number">@Model.TotalDocuments</div>
+                <div class="stat-label">Documents</div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8% this month</span>
+                </div>
+            </div>
+    <a asp-controller="FeedbackComplaint" asp-action="Index" class="btn btn-secondary">Issues</a>
+
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-grid">
+                <a href="Contact" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h3>New Contact</h3>
+                </a>
+                <a href="Event" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h3>Schedule Event</h3>
+                </a>
+                <a href="Document" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <h3>Upload Document</h3>
+                </a>
+                <a href="FeedbackComplaint" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <h3>Report Issue</h3>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

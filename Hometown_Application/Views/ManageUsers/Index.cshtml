@@ -1,32 +1,220 @@
 ﻿@model IEnumerable<(Hometown_Application.Areas.Identity.Data.ApplicationUser User, string Role)>
+@using Hometown_Application.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
-<h1>User Management</h1>
-
-<h1>Admin Access Only</h1>
-
-<a asp-controller="ManageUsers" asp-action="ChangeRole" class="btn btn-secondary">Change Role</a>
-
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Username</th>
-            <th>Role</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.User.FirstName</td>
-                <td>@item.User.LastName</td>
-                <td>@item.User.Email</td>
-                <td>@item.User.UserName</td>
-                <td>@item.Role</td> <!-- Role from tuple -->
-            </tr>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6F754E;
+            --primary-light: #8a916a;
+            --secondary-color: #A08D67;
+            --background-color: #E6DDC4;
+            --text-color: #2F3A31;
+            --card-bg: #FFFFFF;
+            --danger-color: #dc3545;
+            --success-color: #198754;
+            --border-radius: 16px;
+            --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
-    </tbody>
-</table>
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            min-height: 100px;
+            padding: 15px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 1.2rem;
+            font-weight: normal;
+            color: white;
+            padding-left: 12px;
+        }
+
+            .navbar-brand:hover {
+                transform: scale(1.05);
+            }
+
+        .navbar-nav .nav-link {
+            color: white;
+            font-weight: 500;
+            margin: 0 10px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+            .navbar-nav .nav-link:hover {
+                background: var(--primary-light);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .user-info {
+            background: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .user-info i {
+                font-size: 1.2rem;
+            }
+
+        .content {
+            padding: 100px 40px 40px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .users-table {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 40px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .role-admin {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .role-user {
+            background-color: var(--primary-light);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-home me-2"></i>
+                Golden Haven
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var user = await UserManager.GetUserAsync(User);
+                        if (user != null)
+                        {
+                            <div class="nav-item">
+                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                    <i class="fas fa-user"></i>
+                                    <span>@user.FirstName @user.LastName</span>
+                                </a>
+                            </div>
+                        }
+                    }
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <div class="user-info @(ViewContext.RouteData.Values["Controller"]?.ToString() == "UserManagement" ? "active-tab" : "")">
+                                    <i class="fas fa-users-cog me-2"></i>
+                                    <span>User Management</span>
+                                </div>
+                            </li>
+                        }
+                    }
+                    <li class="nav-item"><a class="nav-link" asp-controller="Contact" asp-action="Index"><i class="fas fa-address-book me-2"></i>Contacts</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Event" asp-action="Index"><i class="fas fa-calendar me-2"></i>Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="Index"><i class="fas fa-upload me-2"></i>Upload</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="FileDownload"><i class="fas fa-download me-2"></i>Download</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="FeedbackComplaint" asp-action="Index"><i class="fas fa-exclamation-circle me-2"></i>Issues</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>User Management</h1>
+            <a asp-controller="UserManagement" asp-action="ChangeRole" class="btn btn-secondary">
+                <i class="fas fa-user-cog"></i> Change Role
+            </a>
+        </div>
+
+        <div class="users-table table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.User.FirstName</td>
+                            <td>@item.User.LastName</td>
+                            <td>@item.User.Email</td>
+                            <td>@item.User.UserName</td>
+                            <td>
+                                <span class="role-badge @(item.Role == "Admin" ? "role-admin" : "role-user")">
+                                    @item.Role
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

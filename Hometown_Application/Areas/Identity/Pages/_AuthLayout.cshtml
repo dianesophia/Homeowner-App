@@ -1,46 +1,164 @@
-﻿﻿@{
+﻿@{
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center">
-    <div class="col-5 mt-5">
-        <div class="card login-logout-card">
-            <div class="card-header">
-                <ul class="nav nav-tabs card-header-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Identity/Account/Login">
-                            Log In
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Identity/Account/Register">
-                            Register
-                        </a>
-                    </li>
-                </ul>
+<!-- Import Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+    /* Color Palette */
+    :root {
+        --primary-color: #6F754E; /* Earthy Green */
+        --secondary-color: #A08D67; /* Gold/Bronze Accent */
+        --background-color: #E6DDC4; /* Warm Beige */
+        --text-color: #2F3A31; /* Dark Greenish Gray */
+        --card-bg: #FFFFFF;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* General Styles */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Playfair Display', serif;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Main Content Area */
+    .main-content {
+        flex: 1;
+        padding: 80px 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Card Styling */
+    .login-logout-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .login-logout-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .card-header {
+        background: var(--primary-color);
+        color: white;
+        text-align: center;
+        font-weight: 600;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        padding: 15px;
+    }
+
+    /* Navbar Tabs */
+    .nav-tabs {
+        border-bottom: none;
+        display: flex;
+        justify-content: space-around;
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 8px;
+    }
+
+        .nav-tabs .nav-link {
+            color: white;
+            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            transition: all 0.3s ease;
+        }
+
+            .nav-tabs .nav-link.active, .nav-tabs .nav-link:hover {
+                background: var(--primary-color);
+                color: #FFF;
+            }
+
+    /* Button Aesthetic */
+    .btn-primary {
+        background: var(--primary-color);
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 14px 24px;
+        font-weight: 600;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+
+    /* Image Styling */
+    .image-container img {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--border-radius);
+        object-fit: cover;
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .image-container img:hover {
+            transform: scale(1.05);
+        }
+
+</style>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container d-flex align-items-center">
+        <div class="row w-100 justify-content-center g-4">
+            <!-- Left Column (Image) -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                <div class="image-container">
+                    <img src="~/images/picc.png" alt="Elegant Illustration" class="img-fluid">
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row justify-content-center">
-                    <div class="col-10 my-4">
-                        @RenderBody()
+
+            <!-- Right Column (Login/Register Card) -->
+            <div class="col-md-6">
+                <div class="card login-logout-card">
+                    <div class="card-body">
+                        <ul class="nav nav-tabs card-header-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link @(Context.Request.Path == "/Identity/Account/Login" ? "active" : "")" href="/Identity/Account/Login">Log In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(Context.Request.Path == "/Identity/Account/Register" ? "active" : "")" href="/Identity/Account/Register">Register</a>
+                            </li>
+                        </ul>
+
+                        <div class="row justify-content-center mt-3">
+                            <div class="col-11">
+                                @RenderBody()
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</main>
 
 @section Scripts {
     @await RenderSectionAsync("Scripts", required: false)
-    <script>
-        $(function () {
-            const currentPage = location.pathname;
-            $('.nav-tabs li a').each(function () {
-                const $this = $(this);
-                if (currentPage.toLowerCase().indexOf($this.attr('href').toLowerCase()) !== -1) {
-                    $this.addClass('active');
-                }
-            })
-        })
-    </script>
 }
