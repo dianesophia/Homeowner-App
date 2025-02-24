@@ -28,13 +28,13 @@ namespace Hometown_Application.Controllers
         public async Task<IActionResult> Index()
         {
             var totalUsers = await _userManager.Users.CountAsync();
-            var activeIssues = await _context.FeedbackComplaints.Where(f => f.Status == "Open").CountAsync();
+            //var activeIssues = await _context.FeedbackComplaints.Where(f => f.Status == "Open").CountAsync();
             var totalDocuments = await _context.Documents.CountAsync();
 
             var model = new DashboardViewModel
             {
                 TotalUsers = totalUsers,
-                ActiveIssues = activeIssues,
+                //ActiveIssues = activeIssues,
                 TotalDocuments = totalDocuments
             };
 
