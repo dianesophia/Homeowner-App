@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Hometown_Application.Models.ReservationModel>
+
+<h2>My Reservations</h2>
+<a asp-action="Create" class="btn btn-primary">Reserve a Facility</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Facility</th>
+            <th>Status</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var res in Model)
+        {
+            <tr>
+                <td>@res.Facility</td>
+                <td>@res.Status</td>
+                <td>@res.StartTime</td>
+                <td>@res.EndTime</td>
+                <td>
+                    <a asp-action="Cancel" asp-route-id="@res.Id" onclick="return confirm('Cancel this reservation?')">Cancel</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -9,12 +9,19 @@
     {
     <h3>Admin Dashboard</h3>
         <a asp-controller="UserManagement" asp-action="Index" class="btn btn-secondary">User Management</a>
+        <a asp-controller="Facility" asp-action="Index" class="btn btn-primary">Facility Management</a>
+        <a asp-controller="Reservation" asp-action="AdminView" class="btn btn-primary">Reservation Management</a>
          
     }
 
     else if (SignInManager.IsSignedIn(User) && User.IsInRole("Staff"))
     {
         <h3>Staff Dashboard</h3>
+    }
+
+    if (SignInManager.IsSignedIn(User))
+    {
+        <a asp-controller="Reservation" asp-action="Index" class="btn btn-primary">My Reservations</a>
     }
 
     <a asp-controller="Contact" asp-action="Index" class="btn btn-secondary">View Contacts</a>

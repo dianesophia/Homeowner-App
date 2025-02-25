@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Hometown_Application.Models.FacilityModel>
+
+@{
+    ViewData["Title"] = "Facilities";
+}
+
+<h2>Facilities</h2>
+
+<p>
+    <a asp-action="CreateOrEditFacility" class="btn btn-success">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Capacity</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImagePath))
+                    {
+                        <img src="@item.ImagePath" alt="Facility Image" class="img-thumbnail" style="max-width: 100px;" />
+                    }
+                </td>
+                <td>@item.Name</td>
+                <td>@item.Type</td>
+                <td>@item.Capacity</td>
+                <td>@item.Description</td>
+                <td>
+                    <a asp-action="CreateOrEditFacility" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

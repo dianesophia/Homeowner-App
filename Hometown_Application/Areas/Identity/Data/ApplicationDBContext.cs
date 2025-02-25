@@ -17,8 +17,24 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<DocumentModel> Documents { get; set; }
     public DbSet<ContactModel> Contacts { get; set; }
     public DbSet<StatusModel> Status { get; set; }
+    public DbSet<ReservationModel> Reservation { get; set; }
+    public DbSet<FacilityModel> Facility { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        base.OnModelCreating(builder);
+        builder.Entity<ReservationModel>()
+            .HasOne(r => r.Facility)
+            .WithMany()
+            .HasForeignKey(r => r.FacilityId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        base.OnModelCreating(builder);
+        builder.Entity<ReservationModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
+
         base.OnModelCreating(builder);
         builder.Entity<FeedbackComplaintModel>()
            .HasOne(fc => fc.ApplicationUser)

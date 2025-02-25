@@ -1,0 +1,28 @@
+﻿<form asp-action="CreateOrEditFacility" method="post">
+    <div class="form-group">
+        <label for="facilityName">Name</label>
+        <input type="text" id="facilityName" name="Name" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="facilityType">Type</label>
+        <input type="text" id="facilityType" name="Type" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="facilityCapacity">Capacity</label>
+        <input type="number" id="facilityCapacity" name="Capacity" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="facilityDescription">Description</label>
+        <textarea id="facilityDescription" name="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="facilityImage">Facility Image</label>
+        <input type="file" id="facilityImage" name="FacilityImage" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
