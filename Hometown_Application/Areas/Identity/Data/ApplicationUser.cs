@@ -17,6 +17,9 @@ public class ApplicationUser : IdentityUser
     [Column(TypeName = "nvarchar(100)")]
     public string LastName { get; set; }
 
+    public byte[]? ProfilePicture { get; set; }
+
+    public string HomeNumber { get; set; }
     //home number
 }
 
