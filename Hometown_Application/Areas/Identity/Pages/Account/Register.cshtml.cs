@@ -90,7 +90,7 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
             public string Email { get; set; }
 
             [Required]
-            [EmailAddress]
+            [Phone]
             [Display(Name = "HomeNumber")]
             public string HomeNumber { get; set; }
 
