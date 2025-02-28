@@ -45,7 +45,11 @@ namespace Hometown_Application.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Profile Picture")]
             public IFormFile ProfilePictureFile { get; set; }
 
+            public string? Bio { get; set; }
+
             public byte[] ProfilePicture { get; set; }
+            public string? Gender { get; set; }
+            public bool IsGenderPublic { get; set; } = false;
         }
 
         private async Task LoadAsync(ApplicationUser user)

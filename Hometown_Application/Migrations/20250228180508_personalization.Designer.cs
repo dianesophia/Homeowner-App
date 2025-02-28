@@ -4,6 +4,7 @@ using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250228180508_personalization")]
+    partial class personalization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace Hometown_Application.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -90,12 +93,6 @@ namespace Hometown_Application.Migrations
                     b.Property<bool>("IsAlsoHomeOwner")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsBirthdayPublic")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsGenderPublic")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsPromotedToAdmin")
                         .HasColumnType("bit");
 
@@ -117,9 +114,6 @@ namespace Hometown_Application.Migrations
 
                     b.Property<int?>("LotNumber")
                         .HasColumnType("int");
-
-                    b.Property<bool>("MakeFacebookPublic")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("MoveInDate")
                         .HasColumnType("datetime2");

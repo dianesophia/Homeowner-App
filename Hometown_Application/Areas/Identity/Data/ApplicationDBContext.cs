@@ -3,6 +3,7 @@ using Hometown_Application.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Hometown_Application.Data;
 
@@ -12,6 +13,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+
     public DbSet<FeedbackComplaintModel> FeedbackComplaints { get; set; }
     public DbSet<EventModel> Events { get; set; }
     public DbSet<DocumentModel> Documents { get; set; }
@@ -47,6 +49,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .HasForeignKey(fc => fc.StatusId)
         .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<ApplicationUser>()
+        .Property(u => u.Salary)
+        .HasColumnType("decimal(18,2)");
 
+        builder.Entity<ApplicationUser>()
+        .Property(u => u.DateOfBirth )
+        .HasColumnType("date");
     }
 }
