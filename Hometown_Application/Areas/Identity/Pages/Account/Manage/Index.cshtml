@@ -5,17 +5,38 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
+<!-- Include Cropper.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
 <h3 class="mb-4 text-primary text-center">@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 
+<!-- Unified Profile Card -->
 <div class="row justify-content-center">
-    <!-- Left Column: Profile Form -->
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div class="card shadow-lg border-0 rounded-4 p-4">
             <div class="card-body">
                 <h5 class="card-title text-center text-secondary mb-4">Edit Profile</h5>
-                <form id="profile-form" method="post">
+
+                <form id="profile-form" method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                    <!-- Profile Picture Section -->
+                    <div class="text-center mb-4">
+                        <img id="profilePicture" class="img-thumbnail rounded-circle shadow-sm"
+                             style="width: 200px; height: 200px; object-fit: cover;"
+                             src="@((Model.Input.ProfilePicture != null) ?
+                                    $"data:image/*;base64,{Convert.ToBase64String(Model.Input.ProfilePicture)}" :
+                                    "https://via.placeholder.com/200")">
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="form-group">
+                        <label asp-for="Input.ProfilePictureFile"></label>
+                        <input type="file" id="ProfilePictureFile" asp-for="Input.ProfilePictureFile" class="form-control" />
+                        <span asp-validation-for="Input.ProfilePictureFile" class="text-danger"></span>
+                    </div>
 
                     <!-- Username (Read-Only) -->
                     <div class="form-floating mb-3">
@@ -30,40 +51,28 @@
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
 
+                    <!-- Save Button -->
                     <button id="update-profile-button" type="submit" class="btn btn-primary w-100 fw-bold">Save Changes</button>
                 </form>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Right Column: Profile Picture Upload -->
-    <div class="col-md-6 mt-4 mt-md-0">
-        <div class="card shadow-lg border-0 rounded-4 p-4 text-center">
-            <div class="card-body">
-                <h5 class="card-title text-secondary mb-4">Profile Picture</h5>
-
-                <div class="mb-3">
-                    @if (Model.Input.ProfilePicture != null)
-                    {
-                        <img id="profilePicture" class="img-thumbnail rounded-circle shadow-sm"
-                             style="width: 180px; height: 180px; object-fit: cover;"
-                             src="data:image/*;base64,@(Convert.ToBase64String(Model.Input.ProfilePicture))">
-                    }
-                    else
-                    {
-                        <img id="profilePicture" class="img-thumbnail rounded-circle shadow-sm"
-                             style="width: 180px; height: 180px; object-fit: cover;"
-                             src="https://via.placeholder.com/180">
-                    }
-                </div>
-
-                <!-- File Upload -->
-                <input type="file" accept=".jpg,.jpeg,.png,.gif"
-                       asp-for="Input.ProfilePicture" class="form-control mb-3"
-                       onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
-                <span asp-validation-for="Input.ProfilePicture" class="text-danger"></span>
-
-                <button type="submit" class="btn btn-secondary w-100 fw-bold">Upload New Picture</button>
+<!-- Bootstrap Modal for Cropper -->
+<div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="cropperImage" style="width: 90%; max-height: 80vh; object-fit: contain;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="cropButton" class="btn btn-primary">Crop & Save</button>
             </div>
         </div>
     </div>
@@ -72,3 +81,66 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let cropper;
+        const fileInput = document.getElementById('ProfilePictureFile');
+        const cropperImage = document.getElementById('cropperImage');
+        const profilePicture = document.getElementById('profilePicture');
+        const cropperModal = new bootstrap.Modal(document.getElementById('cropperModal'));
+        const cropButton = document.getElementById('cropButton');
+
+        fileInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    cropperImage.src = e.target.result;
+                    cropperModal.show();
+
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+
+                    cropper = new Cropper(cropperImage, {
+                        aspectRatio: 1,
+                        viewMode: 2,  // Ensures the image fits better
+                        autoCropArea: 1,  // Makes the crop area larger
+                        responsive: true,
+                        scalable: true,
+                        zoomable: true,
+                        minContainerWidth: 600,  // Wider cropper container
+                        minContainerHeight: 400, // Taller cropper container
+                    });
+
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        cropButton.addEventListener('click', function () {
+            if (!cropper) return;
+
+            const croppedCanvas = cropper.getCroppedCanvas({
+                width: 3000,  // Increase size for better quality
+                height: 3000
+            });
+
+            if (croppedCanvas) {
+                profilePicture.src = croppedCanvas.toDataURL('image/png');
+
+                croppedCanvas.toBlob(function (blob) {
+                    const file = new File([blob], "profile.png", { type: "image/png" });
+
+                    // Replace file input
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInput.files = dataTransfer.files;
+                });
+
+                cropperModal.hide();
+            }
+        });
+    });
+</script>

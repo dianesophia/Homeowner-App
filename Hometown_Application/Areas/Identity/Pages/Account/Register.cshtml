@@ -86,19 +86,84 @@
             </div>
         </div>
 
+        <!-- Searchable Block Dropdown -->
+        <div class="form-floating mb-3">
+            <select asp-for="Input.BlockNumber" class="form-control">
+                <option value="">Select Block</option>
+                <option value="aspen">Aspen Heights Block</option>
+                <option value="birch">Birch Haven Block</option>
+                <option value="cedar">Cedar Crest Block</option>
+                <option value="chestnut">Chestnut Grove Block</option>
+                <option value="crystal">Crystal Lake Block</option>
+                <option value="elm">Elmwood Block</option>
+                <option value="evergreen">Evergreen Haven Block</option>
+                <option value="golden">Golden Oaks Block</option>
+                <option value="harmony">Harmony Hills Block</option>
+                <option value="hawthorn">Hawthorn Valley Block</option>
+                <option value="laurel">Laurel Ridge Block</option>
+                <option value="magnolia">Magnolia Park Block</option>
+                <option value="maple">Maple Grove Block</option>
+                <option value="oak">Oakwood Block</option>
+                <option value="pine">Pinehurst Block</option>
+                <option value="rosewood">Rosewood Block</option>
+                <option value="serenity">Serenity Pines Block</option>
+                <option value="silver">Silver Springs Block</option>
+                <option value="spruce">Spruce Meadows Block</option>
+                <option value="willow">Willow Heights Block</option>
+            </select>
+            <label asp-for="Input.BlockNumber">Block</label>
+            <span asp-validation-for="Input.BlockNumber" class="text-danger"></span>
+        </div>
+
+        <!-- Lot Dropdown -->
+        <div class="form-floating mb-3">
+            <select asp-for="Input.LotNumber" class="form-control">
+                <option value="">Select Lot</option>
+                <option value="1">Lot 1</option>
+                <option value="2">Lot 2</option>
+                <option value="3">Lot 3</option>
+                <option value="4">Lot 4</option>
+                <option value="5">Lot 5</option>
+            </select>
+            <label asp-for="Input.LotNumber">Lot</label>
+            <span asp-validation-for="Input.LotNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select asp-for="Input.StreetName" class="form-control">
+                <option value="">Select Street</option>
+                <option value="ashwood">Ashwood Lane</option>
+                <option value="birch">Birchwood Avenue</option>
+                <option value="cedar">Cedar Hollow Road</option>
+                <option value="cherry">Cherry Blossom Street</option>
+                <option value="chestnut">Chestnut Boulevard</option>
+                <option value="crystal">Crystal Waters Drive</option>
+                <option value="elm">Elmwood Drive</option>
+                <option value="evergreen">Evergreen Parkway</option>
+                <option value="golden">Golden Leaf Street</option>
+                <option value="harmony">Harmony Crescent</option>
+                <option value="hawthorn">Hawthorn Meadows</option>
+                <option value="ivy">Ivy Lane</option>
+                <option value="jasmine">Jasmine Court</option>
+                <option value="laurel">Laurel Springs Road</option>
+                <option value="maple">Maplewood Avenue</option>
+                <option value="magnolia">Magnolia Terrace</option>
+                <option value="oak">Oakwood Lane</option>
+                <option value="pearl">Pearl River Road</option>
+                <option value="rosewood">Rosewood Lane</option>
+                <option value="willow">Willow Creek Drive</option>
+            </select>
+            <label asp-for="Input.StreetName">Street</label>
+            <span asp-validation-for="Input.StreetName" class="text-danger"></span>
+        </div>
+
+
         <!-- Email Field -->
         <div class="form-floating mb-3">
             <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
             <label asp-for="Input.Email">Email</label>
             <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
-
-        <div class="form-floating mb-3">
-            <input asp-for="Input.HomeNumber" class="form-control" autocomplete="tel" placeholder="Home Number" />
-            <label asp-for="Input.HomeNumber">Home Number</label>
-            <span asp-validation-for="Input.HomeNumber" class="text-danger"></span>
-        </div>
-
 
         <!-- Password Field -->
         <div class="form-floating mb-3">
@@ -113,6 +178,7 @@
             <label asp-for="Input.ConfirmPassword">Confirm Password</label>
             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
         </div>
+
         <!-- Submit Button -->
         <button id="registerSubmit" type="submit" class="btn btn-primary w-100">Register</button>
     </form>
@@ -121,3 +187,17 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+
+<script>
+    function filterBlocks() {
+        let input = document.getElementById("blockSearch").value.toLowerCase();
+        let select = document.getElementById("blockSelect");
+        let options = select.getElementsByTagName("option");
+
+        for (let i = 1; i < options.length; i++) {
+            let text = options[i].textContent.toLowerCase();
+            options[i].style.display = text.includes(input) ? "" : "none";
+        }
+    }
+</script>

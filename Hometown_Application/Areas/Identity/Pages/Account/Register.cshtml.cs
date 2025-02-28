@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hometown_Application.Areas.Identity.Pages.Account
 {
@@ -89,10 +90,17 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            [Required]
-            [Phone]
-            [Display(Name = "HomeNumber")]
-            public string HomeNumber { get; set; }
+
+            [PersonalData]
+            [Column(TypeName = "nvarchar(50)")]
+            public string BlockNumber { get; set; }
+
+            [PersonalData]
+            public int LotNumber { get; set; }
+
+            [PersonalData]
+            [Column(TypeName = "nvarchar(150)")]
+            public string StreetName { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -131,7 +139,11 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
 
                 user.FirstName = Input.FirstName; 
                 user.LastName = Input.LastName;
-                user.HomeNumber = Input.HomeNumber;
+                user.Email = Input.Email;
+                user.BlockNumber = Input.BlockNumber;
+                user.LotNumber = Input.LotNumber;
+                user.StreetName = Input.StreetName;
+              
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -140,6 +152,8 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    await _userManager.AddToRoleAsync(user, "HomeOwner");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

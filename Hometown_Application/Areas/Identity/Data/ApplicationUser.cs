@@ -19,7 +19,17 @@ public class ApplicationUser : IdentityUser
 
     public byte[]? ProfilePicture { get; set; }
 
-    public string HomeNumber { get; set; }
-    //home number
+    [PersonalData]
+    [Column(TypeName = "nvarchar(50)")]
+    public string? BlockNumber { get; set; }
+
+    [PersonalData]
+    public int? LotNumber { get; set; }
+
+    [PersonalData]
+    [Column(TypeName = "nvarchar(150)")]
+    public string? StreetName { get; set; }
+
+    
 }
 

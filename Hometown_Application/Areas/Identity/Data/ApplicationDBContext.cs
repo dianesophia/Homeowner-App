@@ -21,7 +21,10 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<IdentityRole>().ToTable("AspNetRoles").HasKey(r => r.Id);
+        builder.Entity<ApplicationUser>().ToTable("AspNetUsers").HasKey(u => u.Id);
 
+  
         builder.Entity<StatusModel>().HasData(
             new StatusModel { StatusId = 1, StatusName = "Available" },
             new StatusModel { StatusId = 2, StatusName = "Unavailable" },
