@@ -5,6 +5,7 @@ using Hometown_Application.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hometown_Application.Controllers
@@ -13,26 +14,27 @@ namespace Hometown_Application.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public CreateStaffController(ApplicationDBContext context, UserManager<ApplicationUser> userManager)
+        public CreateStaffController(ApplicationDBContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
-       
         public IActionResult Index()
         {
             return View(new CreateStaffViewModel());
         }
 
         public async Task<IActionResult> StaffList()
-        { 
-            var StaffProfiles = await _context.StaffProfiles
+        {
+            var staffProfiles = await _context.StaffProfiles
                 .Include(s => s.ApplicationUser)
                 .ToListAsync();
 
-            return View(StaffProfiles);
+            return View(staffProfiles);
         }
 
         [HttpPost]
@@ -56,7 +58,16 @@ namespace Hometown_Application.Controllers
                     return View(model);
                 }
 
-                // Step 2: Create a new StaffProfile linked to this user
+                // Step 2: Ensure the "Staff" role exists
+                if (!await _roleManager.RoleExistsAsync("Staff"))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("Staff"));
+                }
+
+                // Step 3: Assign the "Staff" role to the user
+                await _userManager.AddToRoleAsync(user, "Staff");
+
+                // Step 4: Create a new StaffProfile linked to this user
                 var staffProfile = new StaffProfileModel
                 {
                     UserId = user.Id, // Link to ApplicationUser
@@ -68,13 +79,10 @@ namespace Hometown_Application.Controllers
                 _context.StaffProfiles.Add(staffProfile);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Index", "StaffProfile"); // Redirect to staff list
+                return RedirectToAction("StaffList");
             }
 
             return View(model);
         }
-
-
-
     }
 }
