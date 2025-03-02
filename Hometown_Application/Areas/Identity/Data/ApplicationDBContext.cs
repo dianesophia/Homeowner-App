@@ -14,6 +14,8 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     {
     }
 
+    public DbSet<HomeownerProfileModel> HomeownerProfiles { get; set; }
+
     public DbSet<FeedbackComplaintModel> FeedbackComplaints { get; set; }
     public DbSet<EventModel> Events { get; set; }
     public DbSet<DocumentModel> Documents { get; set; }
@@ -36,6 +38,24 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             new StatusModel { StatusId = 6, StatusName = "Closed" }
         );
 
+        builder.Entity<HomeownerProfileModel>()
+          .HasOne(fc => fc.ApplicationUser)
+          .WithMany()
+          .HasForeignKey(fc => fc.UserId)
+          .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<StaffProfileModel>()
+        .HasOne(fc => fc.ApplicationUser)
+        .WithMany()
+        .HasForeignKey(fc => fc.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<AdminProfileModel>()
+        .HasOne(fc => fc.ApplicationUser)
+        .WithMany()
+        .HasForeignKey(fc => fc.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
         builder.Entity<FeedbackComplaintModel>()
            .HasOne(fc => fc.ApplicationUser)
            .WithMany()
@@ -49,12 +69,6 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .HasForeignKey(fc => fc.StatusId)
         .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Entity<ApplicationUser>()
-        .Property(u => u.Salary)
-        .HasColumnType("decimal(18,2)");
-
-        builder.Entity<ApplicationUser>()
-        .Property(u => u.DateOfBirth )
-        .HasColumnType("date");
+       
     }
 }

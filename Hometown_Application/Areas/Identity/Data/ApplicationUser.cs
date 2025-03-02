@@ -49,21 +49,21 @@ public class ApplicationUser : IdentityUser
     [Column(TypeName = "nvarchar(255)")]
     public string? LinkedInProfile { get; set; }
 
-    [PersonalData]
-    public bool ReceiveNewsletter { get; set; } = true; // If they want email updates
+    //[PersonalData]
+    //public bool ReceiveNewsletter { get; set; } = true; // If they want email updates
 
-    [PersonalData]
-    public bool ReceiveSMSAlerts { get; set; } = true; // If they want SMS notifications
+    //[PersonalData]
+    //public bool ReceiveSMSAlerts { get; set; } = true; // If they want SMS notifications
 
    
-    [PersonalData]
-    [Column(TypeName = "nvarchar(15)")]
-    public string? AlternatePhoneNumber { get; set; } // Additional contact number
+    //[PersonalData]
+    //[Column(TypeName = "nvarchar(15)")]
+    //public string? AlternatePhoneNumber { get; set; } // Additional contact number
 
   
 
     // ✅ Homeowner-Specific Information
-    [PersonalData]
+  /* [PersonalData]
     [Column(TypeName = "nvarchar(50)")]
     public string? BlockNumber { get; set; }
 
@@ -86,7 +86,7 @@ public class ApplicationUser : IdentityUser
 
     [PersonalData]
     public bool IsPromotedToAdmin { get; set; } = false; // homeOwner or staff to admin
-
+  
 
 
     // ✅ Staff & Admin Information
@@ -128,6 +128,7 @@ public class ApplicationUser : IdentityUser
     // ✅ Timestamps
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // When user was created
     public DateTime? UpdatedAt { get; set; } // Last updated timestamp
+  */
 
 
 

@@ -1,55 +1,146 @@
 ﻿@model IEnumerable<(Hometown_Application.Areas.Identity.Data.ApplicationUser User, string Role)>
+@using Hometown_Application.Data
+@inject ApplicationDBContext dbContext
 
-<h1>Change User Role</h1>
-<a asp-controller="ManageUsers" asp-action="Index" class="btn btn-secondary">Back</a>
+<h1 class="mb-4">Change User Role</h1>
+<a asp-controller="ManageUsers" asp-action="Index" class="btn btn-secondary mb-3">Back</a>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Username</th>
-            <th>Role</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.User.FirstName</td>
-                <td>@item.User.LastName</td>
-                <td>@item.User.Email</td>
-                <td>@item.User.UserName</td>
-                <td>
-               
-                    <form asp-action="ChangeRole" method="post" class="d-flex align-items-center gap-2">
-                        <input type="hidden" name="userId" value="@item.User.Id" />
+<!-- Bootstrap Tabs -->
+<ul class="nav nav-tabs mb-3" id="roleTabs">
+    <li class="nav-item">
+        <a class="nav-link active" id="admin-tab" data-bs-toggle="tab" href="#admin">Admins</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="staff-tab" data-bs-toggle="tab" href="#staff">Staff</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="homeowner-tab" data-bs-toggle="tab" href="#homeowner">Home Owners</a>
+    </li>
+</ul>
 
-                        <select name="newRole" class="form-select">
-                            <option selected disabled>@item.Role</option>
-                                @if (item.Role != "Staff")
-                                {
-                                <option value="Staff">Staff</option>
-                                }
-                                @if (item.Role != "Admin")
-                                {
-                                <option value="Admin">Admin</option>
-                                }
-                                @if (item.Role != "HomeOwner")
-                                {
-                                <option value="HomeOwner">Home Owner</option>
-                                }
-                        </select>
+<div class="tab-content">
+    @foreach (var role in new[] { "Admin", "Staff" })
+    {
+        var users = Model.Where(u => u.Role == role).OrderBy(u => u.User.FirstName);
 
-                        <button type="submit" class="btn btn-primary">Change</button>
-                    </form>
-               
+        <div class="tab-pane fade @(role == "Admin" ? "show active" : "")" id="@role.ToLower()">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover text-center align-middle">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in users)
+                        {
+                            <tr>
+                                <td>@item.User.FirstName</td>
+                                <td>@item.User.LastName</td>
+                                <td>@item.User.Email</td>
+                                <td>@item.User.UserName</td>
+                                <td>
+                                    <form asp-action="ChangeRole" method="post" class="d-flex align-items-center gap-2">
+                                        <input type="hidden" name="userId" value="@item.User.Id" />
+                                        <select name="newRole" class="form-select">
+                                            <option selected disabled>@item.Role</option>
+                                            @if (item.Role != "Staff")
+                                            {
+                                                <option value="Staff">Staff</option>
+                                            }
+                                            @if (item.Role != "Admin")
+                                            {
+                                                <option value="Admin">Admin</option>
+                                            }
+                                            @if (item.Role != "HomeOwner")
+                                            {
+                                                <option value="HomeOwner">Home Owner</option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-primary">Change</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
+    <!-- Home Owners Tab -->
+    <div class="tab-pane fade" id="homeowner">
+        <h3>Approved Home Owners</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center align-middle">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Where(u => u.Role == "HomeOwner" && dbContext.HomeownerProfiles.Any(h => h.UserId == u.User.Id && h.IsApproved)))
+                    {
+                        <tr>
+                            <td>@item.User.FirstName</td>
+                            <td>@item.User.LastName</td>
+                            <td>@item.User.Email</td>
+                            <td>@item.User.UserName</td>
+                            <td>
+                                <form asp-action="ChangeRole" method="post" class="d-flex align-items-center gap-2">
+                                    <input type="hidden" name="userId" value="@item.User.Id" />
+                                    <select name="newRole" class="form-select">
+                                        <option selected disabled>@item.Role</option>
+                                        <option value="Staff">Staff</option>
+                                        <option value="Admin">Admin</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">Change</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <h3 class="mt-4">Pending Approval</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center align-middle">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Approval</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Where(u => u.Role == "HomeOwner" && dbContext.HomeownerProfiles.Any(h => h.UserId == u.User.Id && !h.IsApproved)))
+                    {
+                        <tr>
+                            <td>@item.User.FirstName</td>
+                            <td>@item.User.LastName</td>
+                            <td>@item.User.Email</td>
+                            <td>@item.User.UserName</td>
+                            <td>
+                                <form asp-action="ApproveHomeowner" method="post" class="d-inline">
+                                    <input type="hidden" name="userId" value="@item.User.Id" />
+                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class Profile : Migration
+    public partial class Home : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,9 +35,16 @@ namespace Hometown_Application.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(100)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(100)", nullable: false),
                     ProfilePicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    BlockNumber = table.Column<string>(type: "nvarchar(50)", nullable: true),
-                    LotNumber = table.Column<int>(type: "int", nullable: true),
-                    StreetName = table.Column<string>(type: "nvarchar(150)", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    IsGenderPublic = table.Column<bool>(type: "bit", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsBirthdayPublic = table.Column<bool>(type: "bit", nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(500)", nullable: true),
+                    IsActiveUser = table.Column<bool>(type: "bit", nullable: false),
+                    FacebookProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    MakeFacebookPublic = table.Column<bool>(type: "bit", nullable: false),
+                    TwitterProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    LinkedInProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -155,6 +162,28 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AdminProfileModel",
+                columns: table => new
+                {
+                    AdminId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AdminRole = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    AppointedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsSuperAdmin = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdminProfileModel", x => x.AdminId);
+                    table.ForeignKey(
+                        name: "FK_AdminProfileModel_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -240,6 +269,64 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "HomeownerProfiles",
+                columns: table => new
+                {
+                    HomeownerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    BlockNumber = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    LotNumber = table.Column<int>(type: "int", nullable: true),
+                    StreetName = table.Column<string>(type: "nvarchar(150)", nullable: true),
+                    MoveInDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MoveOutDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsPromotedToStaff = table.Column<bool>(type: "bit", nullable: true),
+                    IsPromotedToAdmin = table.Column<bool>(type: "bit", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    ApprovedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ApoprovedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RegisteredOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HomeownerProfiles", x => x.HomeownerId);
+                    table.ForeignKey(
+                        name: "FK_HomeownerProfiles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaffProfileModel",
+                columns: table => new
+                {
+                    StaffId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Position = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    IsActiveEmployee = table.Column<bool>(type: "bit", nullable: false),
+                    IsAlsoHomeOwner = table.Column<bool>(type: "bit", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    EmergencyContactName = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    EmergencyContactNumber = table.Column<string>(type: "nvarchar(15)", nullable: true),
+                    EmergencyContactRelation = table.Column<string>(type: "nvarchar(100)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaffProfileModel", x => x.StaffId);
+                    table.ForeignKey(
+                        name: "FK_StaffProfileModel_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FeedbackComplaints",
                 columns: table => new
                 {
@@ -290,6 +377,11 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AdminProfileModel_UserId",
+                table: "AdminProfileModel",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -337,11 +429,24 @@ namespace Hometown_Application.Migrations
                 name: "IX_FeedbackComplaints_UserId",
                 table: "FeedbackComplaints",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HomeownerProfiles_UserId",
+                table: "HomeownerProfiles",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaffProfileModel_UserId",
+                table: "StaffProfileModel",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AdminProfileModel");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -370,13 +475,19 @@ namespace Hometown_Application.Migrations
                 name: "FeedbackComplaints");
 
             migrationBuilder.DropTable(
+                name: "HomeownerProfiles");
+
+            migrationBuilder.DropTable(
+                name: "StaffProfileModel");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Status");
 
             migrationBuilder.DropTable(
-                name: "Status");
+                name: "AspNetUsers");
         }
     }
 }

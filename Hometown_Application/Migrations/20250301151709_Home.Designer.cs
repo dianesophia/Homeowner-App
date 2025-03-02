@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250228120829_Profile")]
-    partial class Profile
+    [Migration("20250301151709_Home")]
+    partial class Home
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,12 +33,15 @@ namespace Hometown_Application.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("BlockNumber")
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -47,13 +50,31 @@ namespace Hometown_Application.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FacebookProfile")
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsActiveUser")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsBirthdayPublic")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsGenderPublic")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LinkedInProfile")
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -61,8 +82,8 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int?>("LotNumber")
-                        .HasColumnType("int");
+                    b.Property<bool>("MakeFacebookPublic")
+                        .HasColumnType("bit");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -87,8 +108,8 @@ namespace Hometown_Application.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StreetName")
-                        .HasColumnType("nvarchar(150)");
+                    b.Property<string>("TwitterProfile")
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -108,6 +129,35 @@ namespace Hometown_Application.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.AdminProfileModel", b =>
+                {
+                    b.Property<int>("AdminId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AdminId"));
+
+                    b.Property<string>("AdminRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("AppointedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsSuperAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AdminId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AdminProfileModel");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ContactModel", b =>
@@ -313,6 +363,105 @@ namespace Hometown_Application.Migrations
                     b.ToTable("FeedbackComplaints");
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.HomeownerProfileModel", b =>
+                {
+                    b.Property<int>("HomeownerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HomeownerId"));
+
+                    b.Property<string>("ApoprovedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ApprovedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("BlockNumber")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsPromotedToAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsPromotedToStaff")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("LotNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("MoveInDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("MoveOutDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RegisteredOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("StreetName")
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("HomeownerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HomeownerProfiles");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
+                {
+                    b.Property<int>("StaffId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffId"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("EmergencyContactName")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EmergencyContactNumber")
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("EmergencyContactRelation")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("HireDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActiveEmployee")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAlsoHomeOwner")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("Salary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("StaffId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StaffProfileModel");
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.StatusModel", b =>
                 {
                     b.Property<int>("StatusId")
@@ -499,6 +648,17 @@ namespace Hometown_Application.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.AdminProfileModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.FeedbackComplaintModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.StatusModel", "Status")
@@ -516,6 +676,28 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.HomeownerProfileModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
