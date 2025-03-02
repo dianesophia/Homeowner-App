@@ -49,89 +49,11 @@ public class ApplicationUser : IdentityUser
     [Column(TypeName = "nvarchar(255)")]
     public string? LinkedInProfile { get; set; }
 
-    //[PersonalData]
-    //public bool ReceiveNewsletter { get; set; } = true; // If they want email updates
-
-    //[PersonalData]
-    //public bool ReceiveSMSAlerts { get; set; } = true; // If they want SMS notifications
-
-   
-    //[PersonalData]
-    //[Column(TypeName = "nvarchar(15)")]
-    //public string? AlternatePhoneNumber { get; set; } // Additional contact number
-
-  
-
-    // ✅ Homeowner-Specific Information
-  /* [PersonalData]
-    [Column(TypeName = "nvarchar(50)")]
-    public string? BlockNumber { get; set; }
-
-    [PersonalData]
-    public int? LotNumber { get; set; }
-
-    [PersonalData]
-    [Column(TypeName = "nvarchar(150)")]
-    public string? StreetName { get; set; }
-
-    [PersonalData]
-    public DateTime? MoveInDate { get; set; } // When the homeowner moved in
-
-    [PersonalData]
-    public DateTime? MoveOutDate { get; set; } // When the homeowner moved in
 
 
-    [PersonalData]
-    public bool IsPromotedToStaff { get; set; } = false; // homeOwner to staff
-
-    [PersonalData]
-    public bool IsPromotedToAdmin { get; set; } = false; // homeOwner or staff to admin
-  
-
-
-    // ✅ Staff & Admin Information
-    [PersonalData]
-    [Column(TypeName = "nvarchar(100)")]
-    public string? Position { get; set; } // Manager, Maintenance Staff, Security, etc.
-
-    [PersonalData]
-    public DateTime? HireDate { get; set; } // Staff employment date
-
-    [PersonalData]
-    public decimal? Salary { get; set; } // Salary for staff roles
-
-    [PersonalData]
-    public bool IsActiveEmployee { get; set; } = true; // Check if still working
-
-    [PersonalData]
-    public bool IsAlsoHomeOwner { get; set; } = false; // if the staff or admin also lived in the subdivision
-
-    [PersonalData]
-    [Column(TypeName = "nvarchar(255)")]
-    public string? Address { get; set; } // Full address field for the staff/ admin
-
-    [PersonalData]
-    [Column(TypeName = "nvarchar(100)")]
-    public string? EmergencyContactName { get; set; }
-
-    [PersonalData]
-    [Column(TypeName = "nvarchar(15)")]
-    public string? EmergencyContactNumber { get; set; }
-
-    [PersonalData]
-    [Column(TypeName = "nvarchar(100)")]
-    public string? EmergencyContactRelation { get; set; }
-
-    // ✅ Position History Tracking
-   // public virtual ICollection<PositionHistory> PositionHistories { get; set; } = new List<PositionHistory>();
-
-    // ✅ Timestamps
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // When user was created
-    public DateTime? UpdatedAt { get; set; } // Last updated timestamp
-  */
-
-
-
+    public AdminProfileModel? AdminProfiles { get; set; }
+    public HomeownerProfileModel? HomeownerProfiles { get; set; }
+    public StaffProfileModel? StaffProfiles { get; set; }
 
 }
 

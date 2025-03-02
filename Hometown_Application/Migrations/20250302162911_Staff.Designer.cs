@@ -4,6 +4,7 @@ using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250302162911_Staff")]
+    partial class Staff
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,7 +172,7 @@ namespace Hometown_Application.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AdminProfiles");
+                    b.ToTable("AdminProfileModel");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ContactModel", b =>
@@ -472,7 +475,7 @@ namespace Hometown_Application.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("StaffProfiles");
+                    b.ToTable("StaffProfileModel");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StatusModel", b =>

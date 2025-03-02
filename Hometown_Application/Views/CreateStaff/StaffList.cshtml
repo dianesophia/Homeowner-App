@@ -1,0 +1,23 @@
+﻿@model List<Hometown_Application.Models.StaffProfileModel>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Hire Date</th>
+            <th>Salary</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var staff in Model)
+        {
+            <tr>
+                <td>@staff.ApplicationUser.FirstName @staff.ApplicationUser.LastName</td>
+                <td>@staff.Position</td>
+                <td>@(staff.HireDate.HasValue ? staff.HireDate.Value.ToString("yyyy-MM-dd") : "N/A")</td>
+                <td>@staff.Salary</td>
+            </tr>
+        }
+    </tbody>
+</table>

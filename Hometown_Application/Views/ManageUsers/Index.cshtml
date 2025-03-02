@@ -123,6 +123,10 @@
             <a asp-controller="ManageUsers" asp-action="ChangeRole" class="btn btn-secondary">
                 <i class="fas fa-user-cog"></i> Change Role
             </a>
+
+            <a asp-controller="ManageUsers" asp-action="AccountApproval" class="btn btn-secondary">
+                <i class="fas fa-user-cog"></i> Approve Homeowner
+            </a>
         </div>
 
         <ul class="nav nav-tabs" id="userTabs">
@@ -148,7 +152,7 @@
                                 <th>Last Name</th>
                                 <th>Email</th>
                                 <th>Username</th>
-                                <th>Role</th>
+                                <th>Approved</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -159,10 +163,10 @@
                                     <td>@item.User.LastName</td>
                                     <td>@item.User.Email</td>
                                     <td>@item.User.UserName</td>
-                                    <td><span class="role-badge role-user">@item.Role</span></td>
+                                    <td></td>
                                 </tr>
                             }
-                        </tbody>
+                        </tbody> 
                     </table>
                 </div>
             </div>

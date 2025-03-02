@@ -15,6 +15,13 @@ namespace Hometown_Application.Models
         [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
 
+        [NotMapped]
+        public string FirstName => ApplicationUser?.FirstName ?? string.Empty;
+
+        [NotMapped]
+        public string LastName => ApplicationUser?.LastName ?? string.Empty;
+
+
         [PersonalData]
         [Column(TypeName = "nvarchar(100)")]
         public string Position { get; set; } // e.g., Security, Maintenance, Manager
@@ -23,6 +30,8 @@ namespace Hometown_Application.Models
         public DateTime? HireDate { get; set; }
 
         [PersonalData]
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal? Salary { get; set; }
 
         [PersonalData]

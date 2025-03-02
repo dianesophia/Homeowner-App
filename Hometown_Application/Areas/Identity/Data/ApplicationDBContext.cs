@@ -15,6 +15,8 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<HomeownerProfileModel> HomeownerProfiles { get; set; }
+    public DbSet<StaffProfileModel> StaffProfiles { get; set; }
+    public DbSet<AdminProfileModel> AdminProfiles { get; set; }
 
     public DbSet<FeedbackComplaintModel> FeedbackComplaints { get; set; }
     public DbSet<EventModel> Events { get; set; }

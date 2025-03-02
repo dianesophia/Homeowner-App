@@ -25,6 +25,7 @@ namespace Hometown_Application.Controllers
         {
             var users = _userManager.Users.ToList();
             var usersWithRoles = new List<(ApplicationUser User, string Role)>();
+           // var homeowners = _context.HomeownerProfiles.Include(h => h.User).ToList();
 
             foreach (var user in users)
             {
@@ -33,6 +34,11 @@ namespace Hometown_Application.Controllers
                 usersWithRoles.Add((user, role));
             }
 
+            var homeowners = _dbContext.HomeownerProfiles
+        .Include(h => h.ApplicationUser) // Ensure user data is loaded
+
+        .ToList();
+
             return View(usersWithRoles);
         }
 
@@ -40,6 +46,7 @@ namespace Hometown_Application.Controllers
         {
             var users = _userManager.Users.ToList();
             var usersWithRoles = new List<(ApplicationUser User, string Role)>();
+            // var homeownerProfile = _dbContext.HomeownerProfiles.FirstOrDefault(h => h.UserId == userId);
 
             foreach (var user in users)
             {
@@ -108,7 +115,30 @@ namespace Hometown_Application.Controllers
 
 
 
+        public async Task<IActionResult> AccountApproval()
+        {
+            var users = _userManager.Users.ToList();
+            var usersWithRoles = new List<(ApplicationUser User, string Role)>();
 
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault() ?? "No Role";
+                usersWithRoles.Add((user, role));
+            }
+
+            return View(usersWithRoles);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> HomeownerProfilesList()
+        {
+            var homeownerProfiles = await _dbContext.HomeownerProfiles
+                .Include(h => h.UserId) // Assuming there's a navigation property to ApplicationUser
+                .ToListAsync();
+
+            return View(homeownerProfiles);
+        }
 
     }
 }
