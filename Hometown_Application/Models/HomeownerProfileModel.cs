@@ -33,6 +33,9 @@ namespace Hometown_Application.Models
         public DateTime? MoveOutDate { get; set; } = DateTime.MinValue;
 
         [PersonalData]
+        public bool? IsBanned { get; set; } = false;
+
+        [PersonalData]
         public bool? IsPromotedToStaff { get; set; } = false;
 
         public bool? IsPromotedToAdmin { get; set; } = false;

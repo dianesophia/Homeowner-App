@@ -37,12 +37,17 @@ namespace Hometown_Application.Controllers
             return View(staffProfiles);
         }
 
+        public IActionResult CreateStaff()
+        {
+            return View();
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> CreateStaff(CreateStaffViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Step 1: Create a new ApplicationUser
                 var user = new ApplicationUser
                 {
                     UserName = model.Email,
@@ -51,29 +56,33 @@ namespace Hometown_Application.Controllers
                     LastName = model.LastName
                 };
 
-                var result = await _userManager.CreateAsync(user, "DefaultPassword123!"); // Default password, admin can reset later
+                var result = await _userManager.CreateAsync(user, "DefaultPassword123!");
                 if (!result.Succeeded)
                 {
                     ModelState.AddModelError("", "Error creating user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
                     return View(model);
                 }
 
-                // Step 2: Ensure the "Staff" role exists
                 if (!await _roleManager.RoleExistsAsync("Staff"))
                 {
                     await _roleManager.CreateAsync(new IdentityRole("Staff"));
                 }
 
-                // Step 3: Assign the "Staff" role to the user
                 await _userManager.AddToRoleAsync(user, "Staff");
 
-                // Step 4: Create a new StaffProfile linked to this user
                 var staffProfile = new StaffProfileModel
                 {
-                    UserId = user.Id, // Link to ApplicationUser
+                    UserId = user.Id,
                     Position = model.Position,
                     HireDate = model.HireDate,
-                    Salary = model.Salary
+                    Salary = model.Salary,
+                    Department = model.Department,
+                    IsActiveEmployee = model.IsActiveEmployee,
+                    IsAlsoHomeOwner = model.IsAlsoHomeOwner,
+                    Address = model.Address,
+                    EmergencyContactName = model.EmergencyContactName,
+                    EmergencyContactNumber = model.EmergencyContactNumber,
+                    EmergencyContactRelation = model.EmergencyContactRelation
                 };
 
                 _context.StaffProfiles.Add(staffProfile);

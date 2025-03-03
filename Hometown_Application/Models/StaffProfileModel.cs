@@ -5,6 +5,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hometown_Application.Models
 {
+    public enum StaffDepartment
+    {
+        Administration,
+        Finance,
+        Security,
+        Maintenance,
+        CustomerSupport,
+        Legal,
+        CommunityManagement,
+        IT,
+        Amenities,
+        Landscaping,
+        VendorManagement
+    }
+
     public class StaffProfileModel
     {
         [Key]
@@ -15,16 +30,23 @@ namespace Hometown_Application.Models
         [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
 
+        // Correctly retrieving ProfilePicture as a byte array
+        [NotMapped]
+        public byte[]? ProfilePicture => ApplicationUser?.ProfilePicture ?? Array.Empty<byte>();
+
         [NotMapped]
         public string FirstName => ApplicationUser?.FirstName ?? string.Empty;
 
         [NotMapped]
         public string LastName => ApplicationUser?.LastName ?? string.Empty;
 
+        [PersonalData]
+        [Required]
+        public StaffDepartment Department { get; set; } // Enum for department names
 
         [PersonalData]
         [Column(TypeName = "nvarchar(100)")]
-        public string Position { get; set; } // e.g., Security, Maintenance, Manager
+        public string Position { get; set; } // e.g., Security Officer, Maintenance Supervisor
 
         [PersonalData]
         public DateTime? HireDate { get; set; }
@@ -55,5 +77,19 @@ namespace Hometown_Application.Models
         [PersonalData]
         [Column(TypeName = "nvarchar(100)")]
         public string? EmergencyContactRelation { get; set; }
+
+        [PersonalData]
+        public bool? IsFired { get; set; } = false;
+
+        public string? AccountCreatedBy { get; set; }
+
+        public DateTime? AccountCreatedOn { get; set; } = DateTime.UtcNow;
+
+        public DateTime? UpdatedOn { get; set; }
+
+        [StringLength(50)]
+        public string? UpdatedBy { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Hometown_Application.Models;
 
-namespace Hometown_Application.Models
+namespace Hometown_Application.ViewModel
 {
     public class DashboardViewModel
     {
