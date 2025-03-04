@@ -120,10 +120,11 @@ namespace Hometown_Application.Migrations
                 name: "Facility",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    FacilityId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    OtherType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(252)", maxLength: 252, nullable: false),
                     AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -132,11 +133,11 @@ namespace Hometown_Application.Migrations
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ApprovedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    ImagePath = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Facility", x => x.Id);
+                    table.PrimaryKey("PK_Facility", x => x.FacilityId);
                 });
 
             migrationBuilder.CreateTable(
@@ -292,23 +293,24 @@ namespace Hometown_Application.Migrations
                 name: "Reservation",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    ReservationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FacilityId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ReservationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ApprovedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reservation", x => x.Id);
+                    table.PrimaryKey("PK_Reservation", x => x.ReservationId);
                     table.ForeignKey(
                         name: "FK_Reservation_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -319,7 +321,7 @@ namespace Hometown_Application.Migrations
                         name: "FK_Reservation_Facility_FacilityId",
                         column: x => x.FacilityId,
                         principalTable: "Facility",
-                        principalColumn: "Id",
+                        principalColumn: "FacilityId",
                         onDelete: ReferentialAction.Cascade);
                 });
 

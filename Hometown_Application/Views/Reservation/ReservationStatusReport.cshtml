@@ -11,6 +11,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th>Facility Image</th> <!-- New column for image -->
                 <th>Facility</th>
                 <th>Reservation Date</th>
                 <th>Start Time</th>
@@ -23,6 +24,18 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>
+                        @if (item.Facility?.Image != null && item.Facility.Image.Length > 0)
+                        {
+                            var base64Image = Convert.ToBase64String(item.Facility.Image);
+                            var imgSrc = $"data:image/jpeg;base64,{base64Image}";
+                            <img src="@imgSrc" alt="@item.Facility.Name" style="max-width: 100px; max-height: 100px;" />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
+                    </td>
                     <td>@(item.Facility?.Name ?? "Unknown Facility")</td>
                     <td>@item.ReservationDate.ToString("yyyy-MM-dd")</td>
                     <td>@item.StartTime.ToString("hh:mm tt")</td>

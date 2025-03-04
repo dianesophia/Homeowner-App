@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Hometown_Application.Models.FacilityModel>
+
+@{
+    ViewData["Title"] = "Available Facilities";
+}
+
+<h2>Available Facilities</h2>
+
+<div class="mb-3">
+    <label for="searchInput" class="form-label"><strong>Search Facilities:</strong></label>
+    <input type="text" id="searchInput" class="form-control" placeholder="Enter facility name..." onkeyup="filterFacilities()">
+</div>
+
+<table class="table" id="facilityTable">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Capacity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var facility in Model)
+        {
+            var hasPendingReservation = facility.Reservations?.Any(r => r.Status == "Pending" && !r.IsDeleted) ?? false;
+
+            <tr>
+                <td>
+                    @if (facility.Image != null && facility.Image.Length > 0)
+                    {
+                        var base64Image = Convert.ToBase64String(facility.Image);
+                        var imgSrc = $"data:image/jpeg;base64,{base64Image}";
+                        <img src="@imgSrc" alt="Facility Image" style="max-width: 100px;" />
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
+                </td>
+                <td class="facility-name">@facility.Name</td>
+                <td>@facility.Type</td>
+                <td>@facility.Capacity</td>
+                <td>
+                    @if (hasPendingReservation)
+                    {
+                        <span class="badge bg-warning text-dark">Pending Reservation</span>
+                    }
+                    else
+                    {
+                        <a asp-action="CreateOrEdit" asp-controller="Reservation" asp-route-facilityId="@facility.FacilityId" class="btn btn-primary">Reserve</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function filterFacilities() {
+        var input = document.getElementById("searchInput");
+        var filter = input.value.toLowerCase();
+        var table = document.getElementById("facilityTable");
+        var tr = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < tr.length; i++) { // Skip table header
+            var td = tr[i].getElementsByClassName("facility-name")[0];
+            if (td) {
+                var txtValue = td.textContent || td.innerText;
+                tr[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+</script>

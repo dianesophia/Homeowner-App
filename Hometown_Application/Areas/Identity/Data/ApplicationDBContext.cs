@@ -22,20 +22,21 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.Entity<ReservationModel>()
-            .HasOne(r => r.Facility)
-            .WithMany()
+
+        builder.Entity<FacilityModel>()
+            .HasMany(f => f.Reservations)
+            .WithOne(r => r.Facility)
             .HasForeignKey(r => r.FacilityId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        base.OnModelCreating(builder);
+        
         builder.Entity<ReservationModel>()
            .HasOne(fc => fc.ApplicationUser)
            .WithMany()
            .HasForeignKey(fc => fc.UserId)
            .OnDelete(DeleteBehavior.Cascade);
 
-        base.OnModelCreating(builder);
+        
         builder.Entity<FeedbackComplaintModel>()
            .HasOne(fc => fc.ApplicationUser)
            .WithMany()

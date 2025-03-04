@@ -7,7 +7,7 @@ namespace Hometown_Application.Models
     public class FacilityModel
     {
         [Key]
-        public int Id { get; set; }
+        public int FacilityId { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -16,6 +16,8 @@ namespace Hometown_Application.Models
         [Required]
         [StringLength(50)]
         public string Type { get; set; }
+
+        public string? OtherType { get; set; }
 
         [Required]
         public int Capacity { get; set; }
@@ -39,7 +41,8 @@ namespace Hometown_Application.Models
 
         public bool IsDeleted { get; set; } = false;
 
-        [StringLength(255)]
-        public string? ImagePath { get; set; } // Stores the file path of the uploaded image
+        public byte[]? Image { get; set; }
+
+        public virtual ICollection<ReservationModel> Reservations { get; set; } = new List<ReservationModel>();
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250225102754_yeah")]
+    [Migration("20250303132817_yeah")]
     partial class yeah
     {
         /// <inheritdoc />
@@ -239,11 +239,11 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.FacilityModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("FacilityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FacilityId"));
 
                     b.Property<string>("AddedBy")
                         .IsRequired()
@@ -265,9 +265,8 @@ namespace Hometown_Application.Migrations
                         .HasMaxLength(252)
                         .HasColumnType("nvarchar(252)");
 
-                    b.Property<string>("ImagePath")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -276,6 +275,9 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("OtherType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -289,7 +291,7 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("FacilityId");
 
                     b.ToTable("Facility");
                 });
@@ -357,11 +359,11 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ReservationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservationId"));
 
                     b.Property<string>("AddedBy")
                         .IsRequired()
@@ -370,10 +372,6 @@ namespace Hometown_Application.Migrations
 
                     b.Property<DateTime>("AddedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ApprovedBy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
@@ -384,26 +382,33 @@ namespace Hometown_Application.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime>("ReservationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ReservationId");
 
                     b.HasIndex("FacilityId");
 
@@ -612,7 +617,7 @@ namespace Hometown_Application.Migrations
             modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.FacilityModel", "Facility")
-                        .WithMany()
+                        .WithMany("Reservations")
                         .HasForeignKey("FacilityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -677,6 +682,11 @@ namespace Hometown_Application.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.FacilityModel", b =>
+                {
+                    b.Navigation("Reservations");
                 });
 #pragma warning restore 612, 618
         }
