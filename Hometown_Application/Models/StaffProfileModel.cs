@@ -62,6 +62,10 @@ namespace Hometown_Application.Models
         [PersonalData]
         public bool IsAlsoHomeOwner { get; set; } = false;
 
+        public int? HouseId { get; set; }
+        [ForeignKey("HouseId")]
+        public HouseModel? House { get; set; }
+
         [PersonalData]
         [Column(TypeName = "nvarchar(255)")]
         public string? Address { get; set; }

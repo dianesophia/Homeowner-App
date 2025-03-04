@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class Home : Migration
+    public partial class UserHouse : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,44 +25,6 @@ namespace Hometown_Application.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(100)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(100)", nullable: false),
-                    ProfilePicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(50)", nullable: true),
-                    IsGenderPublic = table.Column<bool>(type: "bit", nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsBirthdayPublic = table.Column<bool>(type: "bit", nullable: false),
-                    Bio = table.Column<string>(type: "nvarchar(500)", nullable: true),
-                    IsActiveUser = table.Column<bool>(type: "bit", nullable: false),
-                    FacebookProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
-                    MakeFacebookPublic = table.Column<bool>(type: "bit", nullable: false),
-                    TwitterProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
-                    LinkedInProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -162,7 +124,7 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AdminProfileModel",
+                name: "AdminProfiles",
                 columns: table => new
                 {
                     AdminId = table.Column<int>(type: "int", nullable: false)
@@ -174,13 +136,7 @@ namespace Hometown_Application.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AdminProfileModel", x => x.AdminId);
-                    table.ForeignKey(
-                        name: "FK_AdminProfileModel_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_AdminProfiles", x => x.AdminId);
                 });
 
             migrationBuilder.CreateTable(
@@ -196,12 +152,6 @@ namespace Hometown_Application.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -216,12 +166,6 @@ namespace Hometown_Application.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -240,12 +184,52 @@ namespace Hometown_Application.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    ProfilePicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    IsGenderPublic = table.Column<bool>(type: "bit", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsBirthdayPublic = table.Column<bool>(type: "bit", nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(500)", nullable: true),
+                    IsActiveUser = table.Column<bool>(type: "bit", nullable: false),
+                    FacebookProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    MakeFacebookPublic = table.Column<bool>(type: "bit", nullable: false),
+                    TwitterProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    LinkedInProfile = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    AdminProfilesAdminId = table.Column<int>(type: "int", nullable: true),
+                    HomeownerProfilesHomeownerId = table.Column<int>(type: "int", nullable: true),
+                    StaffProfilesStaffId = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_AspNetUsers_AdminProfiles_AdminProfilesAdminId",
+                        column: x => x.AdminProfilesAdminId,
+                        principalTable: "AdminProfiles",
+                        principalColumn: "AdminId");
                 });
 
             migrationBuilder.CreateTable(
@@ -262,64 +246,6 @@ namespace Hometown_Application.Migrations
                     table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                     table.ForeignKey(
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "HomeownerProfiles",
-                columns: table => new
-                {
-                    HomeownerId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BlockNumber = table.Column<string>(type: "nvarchar(50)", nullable: true),
-                    LotNumber = table.Column<int>(type: "int", nullable: true),
-                    StreetName = table.Column<string>(type: "nvarchar(150)", nullable: true),
-                    MoveInDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    MoveOutDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsPromotedToStaff = table.Column<bool>(type: "bit", nullable: true),
-                    IsPromotedToAdmin = table.Column<bool>(type: "bit", nullable: true),
-                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
-                    ApprovedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ApoprovedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RegisteredOn = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HomeownerProfiles", x => x.HomeownerId);
-                    table.ForeignKey(
-                        name: "FK_HomeownerProfiles_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StaffProfileModel",
-                columns: table => new
-                {
-                    StaffId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Position = table.Column<string>(type: "nvarchar(100)", nullable: false),
-                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    IsActiveEmployee = table.Column<bool>(type: "bit", nullable: false),
-                    IsAlsoHomeOwner = table.Column<bool>(type: "bit", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(255)", nullable: true),
-                    EmergencyContactName = table.Column<string>(type: "nvarchar(100)", nullable: true),
-                    EmergencyContactNumber = table.Column<string>(type: "nvarchar(15)", nullable: true),
-                    EmergencyContactRelation = table.Column<string>(type: "nvarchar(100)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StaffProfileModel", x => x.StaffId);
-                    table.ForeignKey(
-                        name: "FK_StaffProfileModel_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -363,6 +289,106 @@ namespace Hometown_Application.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "House",
+                columns: table => new
+                {
+                    HouseId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    BlockNumber = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    LotNumber = table.Column<int>(type: "int", nullable: true),
+                    StreetName = table.Column<string>(type: "nvarchar(150)", nullable: true),
+                    IsOccupied = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_House", x => x.HouseId);
+                    table.ForeignKey(
+                        name: "FK_House_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HomeownerProfiles",
+                columns: table => new
+                {
+                    HomeownerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    HouseId = table.Column<int>(type: "int", nullable: true),
+                    MoveInDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MoveOutDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsBanned = table.Column<bool>(type: "bit", nullable: true),
+                    IsPromotedToStaff = table.Column<bool>(type: "bit", nullable: true),
+                    IsPromotedToAdmin = table.Column<bool>(type: "bit", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    ApprovedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ApoprovedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RegisteredOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HomeownerProfiles", x => x.HomeownerId);
+                    table.ForeignKey(
+                        name: "FK_HomeownerProfiles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HomeownerProfiles_House_HouseId",
+                        column: x => x.HouseId,
+                        principalTable: "House",
+                        principalColumn: "HouseId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaffProfiles",
+                columns: table => new
+                {
+                    StaffId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Department = table.Column<int>(type: "int", nullable: false),
+                    Position = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsActiveEmployee = table.Column<bool>(type: "bit", nullable: false),
+                    IsAlsoHomeOwner = table.Column<bool>(type: "bit", nullable: false),
+                    HouseId = table.Column<int>(type: "int", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    EmergencyContactName = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    EmergencyContactNumber = table.Column<string>(type: "nvarchar(15)", nullable: true),
+                    EmergencyContactRelation = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    IsFired = table.Column<bool>(type: "bit", nullable: true),
+                    AccountCreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccountCreatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaffProfiles", x => x.StaffId);
+                    table.ForeignKey(
+                        name: "FK_StaffProfiles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StaffProfiles_House_HouseId",
+                        column: x => x.HouseId,
+                        principalTable: "House",
+                        principalColumn: "HouseId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 table: "Status",
                 columns: new[] { "StatusId", "StatusName" },
@@ -377,8 +403,8 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AdminProfileModel_UserId",
-                table: "AdminProfileModel",
+                name: "IX_AdminProfiles_UserId",
+                table: "AdminProfiles",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -414,6 +440,21 @@ namespace Hometown_Application.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_AdminProfilesAdminId",
+                table: "AspNetUsers",
+                column: "AdminProfilesAdminId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_HomeownerProfilesHomeownerId",
+                table: "AspNetUsers",
+                column: "HomeownerProfilesHomeownerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_StaffProfilesStaffId",
+                table: "AspNetUsers",
+                column: "StaffProfilesStaffId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -431,21 +472,95 @@ namespace Hometown_Application.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_HomeownerProfiles_HouseId",
+                table: "HomeownerProfiles",
+                column: "HouseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_HomeownerProfiles_UserId",
                 table: "HomeownerProfiles",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StaffProfileModel_UserId",
-                table: "StaffProfileModel",
+                name: "IX_House_UserId",
+                table: "House",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaffProfiles_HouseId",
+                table: "StaffProfiles",
+                column: "HouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaffProfiles_UserId",
+                table: "StaffProfiles",
+                column: "UserId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AdminProfiles_AspNetUsers_UserId",
+                table: "AdminProfiles",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                table: "AspNetUserRoles",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUsers_HomeownerProfiles_HomeownerProfilesHomeownerId",
+                table: "AspNetUsers",
+                column: "HomeownerProfilesHomeownerId",
+                principalTable: "HomeownerProfiles",
+                principalColumn: "HomeownerId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUsers_StaffProfiles_StaffProfilesStaffId",
+                table: "AspNetUsers",
+                column: "StaffProfilesStaffId",
+                principalTable: "StaffProfiles",
+                principalColumn: "StaffId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "AdminProfileModel");
+            migrationBuilder.DropForeignKey(
+                name: "FK_AdminProfiles_AspNetUsers_UserId",
+                table: "AdminProfiles");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_HomeownerProfiles_AspNetUsers_UserId",
+                table: "HomeownerProfiles");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_House_AspNetUsers_UserId",
+                table: "House");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_StaffProfiles_AspNetUsers_UserId",
+                table: "StaffProfiles");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -475,12 +590,6 @@ namespace Hometown_Application.Migrations
                 name: "FeedbackComplaints");
 
             migrationBuilder.DropTable(
-                name: "HomeownerProfiles");
-
-            migrationBuilder.DropTable(
-                name: "StaffProfileModel");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -488,6 +597,18 @@ namespace Hometown_Application.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "AdminProfiles");
+
+            migrationBuilder.DropTable(
+                name: "HomeownerProfiles");
+
+            migrationBuilder.DropTable(
+                name: "StaffProfiles");
+
+            migrationBuilder.DropTable(
+                name: "House");
         }
     }
 }

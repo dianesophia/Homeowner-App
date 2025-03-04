@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hometown_Application.Models; // Import for StaffDepartment Enum
 
 namespace Hometown_Application.ViewModel
@@ -13,9 +14,21 @@ namespace Hometown_Application.ViewModel
         [Required]
         public string LastName { get; set; }
 
+        [Phone]
+        [StringLength(15, ErrorMessage = "Phone number must be at most 15 characters long")]
+        public string? PhoneNumber { get; set; } // Added from AspNetUsers table
+
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
+        public string? BlockNumber { get; set; }
+
+
+        public int? LotNumber { get; set; }
+
+        [Column(TypeName = "nvarchar(150)")]
+        public string? StreetName { get; set; }
 
         [Required]
         public StaffDepartment Department { get; set; } // Use Enum for department names
@@ -56,5 +69,10 @@ namespace Hometown_Application.ViewModel
         public string? UpdatedBy { get; set; }
 
         public bool IsDeleted { get; set; } = false;
+
+        [Required]
+        [DataType(DataType.Password)]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
+        public string Password { get; set; }
     }
 }

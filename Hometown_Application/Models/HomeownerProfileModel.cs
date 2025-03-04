@@ -15,16 +15,22 @@ namespace Hometown_Application.Models
         [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
 
-        [PersonalData]
-        [Column(TypeName = "nvarchar(50)")]
-        public string? BlockNumber { get; set; }
+        /*    [PersonalData]
+            [Column(TypeName = "nvarchar(50)")]
+            public string? BlockNumber { get; set; }
 
-        [PersonalData]
-        public int? LotNumber { get; set; }
+            [PersonalData]
+            public int? LotNumber { get; set; }
 
-        [PersonalData]
-        [Column(TypeName = "nvarchar(150)")]
-        public string? StreetName { get; set; }
+            [PersonalData]
+            [Column(TypeName = "nvarchar(150)")]
+            public string? StreetName { get; set; }
+
+            */
+
+        public int? HouseId { get; set; }
+        [ForeignKey("HouseId")]
+        public HouseModel House { get; set; }
 
         [PersonalData]
         public DateTime? MoveInDate { get; set; } = DateTime.MinValue;

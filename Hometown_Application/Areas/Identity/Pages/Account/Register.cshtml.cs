@@ -217,17 +217,28 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
                     var homeownerProfile = new HomeownerProfileModel
                     {
                         UserId = user.Id,
+                        /*BlockNumber = Input.BlockNumber,
+                        LotNumber = Input.LotNumber,
+                        StreetName = Input.StreetName,*/
+                        RegisteredOn = DateTime.UtcNow
+                    };
+
+                    var houses = new HouseModel
+                    {
+
                         BlockNumber = Input.BlockNumber,
                         LotNumber = Input.LotNumber,
                         StreetName = Input.StreetName,
-                        RegisteredOn = DateTime.UtcNow
+                        UserId = user.Id,
+
                     };
 
                     using (var scope = HttpContext.RequestServices.CreateScope())
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-                        dbContext.HomeownerProfiles.Add(homeownerProfile);
-                        await dbContext.SaveChangesAsync();
+                     dbContext.HomeownerProfiles.Add(homeownerProfile);
+                    dbContext.House.Add(houses);
+                    await dbContext.SaveChangesAsync();
                     }
 
                     var userId = await _userManager.GetUserIdAsync(user);

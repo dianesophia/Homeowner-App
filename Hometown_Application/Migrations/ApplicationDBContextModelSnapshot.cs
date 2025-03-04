@@ -389,8 +389,8 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("ApprovedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("BlockNumber")
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int?>("HouseId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
@@ -404,9 +404,6 @@ namespace Hometown_Application.Migrations
                     b.Property<bool?>("IsPromotedToStaff")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LotNumber")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("MoveInDate")
                         .HasColumnType("datetime2");
 
@@ -416,6 +413,36 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("RegisteredOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("HomeownerId");
+
+                    b.HasIndex("HouseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HomeownerProfiles");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
+                {
+                    b.Property<int?>("HouseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("HouseId"));
+
+                    b.Property<string>("BlockNumber")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool?>("IsOccupied")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("LotNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("StreetName")
                         .HasColumnType("nvarchar(150)");
 
@@ -423,11 +450,11 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("HomeownerId");
+                    b.HasKey("HouseId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("HomeownerProfiles");
+                    b.ToTable("House");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
@@ -462,6 +489,9 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("HireDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("HouseId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActiveEmployee")
                         .HasColumnType("bit");
 
@@ -494,6 +524,8 @@ namespace Hometown_Application.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("StaffId");
+
+                    b.HasIndex("HouseId");
 
                     b.HasIndex("UserId");
 
@@ -739,6 +771,24 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.HomeownerProfileModel", b =>
                 {
+                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
+                        .WithMany("Homeowners")
+                        .HasForeignKey("HouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("House");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
+                {
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -750,6 +800,11 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
                 {
+                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
+                        .WithMany()
+                        .HasForeignKey("HouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -757,6 +812,8 @@ namespace Hometown_Application.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("House");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -808,6 +865,11 @@ namespace Hometown_Application.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
+                {
+                    b.Navigation("Homeowners");
                 });
 #pragma warning restore 612, 618
         }

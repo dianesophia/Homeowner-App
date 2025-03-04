@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250302162911_Staff")]
-    partial class Staff
+    [Migration("20250304184500_UserHouse")]
+    partial class UserHouse
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -172,7 +172,7 @@ namespace Hometown_Application.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AdminProfileModel");
+                    b.ToTable("AdminProfiles");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ContactModel", b =>
@@ -392,10 +392,13 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("ApprovedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("BlockNumber")
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int?>("HouseId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBanned")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsPromotedToAdmin")
@@ -403,9 +406,6 @@ namespace Hometown_Application.Migrations
 
                     b.Property<bool?>("IsPromotedToStaff")
                         .HasColumnType("bit");
-
-                    b.Property<int?>("LotNumber")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("MoveInDate")
                         .HasColumnType("datetime2");
@@ -416,6 +416,36 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("RegisteredOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("HomeownerId");
+
+                    b.HasIndex("HouseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HomeownerProfiles");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
+                {
+                    b.Property<int?>("HouseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("HouseId"));
+
+                    b.Property<string>("BlockNumber")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool?>("IsOccupied")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("LotNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("StreetName")
                         .HasColumnType("nvarchar(150)");
 
@@ -423,11 +453,11 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("HomeownerId");
+                    b.HasKey("HouseId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("HomeownerProfiles");
+                    b.ToTable("House");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
@@ -438,8 +468,17 @@ namespace Hometown_Application.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffId"));
 
+                    b.Property<string>("AccountCreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("AccountCreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("Department")
+                        .HasColumnType("int");
 
                     b.Property<string>("EmergencyContactName")
                         .HasColumnType("nvarchar(100)");
@@ -453,10 +492,19 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("HireDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("HouseId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActiveEmployee")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsAlsoHomeOwner")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsFired")
                         .HasColumnType("bit");
 
                     b.Property<string>("Position")
@@ -467,15 +515,24 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("StaffId");
 
+                    b.HasIndex("HouseId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("StaffProfileModel");
+                    b.ToTable("StaffProfiles");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StatusModel", b =>
@@ -717,6 +774,24 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.HomeownerProfileModel", b =>
                 {
+                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
+                        .WithMany("Homeowners")
+                        .HasForeignKey("HouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("House");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
+                {
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -728,6 +803,11 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
                 {
+                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
+                        .WithMany()
+                        .HasForeignKey("HouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -735,6 +815,8 @@ namespace Hometown_Application.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("House");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -786,6 +868,11 @@ namespace Hometown_Application.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
+                {
+                    b.Navigation("Homeowners");
                 });
 #pragma warning restore 612, 618
         }

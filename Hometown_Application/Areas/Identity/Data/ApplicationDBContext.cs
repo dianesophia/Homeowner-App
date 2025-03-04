@@ -13,7 +13,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
-
+    public DbSet<HouseModel> House { get; set; }
     public DbSet<HomeownerProfileModel> HomeownerProfiles { get; set; }
     public DbSet<StaffProfileModel> StaffProfiles { get; set; }
     public DbSet<AdminProfileModel> AdminProfiles { get; set; }
@@ -46,11 +46,23 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
           .HasForeignKey(fc => fc.UserId)
           .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Entity<HomeownerProfileModel>()
+        .HasOne(h => h.House)
+        .WithMany(h => h.Homeowners)
+        .HasForeignKey(h => h.HouseId)
+        .OnDelete(DeleteBehavior.Restrict);
+
         builder.Entity<StaffProfileModel>()
         .HasOne(fc => fc.ApplicationUser)
         .WithMany()
         .HasForeignKey(fc => fc.UserId)
         .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<StaffProfileModel>()
+     .HasOne(s => s.House)
+     .WithMany()
+     .HasForeignKey(s => s.HouseId)
+     .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<AdminProfileModel>()
         .HasOne(fc => fc.ApplicationUser)
@@ -59,6 +71,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<FeedbackComplaintModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<HouseModel>()
            .HasOne(fc => fc.ApplicationUser)
            .WithMany()
            .HasForeignKey(fc => fc.UserId)
