@@ -1,45 +1,441 @@
-﻿@model IEnumerable<Hometown_Application.Models.ContactModel>
+﻿<!--CONTACT-->
+@model IEnumerable<Hometown_Application.Models.ContactModel>
+@using Hometown_Application.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
-@{
-    ViewData["Title"] = "Contact List";
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6F754E;
+            --primary-light: #8a916a;
+            --secondary-color: #A08D67;
+            --background-color: #E6DDC4;
+            --text-color: #2F3A31;
+            --card-bg: #FFFFFF;
+            --danger-color: #dc3545;
+            --success-color: #198754;
+            --border-radius: 16px;
+            --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-<h2>Contact List</h2>
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            min-height: 100px;
+            padding: 15px 20px;
+            font-family: 'Marcellus', serif;
+        }
 
-@if (User.IsInRole("Admin"))
-{
-    <a asp-action="CreateEditContact" class="btn btn-primary">Add Contact</a>
-}
+        .navbar-brand {
+            font-size: 1.2rem;
+            font-weight: normal;
+            color: white;
+        }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Contact Type</th>
-            <th>Description</th>
-            <th>Number</th>
+            .navbar-brand:hover {
+                transform: scale(1.05);
+            }
+
+        .navbar-nav .nav-link {
+            color: white;
+            font-weight: 500;
+            margin: 0 10px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+            .navbar-nav .nav-link:hover {
+                background: var(--primary-light);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .user-info {
+            background: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+            .user-info i {
+                font-size: 1.2rem;
+            }
+
+        .content {
+            flex: 1;
+        }
+
+        /* Prevent content from being hidden under the fixed header */
+        body {
+            padding-top: 120px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Marcellus', serif;
+            min-height: 100vh;
+            width: 100%;
+            margin: 0;
+            padding-bottom: 30px;
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .body-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-bottom: 50px;
+        }
+
+        .header-container {
+            width: 87%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            flex-grow: 1;
+            min-width: 600px;
+            gap: 15px;
+        }
+
+        .page-title {
+            color: var(--text-color);
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .btn-add-contact {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+            .btn-add-contact:hover {
+                background-color: var(--primary-light);
+                transform: translateY(-2px);
+                color: white;
+            }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .contact-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+        }
+
+            .contact-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+            }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-type-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .contact-info {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            word-break: break-word;
+        }
+
+        .card-footer {
+            padding: 15px 20px;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+            .btn-edit:hover {
+                background-color: #e0a800;
+                transform: translateY(-2px);
+            }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-delete:hover {
+                background-color: #c82333;
+                transform: translateY(-2px);
+            }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+
+            .empty-state i {
+                color: var(--secondary-color);
+                opacity: 0.7;
+                font-size: 4rem;
+                margin-bottom: 20px;
+            }
+
+            .empty-state p {
+                color: var(--text-color);
+                font-size: 1.2rem;
+                margin: 0;
+            }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: var(--primary-light);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-home me-2"></i>
+                Golden Haven
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var user = await UserManager.GetUserAsync(User);
+                        if (user != null)
+                        {
+                            <div class="nav-item">
+                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                    <i class="fas fa-user"></i>
+                                    <span>@user.FirstName @user.LastName</span>
+                                </a>
+                            </div>
+                        }
+                    }
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="ManageUsers" asp-action="Index"><i class="fas fa-users-cog me-2"></i>Management Users</a></li>
+                        }
+                    }
+                    <li class="nav-item">
+                        <div class="user-info @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contact" ? "active-tab" : "")">
+                            <i class="fas fa-address-book me-2"></i>
+                            <span>Contacts</span>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Event" asp-action="Index"><i class="fas fa-calendar me-2"></i>Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="Index"><i class="fas fa-file-alt me-2"></i>Document</a></li>
+                    <!--<li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="FileDownload"><i class="fas fa-download me-2"></i>Download</a></li>-->
+                    <li class="nav-item"><a class="nav-link" asp-controller="FeedbackComplaint" asp-action="Index"><i class="fas fa-exclamation-circle me-2"></i>Issues</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div class="header-container">
+            <h2 class="page-title">Contact List</h2>
             @if (User.IsInRole("Admin"))
             {
-                <th>Actions</th>
+                <a asp-action="CreateEditContact" class="btn-add-contact">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Contact</span>
+                </a>
             }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var contact in Model)
-        {
-            <tr>
-                <td>@contact.ContactType</td>
-                <td>@contact.Description</td>
-                <td>@contact.Number</td>
-                @if (User.IsInRole("Admin"))
+        </div>
+        <div class="body-container">
+            <div class="cards-container">
+                @if (Model != null && Model.Any())
                 {
-                    <td>
-                        <a asp-action="CreateEditContact" asp-route-id="@contact.Id" class="btn btn-warning">Edit</a>
-                        <form asp-action="DeleteContact" asp-route-id="@contact.Id" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    </td>
+                    @foreach (var contact in Model)
+                    {
+                        <div class="contact-card">
+                            <div class="card-header">
+                                <span>Contact Details</span>
+                                <span class="contact-type-badge">@contact.ContactType</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="contact-icon">
+                                    @if (contact.ContactType.ToLower().Contains("emergency"))
+                                    {
+                                        <i class="fas fa-ambulance"></i>
+                                    }
+                                    else if (contact.ContactType.ToLower().Contains("police") || contact.ContactType.ToLower().Contains("security"))
+                                    {
+                                        <i class="fas fa-shield-alt"></i>
+                                    }
+                                    else if (contact.ContactType.ToLower().Contains("fire"))
+                                    {
+                                        <i class="fas fa-fire-extinguisher"></i>
+                                    }
+                                    else if (contact.ContactType.ToLower().Contains("hospital") || contact.ContactType.ToLower().Contains("medical"))
+                                    {
+                                        <i class="fas fa-hospital"></i>
+                                    }
+                                    else if (contact.ContactType.ToLower().Contains("utility") || contact.ContactType.ToLower().Contains("electric") || contact.ContactType.ToLower().Contains("water"))
+                                    {
+                                        <i class="fas fa-bolt"></i>
+                                    }
+                                    else if (contact.ContactType.ToLower().Contains("school"))
+                                    {
+                                        <i class="fas fa-school"></i>
+                                    }
+                                    else if (contact.ContactType.ToLower().Contains("government") || contact.ContactType.ToLower().Contains("city"))
+                                    {
+                                        <i class="fas fa-landmark"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-phone-alt"></i>
+                                    }
+                                </div>
+                                <div class="contact-info">
+                                    <div class="info-label">Description</div>
+                                    <div class="info-value">@contact.Description</div>
+                                </div>
+                                <div class="contact-info">
+                                    <div class="info-label">Number</div>
+                                    <div class="info-value">@contact.Number</div>
+                                </div>
+                            </div>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="card-footer">
+                                    <a asp-action="CreateEditContact" asp-route-id="@contact.Id" class="btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                        <span>Edit</span>
+                                    </a>
+                                    <form asp-action="DeleteContact" asp-route-id="@contact.Id" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this contact?')">
+                                            <i class="fas fa-trash-alt"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
                 }
-            </tr>
-        }
-    </tbody>
-</table>
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-address-book"></i>
+                        <p>No contacts found. Add your first contact to get started!</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

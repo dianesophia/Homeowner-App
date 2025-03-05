@@ -1,66 +1,280 @@
 ﻿@model Hometown_Application.Models.ContactModel
+@using Hometown_Application.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
-@{
-    ViewData["Title"] = Model.Id == 0 ? "Add Contact" : "Edit Contact";
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@(Model.Id == 0 ? "Add Contact" : "Edit Contact")</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6F754E;
+            --primary-light: #8a916a;
+            --secondary-color: #A08D67;
+            --background-color: #E6DDC4;
+            --text-color: #2F3A31;
+            --card-bg: #FFFFFF;
+            --danger-color: #dc3545;
+            --success-color: #198754;
+            --border-radius: 16px;
+            --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-<h2>@ViewData["Title"]</h2>
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            min-height: 100px;
+            padding: 15px 20px;
+            font-family: 'Marcellus', serif;
+        }
 
-<form asp-action="CreateEditContactForm" method="post">
-    <input type="hidden" asp-for="Id" />
+        .navbar-brand {
+            font-size: 1.2rem;
+            font-weight: normal;
+            color: white;
+        }
 
-    <div class="form-group">
-        <label asp-for="ContactType"></label>
-        <input asp-for="ContactType" class="form-control" />
-        <span asp-validation-for="ContactType" class="text-danger"></span>
+            .navbar-brand:hover {
+                transform: scale(1.05);
+            }
+
+        .navbar-nav .nav-link {
+            color: white;
+            font-weight: 500;
+            margin: 0 10px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+            .navbar-nav .nav-link:hover {
+                background: var(--primary-light);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .user-info {
+            background: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+            .user-info i {
+                font-size: 1.2rem;
+            }
+
+        .content {
+            flex: 1;
+            margin-bottom: 100px;
+            margin-top: 100px;
+        }
+
+        /* Prevent content from being hidden under the fixed header */
+        body {
+            padding-top: 150px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Marcellus', serif;
+            min-height: 100vh;
+            width: 100%;
+            margin: 0;
+            margin-top: 50px;
+            padding: 0;
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 3rem;
+        }
+
+        .body-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            text-align: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .custom-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            padding: 8px 20px;
+        }
+
+            .custom-btn:hover {
+                background-color: var(--primary-light);
+                opacity: 0.9;
+            }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-home me-2"></i>
+                Golden Haven
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var user = await UserManager.GetUserAsync(User);
+                        if (user != null)
+                        {
+                            <div class="nav-item">
+                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                    <i class="fas fa-user"></i>
+                                    <span>@user.FirstName @user.LastName</span>
+                                </a>
+                            </div>
+                        }
+                    }
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="ManageUsers" asp-action="Index"><i class="fas fa-users-cog me-2"></i>Management Users</a></li>
+                        }
+                    }
+                    <li class="nav-item">
+                        <div class="user-info @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contact" ? "active-tab" : "")">
+                            <i class="fas fa-address-book me-2"></i>
+                            <span>Contacts</span>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Event" asp-action="Index"><i class="fas fa-calendar me-2"></i>Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="Index"><i class="fas fa-file-alt me-2"></i>Document</a></li>
+                    <!--<li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="FileDownload"><i class="fas fa-download me-2"></i>Download</a></li>-->
+                    <li class="nav-item"><a class="nav-link" asp-controller="FeedbackComplaint" asp-action="Index"><i class="fas fa-exclamation-circle me-2"></i>Issues</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div class="body-container">
+            <div class="header-container">
+                <h3 class="page-title">@(Model.Id == 0 ? "Add Contact" : "Edit Contact")</h3>
+            </div>
+
+            <div class="card form-card">
+                <div class="card-body">
+                    <form asp-action="CreateEditContactForm" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="ContactType" class="form-label">Contact Type</label>
+                            <select asp-for="ContactType" asp-items="ViewBag.ContactTypes" class="form-control">
+                                <option value="">Select Contact Type</option>
+                            </select>
+                            <span asp-validation-for="ContactType" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Number" class="form-label">Phone Number</label>
+                            <input asp-for="Number" class="form-control" />
+                            <span asp-validation-for="Number" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn custom-btn">Save</button>
+                            <a asp-action="Index" class="btn custom-btn btn-secondary">Cancel</a>
+                        </div>
+
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger mt-3">
+                                <ul>
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Description"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Number">Phone Number</label>
-        <input asp-for="Number" class="form-control" id="phoneNumber" type="text"
-               pattern="\+63\s\d{3}\s\d{3}\s\d{4}"
-               title="Must be in the format +63 XXX XXX XXXX"
-               placeholder="+63 XXX XXX XXXX" required
-               maxlength="16" oninput="formatPhoneNumber(this)" />
-        <span asp-validation-for="Number" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
-
-<script>
-    function formatPhoneNumber(input) {
-        let value = input.value.replace(/[^0-9+]/g, ''); // Remove non-numeric except "+"
-
-        if (!value.startsWith("+63")) {
-            value = "+63";
-        }
-
-        // Ensure a single space after "+63"
-        value = value.replace(/\+63\s?/g, "+63 ");
-
-        // Remove existing spaces before formatting
-        value = value.replace(/\s+/g, '');
-
-        // Insert spaces at the correct positions
-        if (value.length > 3) {
-            value = value.slice(0, 3) + " " + value.slice(3);
-        }
-        if (value.length > 7) {
-            value = value.slice(0, 7) + " " + value.slice(7);
-        }
-        if (value.length > 11) {
-            value = value.slice(0, 11) + " " + value.slice(11, 16);
-        }
-
-        // Ensure maxlength is not exceeded
-        input.value = value.slice(0, 16);
-    }
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

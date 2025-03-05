@@ -24,57 +24,76 @@ namespace Hometown_Application.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var documents = _context.Documents.ToList(); 
+            var documents = _context.Documents.ToList();
             return View(documents);
         }
 
-
         [Authorize(Roles = "Admin")]
         [HttpPost]
-         public async Task<IActionResult> UploadFiles(List<IFormFile> files)
-         {
-             if (files == null || files.Count == 0)
-             {
-                 TempData["Message"] = "No files selected.";
-                 return RedirectToAction("Index");
-             }
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files)
+        {
+            if (files == null || files.Count == 0)
+            {
+                TempData["MessageType"] = "error";
+                TempData["Message"] = "No files selected.";
+                return RedirectToAction("Index");
+            }
 
-             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Files");
-             Directory.CreateDirectory(uploadsFolder);
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Files");
+            Directory.CreateDirectory(uploadsFolder);
 
-             List<DocumentModel> uploadedDocuments = new List<DocumentModel>();
+            List<DocumentModel> uploadedDocuments = new List<DocumentModel>();
+            bool uploadSuccessful = true;
 
-             foreach (var file in files)
-             {
-                 if (file.Length > 0)
-                 {
-                     var fileName = Path.GetFileName(file.FileName);
-                     var filePath = Path.Combine(uploadsFolder, fileName);
+            foreach (var file in files)
+            {
+                try
+                {
+                    if (file.Length > 0)
+                    {
+                        var fileName = Path.GetFileName(file.FileName);
+                        var filePath = Path.Combine(uploadsFolder, fileName);
 
-                     using (var stream = new FileStream(filePath, FileMode.Create))
-                     {
-                         await file.CopyToAsync(stream);
-                     }
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
 
-                     var document = new DocumentModel
-                     {
-                         DocumentName = fileName,
-                         DocumentType = file.ContentType,
-                         FilePath = $"/Files/{fileName}",
-                         FileSize = file.Length / 1024,
-                         UploadedOn = DateTime.Now,
-                         UploadedBy = "Admin"
-                     };
+                        var document = new DocumentModel
+                        {
+                            DocumentName = fileName,
+                            DocumentType = file.ContentType,
+                            FilePath = $"/Files/{fileName}",
+                            FileSize = file.Length / 1024,
+                            UploadedOn = DateTime.Now,
+                            UploadedBy = "Admin"
+                        };
 
-                     uploadedDocuments.Add(document);
-                     _context.Documents.Add(document);
-                 }
-             }
+                        uploadedDocuments.Add(document);
+                        _context.Documents.Add(document);
+                    }
+                }
+                catch (Exception)
+                {
+                    uploadSuccessful = false;
+                }
+            }
 
-             await _context.SaveChangesAsync();
-             TempData["Message"] = "Files uploaded successfully!";
-             return RedirectToAction("Index");
-         }
+            if (uploadSuccessful)
+            {
+                await _context.SaveChangesAsync();
+                TempData["MessageType"] = "success";
+                TempData["Message"] = $"{files.Count} file(s) uploaded successfully!";
+            }
+            else
+            {
+                TempData["MessageType"] = "error";
+                TempData["Message"] = "Error uploading some files. Please try again.";
+            }
+
+            return RedirectToAction("Index");
+        }
+
         [HttpGet]
         public IActionResult FileDownload()
         {
@@ -88,6 +107,7 @@ namespace Hometown_Application.Controllers
         {
             if (string.IsNullOrEmpty(fileName))
             {
+                TempData["MessageType"] = "error";
                 TempData["Message"] = "Invalid file name.";
                 return RedirectToAction("FileDownload");
             }
@@ -97,6 +117,7 @@ namespace Hometown_Application.Controllers
 
             if (!System.IO.File.Exists(filePath))
             {
+                TempData["MessageType"] = "error";
                 TempData["Message"] = "File not found.";
                 return RedirectToAction("FileDownload");
             }
@@ -112,6 +133,7 @@ namespace Hometown_Application.Controllers
             var documentDb = _context.Documents.SingleOrDefault(doc => doc.Id == id);
             if (documentDb == null)
             {
+                TempData["MessageType"] = "error";
                 TempData["Message"] = "Document not found.";
                 return RedirectToAction("Index");
             }
@@ -125,9 +147,10 @@ namespace Hometown_Application.Controllers
 
             _context.Documents.Remove(documentDb);
             _context.SaveChanges();
+
+            TempData["MessageType"] = "success";
             TempData["Message"] = "Document deleted successfully!";
             return RedirectToAction("Index");
         }
-
     }
 }
