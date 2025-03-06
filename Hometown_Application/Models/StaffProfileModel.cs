@@ -66,7 +66,7 @@ namespace Hometown_Application.Models
         [ForeignKey("HouseId")]
         public HouseModel? House { get; set; }
 
-        [PersonalData]
+        [PersonalData] 
         [Column(TypeName = "nvarchar(255)")]
         public string? Address { get; set; }
 
