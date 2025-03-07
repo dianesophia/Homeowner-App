@@ -336,12 +336,16 @@
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="ManageUsers" asp-action="Index"><i class="fas fa-users-cog me-2"></i>Management Users</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="CreateStaff" asp-action="CreateStaff"><i class="fas fa-users-cog me-2"></i>Create Staff</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Facility" asp-action="Index"><i class="fas fa-users-cog me-2"></i>Facility Management</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Reservation" asp-action="ManageReservations"><i class="fas fa-users-cog me-2"></i>Reservation Management</a></li>
                         }
                     }
+                    <li class="nav-item"><a class="nav-link" asp-controller="Reservation" asp-action="AvailableFacilities"><i class="fas fa-address-book me-2"></i>Facility</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Reservation" asp-action="ReservationStatusReport"><i class="fas fa-address-book me-2"></i>My Reservations</a></li>
                     <li class="nav-item"><a class="nav-link" asp-controller="Contact" asp-action="Index"><i class="fas fa-address-book me-2"></i>Contacts</a></li>
                     <li class="nav-item"><a class="nav-link" asp-controller="Event" asp-action="Index"><i class="fas fa-calendar me-2"></i>Calendar</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="Index"><i class="fas fa-upload me-2"></i>Upload</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="FileDownload"><i class="fas fa-download me-2"></i>Download</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="Index"><i class="fas fa-file-alt me-2"></i>Document</a></li>
+                    <!--<li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="FileDownload"><i class="fas fa-download me-2"></i>Download</a></li>-->
                     <li class="nav-item"><a class="nav-link" asp-controller="FeedbackComplaint" asp-action="Index"><i class="fas fa-exclamation-circle me-2"></i>Issues</a></li>
                     <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                 </ul>
@@ -357,7 +361,7 @@
 
         <div class="dashboard-grid">
             <div class="stat-card">
-                <i class="fas fa-users stat-icon"></i>
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
                 <div class="stat-number">@Model.TotalUsers</div>
                 <div class="stat-label">Total Users</div>
                 <div class="stat-trend trend-up">
@@ -366,7 +370,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <i class="fas fa-exclamation-circle stat-icon"></i>
+                <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
                 <div class="stat-number">@Model.ActiveIssues</div>
                 <div class="stat-label">Active Issues</div>
                 <div class="stat-trend trend-down">
@@ -375,7 +379,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <i class="fas fa-file-alt stat-icon"></i>
+                <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
                 <div class="stat-number">@Model.TotalDocuments</div>
                 <div class="stat-label">Documents</div>
                 <div class="stat-trend trend-up">
