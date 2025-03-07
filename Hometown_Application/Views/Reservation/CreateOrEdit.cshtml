@@ -1,0 +1,91 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Hometown_Application.Areas.Identity.Data
+@inject UserManager<ApplicationUser> UserManager
+@model Hometown_Application.Models.ReservationModel
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    ViewData["Title"] = Model.ReservationId == 0 ? "Create Reservation" : "Edit Reservation";
+}
+
+<h2>@(Model.ReservationId == 0 ? "Create a Reservation" : "Edit Reservation")</h2>
+
+<!-- Display Facility Image (if editing) -->
+@if (Model.ReservationId != 0 && Model.Facility?.Image != null && Model.Facility.Image.Length > 0)
+{
+    <div class="mb-3">
+        <label class="form-label">Facility Image</label>
+        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Facility.Image)" alt="@Model.Facility.Name" style="max-width: 200px; max-height: 200px;" />
+    </div>
+}
+
+<form id="ReservationForm" asp-action="CreateOrEdit" asp-controller="Reservation" onsubmit="return validateReservationForm()">
+    <input type="hidden" name="ReservationId" value="@Model?.ReservationId" />
+    <input type="hidden" name="UserId" value="@user?.Id" />
+    <input type="hidden" name="AddedBy" value="@user?.Id" />
+    <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(Model?.RowVersion ?? Array.Empty<byte>())" />
+
+    <label for="FacilityId">Facility</label>
+    <select class="form-control" id="FacilityId" name="FacilityId" required>
+        <option value="" disabled selected>Select a facility</option>
+        @foreach (var facility in ViewBag.Facilities)
+        {
+            <option value="@facility.Value" selected="@(Model?.FacilityId == Convert.ToInt32(facility.Value) ? "selected" : null)">
+                @facility.Text
+            </option>
+        }
+    </select>
+
+    <label for="ReservationDate">Date</label>
+    <input class="form-control" id="ReservationDate" type="date" name="ReservationDate" value="@Model?.ReservationDate.ToString("yyyy-MM-dd")" required />
+
+    <label for="StartTime">Start Time</label>
+    <input class="form-control" id="StartTime" type="time" name="StartTime" value="@Model?.StartTime.ToString("HH:mm")" required />
+
+    <label for="EndTime">End Time</label>
+    <input class="form-control" id="EndTime" type="time" name="EndTime" value="@Model?.EndTime.ToString("HH:mm")" required />
+
+    <button class="btn btn-primary mt-3" type="submit">Submit</button>
+</form>
+
+<a asp-action="ReservationStatusReport" class="btn btn-secondary mt-3">Back to My Reservations</a>
+
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Validation Errors:</strong>
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script>
+    function validateReservationForm() {
+        var facility = document.querySelector('select[name="FacilityId"]').value;
+        var date = document.querySelector('input[name="ReservationDate"]').value;
+        var startTime = document.querySelector('input[name="StartTime"]').value;
+        var endTime = document.querySelector('input[name="EndTime"]').value;
+
+        if (!facility || facility === "" || !date || !startTime || !endTime) {
+            alert("Please fill in all required fields, including selecting a valid facility.");
+            return false;
+        }
+
+        if (startTime >= endTime) {
+            alert("End time must be later than start time.");
+            return false;
+        }
+
+        return true;
+    }
+</script>

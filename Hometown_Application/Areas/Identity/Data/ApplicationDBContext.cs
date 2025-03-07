@@ -23,9 +23,30 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<DocumentModel> Documents { get; set; }
     public DbSet<ContactModel> Contacts { get; set; }
     public DbSet<StatusModel> Status { get; set; }
+    public DbSet<ReservationModel> Reservation { get; set; }
+    public DbSet<FacilityModel> Facility { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+       builder.Entity<FacilityModel>()
+            .HasMany(f => f.Reservations)
+            .WithOne(r => r.Facility)
+            .HasForeignKey(r => r.FacilityId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        
+        builder.Entity<ReservationModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
+
+        
+        builder.Entity<FeedbackComplaintModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<IdentityRole>().ToTable("AspNetRoles").HasKey(r => r.Id);
         builder.Entity<ApplicationUser>().ToTable("AspNetUsers").HasKey(u => u.Id);
