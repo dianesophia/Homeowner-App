@@ -8,9 +8,16 @@
 
 @if (User.IsInRole("Admin"))
 {
-    <a asp-controller="FeedbackComplaint" asp-action="AdminView" class="btn btn-secondary">Admin</a>
+    <a asp-controller="FeedbackComplaint" asp-action="ManageFeedback" class="btn btn-secondary">Manage Feedback</a>
+    <a asp-controller="FeedbackComplaint" asp-action="ManageComplaint" class="btn btn-secondary">Manage Complaint</a>
 }
 
 <a asp-controller="FeedbackComplaint" asp-action="Feedback" class="btn btn-secondary">Feedback</a>
 <a asp-controller="FeedbackComplaint" asp-action="Complaint" class="btn btn-secondary">Complaint</a>
-<a asp-controller="FeedbackComplaint" asp-action="FCStatusReport" class="btn btn-secondary">Status</a>
+
+
+@if (User.IsInRole("HomeOwner"))
+{
+    <a asp-controller="FeedbackComplaint" asp-action="FeedbackStatusReport" class="btn btn-secondary">Feedback Status Report</a>
+    <a asp-controller="FeedbackComplaint" asp-action="ComplaintStatusReport" class="btn btn-secondary">Complaint Status Report</a>
+}

@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Hometown_Application.Areas.Identity.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+using Hometown_Application.Data;
+using Hometown_Application.ViewModel;
+
 
 namespace Hometown_Application.Controllers
 {
@@ -14,38 +16,29 @@ namespace Hometown_Application.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDBContext _context;
 
-        public DashboardController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public DashboardController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDBContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
-        }
+            var totalUsers = await _userManager.Users.CountAsync();
+            //var activeIssues = await _context.FeedbackComplaints.Where(f => f.Status == "Open").CountAsync();
+            var totalDocuments = await _context.Documents.CountAsync();
 
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UserManagement()
-        {
-            var users = _userManager.Users.ToList();
-            var usersWithRoles = new List<(ApplicationUser User, string Role)>();
-
-            foreach (var user in users)
+            var model = new DashboardViewModel
             {
-                var roles = await _userManager.GetRolesAsync(user); // Fetch role
-                var role = roles.FirstOrDefault() ?? "No Role"; 
-                usersWithRoles.Add((user, role)); 
-            }
+                TotalUsers = totalUsers,
+                //ActiveIssues = activeIssues,
+                TotalDocuments = totalDocuments
+            };
 
-            return View(usersWithRoles);
+            return View(model);
         }
-
-       
-
-        
-
-
     }
 }

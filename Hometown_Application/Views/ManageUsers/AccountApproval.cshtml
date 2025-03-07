@@ -1,0 +1,38 @@
+﻿@model IEnumerable<(Hometown_Application.Areas.Identity.Data.ApplicationUser User, string Role)>
+@using Hometown_Application.Data
+@inject ApplicationDBContext dbContext
+
+<h1 class="mb-4">Change User Role</h1>
+<a asp-controller="ManageUsers" asp-action="Index" class="btn btn-secondary mb-3">Back</a>
+
+<h3 class="mt-4">Pending Approval</h3>
+<div class="table-responsive">
+    <table class="table table-bordered table-hover text-center align-middle">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(u => u.Role == "HomeOwner" && dbContext.HomeownerProfiles.Any(h => h.UserId == u.User.Id && !h.IsApproved)))
+            {
+                <tr>
+                    <td>@item.User.FirstName</td>
+                    <td>@item.User.LastName</td>
+                    <td>@item.User.Email</td>
+                    <td>@item.User.UserName</td>
+                    <td>
+                        <form asp-action="ApproveHomeowner" method="post" class="d-inline">
+                            <input type="hidden" name="userId" value="@item.User.Id" />
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

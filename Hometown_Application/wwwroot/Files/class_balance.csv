@@ -1,0 +1,9 @@
+Class Name,Total Count,Training Count,Validation Count,Test Count
+20,582,416,117,49
+1000,564,400,109,55
+500,534,363,113,58
+50,501,350,101,50
+200,439,304,86,49
+100,403,280,80,43
+\,1,1,0,0
+not money,1,0,0,1
