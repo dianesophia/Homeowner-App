@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class UserHouse : Migration
+    public partial class yeah : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -87,6 +87,30 @@ namespace Hometown_Application.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Events", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Facility",
+                columns: table => new
+                {
+                    FacilityId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    OtherType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(252)", maxLength: 252, nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    ApprovedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Facility", x => x.FacilityId);
                 });
 
             migrationBuilder.CreateTable(
@@ -313,6 +337,42 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Reservation",
+                columns: table => new
+                {
+                    ReservationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FacilityId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ReservationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reservation", x => x.ReservationId);
+                    table.ForeignKey(
+                        name: "FK_Reservation_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reservation_Facility_FacilityId",
+                        column: x => x.FacilityId,
+                        principalTable: "Facility",
+                        principalColumn: "FacilityId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "HomeownerProfiles",
                 columns: table => new
                 {
@@ -487,6 +547,16 @@ namespace Hometown_Application.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reservation_FacilityId",
+                table: "Reservation",
+                column: "FacilityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservation_UserId",
+                table: "Reservation",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StaffProfiles_HouseId",
                 table: "StaffProfiles",
                 column: "HouseId");
@@ -590,10 +660,16 @@ namespace Hometown_Application.Migrations
                 name: "FeedbackComplaints");
 
             migrationBuilder.DropTable(
+                name: "Reservation");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Status");
+
+            migrationBuilder.DropTable(
+                name: "Facility");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

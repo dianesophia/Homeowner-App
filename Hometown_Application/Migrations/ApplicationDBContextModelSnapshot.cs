@@ -434,45 +434,6 @@ namespace Hometown_Application.Migrations
                     b.ToTable("FeedbackComplaints");
                 });
 
-            modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
-                {
-                    b.Property<int>("ReservationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservationId"));
-
-                    b.Property<string>("AddedBy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("AddedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FacilityId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ReservationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
             modelBuilder.Entity("Hometown_Application.Models.HomeownerProfileModel", b =>
                 {
                     b.Property<int>("HomeownerId")
@@ -555,6 +516,65 @@ namespace Hometown_Application.Migrations
                     b.ToTable("House");
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
+                {
+                    b.Property<int>("ReservationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservationId"));
+
+                    b.Property<string>("AddedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FacilityId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ReservationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ReservationId");
+
+                    b.HasIndex("FacilityId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reservation");
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
                 {
                     b.Property<int>("StaffId")
@@ -610,7 +630,6 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasColumnType("decimal(18,2)");
 
-
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -621,14 +640,6 @@ namespace Hometown_Application.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-   b.HasKey("ReservationId");
-
-                    b.HasIndex("FacilityId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Reservation");
 
                     b.HasKey("StaffId");
 
@@ -905,24 +916,6 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
-                {
-                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
-                        .WithMany()
-                        .HasForeignKey("HouseId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("House");
-                });
-
             modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.FacilityModel", "Facility")
@@ -940,6 +933,24 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Facility");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
+                        .WithMany()
+                        .HasForeignKey("HouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("House");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -993,9 +1004,10 @@ namespace Hometown_Application.Migrations
                         .IsRequired();
                 });
 
-    modelBuilder.Entity("Hometown_Application.Models.FacilityModel", b =>
+            modelBuilder.Entity("Hometown_Application.Models.FacilityModel", b =>
                 {
                     b.Navigation("Reservations");
+                });
 
             modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
                 {

@@ -28,40 +28,6 @@
             --transition: all 0.3s ease;
         }
 
-@if (SignInManager.IsSignedIn(User))
-{
-    if (User.IsInRole("Admin"))
-    {
-        <h3>Admin Dashboard</h3>
-        <div class="btn-group mb-3" role="group">
-            <a asp-controller="UserManagement" asp-action="Index" class="btn btn-secondary">User Management</a>
-            <a asp-controller="Facility" asp-action="Index" class="btn btn-primary">Facility Management</a>
-            <a asp-controller="Reservation" asp-action="ManageReservations" class="btn btn-primary">Reservation Management</a>
-        </div>
-    }
-    else if (User.IsInRole("Staff"))
-    {
-        <h3>Staff Dashboard</h3>
-        <!-- Add staff-specific links or content here -->
-        <div class="btn-group mb-3" role="group">
-            <a asp-controller="Reservation" asp-action="ManageReservations" class="btn btn-primary">Reservation Management</a>
-        </div>
-    }
-
-    <div class="btn-group mb-3" role="group">
-        <a asp-controller="Reservation" asp-action="AvailableFacilities" class="btn btn-primary">Facility</a>
-        <a asp-controller="Reservation" asp-action="ReservationStatusReport" class="btn btn-secondary">My Reservations</a>
-        <a asp-controller="Contact" asp-action="Index" class="btn btn-secondary">View Contacts</a>
-        <a asp-controller="Event" asp-action="Index" class="btn btn-secondary">Calendar</a>
-        <a asp-controller="Document" asp-action="FileDownload" class="btn btn-secondary">Files</a>
-        <a asp-controller="FeedbackComplaint" asp-action="Index" class="btn btn-secondary">Issues</a>
-    </div>
-}
-else
-{
-    <p>Please sign in to access the dashboard.</p>
-}
-=======
         .navbar {
             position: fixed;
             top: 0;
@@ -135,7 +101,6 @@ else
         .dashboard-header {
             margin-top: 150px;
             margin-bottom: 40px;
-
         }
 
         .dashboard-title {
@@ -241,6 +206,7 @@ else
                 display: inline-block;
                 padding-bottom: 10px;
             }
+
                 .quick-actions h2:after {
                     content: '';
                     bottom: 0;
@@ -362,7 +328,7 @@ else
                                 </div>
                             </li>
 
-                        }   
+                        }
                     }
                     @if (SignInManager.IsSignedIn(User))
                     {
@@ -417,40 +383,39 @@ else
                     <span>8% this month</span>
                 </div>
             </div>
-    <a asp-controller="FeedbackComplaint" asp-action="Index" class="btn btn-secondary">Issues</a>
+            <a asp-controller="FeedbackComplaint" asp-action="Index" class="btn btn-secondary">Issues</a>
 
-        <div class="quick-actions">
-            <h2>Quick Actions</h2>
-            <div class="action-grid">
-                <a href="Contact" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-plus-circle"></i>
-                    </div>
-                    <h3>New Contact</h3>
-                </a>
-                <a href="Event" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-calendar-plus"></i>
-                    </div>
-                    <h3>Schedule Event</h3>
-                </a>
-                <a href="Document" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-file-upload"></i>
-                    </div>
-                    <h3>Upload Document</h3>
-                </a>
-                <a href="FeedbackComplaint" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-ticket-alt"></i>
-                    </div>
-                    <h3>Report Issue</h3>
-                </a>
+            <div class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="action-grid">
+                    <a href="Contact" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <h3>New Contact</h3>
+                    </a>
+                    <a href="Event" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <h3>Schedule Event</h3>
+                    </a>
+                    <a href="Document" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h3>Upload Document</h3>
+                    </a>
+                    <a href="FeedbackComplaint" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h3>Report Issue</h3>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
