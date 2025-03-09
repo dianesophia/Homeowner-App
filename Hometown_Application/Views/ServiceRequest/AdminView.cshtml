@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Hometown_Application.Models.ServiceRequestModel>
+
+<h2>Admin View - All Service Requests</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Urgency</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.Category</td>
+                <td>@request.Description</td>
+                <td>@request.Urgency</td>
+                <td>@request.Email</td>
+                <td>@request.Status</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning">Edit</a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            onclick="setDeleteId(@request.ServiceRequestId)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

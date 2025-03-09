@@ -9,48 +9,120 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-<h3 class="mb-4 text-primary text-center">@ViewData["Title"]</h3>
+<style>
+    :root {
+        --olive-green: #6d7349;
+        --sand-beige: #e8dcca;
+        --gold-accent: #b19b6d;
+        --text-dark: #4a4a4a;
+    }
+
+    .profile-card {
+        background-color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .profile-title {
+        color: var(--olive-green);
+        font-family: serif;
+        font-weight: normal;
+    }
+
+    .profile-subtitle {
+        color: var(--gold-accent);
+        font-weight: 500;
+    }
+
+    .profile-picture {
+        width: 180px;
+        height: 180px;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .custom-form-control {
+        border-color: #e2e2e2;
+        padding: 0.6rem 0.75rem;
+    }
+
+        .custom-form-control:focus {
+            border-color: var(--gold-accent);
+            box-shadow: 0 0 0 0.2rem rgba(177, 155, 109, 0.15);
+        }
+
+    .custom-select {
+        border-color: #e2e2e2;
+        padding: 0.6rem 0.75rem;
+    }
+
+        .custom-select:focus {
+            border-color: var(--gold-accent);
+            box-shadow: 0 0 0 0.2rem rgba(177, 155, 109, 0.15);
+        }
+
+    .custom-btn {
+        background-color: var(--olive-green);
+        border-color: var(--olive-green);
+        padding: 0.6rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+        .custom-btn:hover {
+            background-color: #5c6240;
+            border-color: #5c6240;
+        }
+
+    .form-check-input:checked {
+        background-color: var(--olive-green);
+        border-color: var(--olive-green);
+    }
+</style>
+
+<h3 class="profile-title text-center mb-4">@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card shadow-lg border-0 rounded-4 p-4">
+        <div class="profile-card p-4">
             <div class="card-body">
-                <h5 class="card-title text-center text-secondary mb-4">Edit Profile</h5>
+                <h5 class="profile-subtitle text-center mb-4">Edit Profile</h5>
 
                 <form id="profile-form" method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                     <!-- Profile Picture Section -->
                     <div class="text-center mb-4">
-                        <img id="profilePicture" class="img-thumbnail rounded-circle shadow-sm"
-                             style="width: 200px; height: 200px; object-fit: cover;"
+                        <img id="profilePicture" class="profile-picture rounded-circle"
                              src="@((Model.Input.ProfilePicture != null) ?
                                     $"data:image/*;base64,{Convert.ToBase64String(Model.Input.ProfilePicture)}" :
                                     "https://via.placeholder.com/200")">
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="Input.ProfilePictureFile"></label>
-                        <input type="file" id="ProfilePictureFile" asp-for="Input.ProfilePictureFile" class="form-control" />
+                    <div class="mb-3">
+                        <label asp-for="Input.ProfilePictureFile" class="form-label">Profile Picture</label>
+                        <input type="file" id="ProfilePictureFile" asp-for="Input.ProfilePictureFile" class="form-control custom-form-control" />
                         <span asp-validation-for="Input.ProfilePictureFile" class="text-danger"></span>
                     </div>
 
                     <!-- Username (Read-Only) -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="Username" class="form-control" placeholder="Your username" disabled />
-                        <label asp-for="Username" class="form-label"></label>
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label">Username</label>
+                        <input asp-for="Username" class="form-control custom-form-control" placeholder="Your username" disabled />
                     </div>
 
                     <!-- Gender Dropdown -->
-                    <div class="form-floating mb-3">
-                        <select asp-for="Input.Gender" class="form-select">
+                    <div class="mb-3">
+                        <label asp-for="Input.Gender" class="form-label">Gender</label>
+                        <select asp-for="Input.Gender" class="form-select custom-select">
                             <option value="">Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                             <option value="Other">Other</option>
                         </select>
-                        <label asp-for="Input.Gender" class="form-label"></label>
                     </div>
 
                     <!-- Gender Privacy -->
@@ -60,24 +132,41 @@
                     </div>
 
                     <!-- Phone Number -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Your phone number" />
-                        <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                    <div class="mb-3">
+                        <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
+                        <input asp-for="Input.PhoneNumber" class="form-control custom-form-control" placeholder="Your phone number" />
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
 
-
                     <!-- Personalization Information -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Bio" class="form-control" placeholder="Short bio about yourself" />
+                    <div class="mb-3">
                         <label asp-for="Input.Bio" class="form-label">Short Bio</label>
+                        <textarea asp-for="Input.Bio" class="form-control custom-form-control" rows="3" placeholder="Short bio about yourself"></textarea>
                     </div>
-                   
 
-                 
-
-                    <button id="update-profile-button" type="submit" class="btn btn-primary w-100 fw-bold">Save Changes</button>
+                    <button id="update-profile-button" type="submit" class="btn custom-btn text-white w-100 mt-3">Save Changes</button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cropper Modal -->
+<div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="img-container">
+                    <img id="cropperImage" src="" style="max-width: 100%;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn custom-btn text-white" id="cropButton">Crop & Save</button>
             </div>
         </div>
     </div>
@@ -85,58 +174,57 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let cropper;
+            const fileInput = document.getElementById('ProfilePictureFile');
+            const cropperImage = document.getElementById('cropperImage');
+            const profilePicture = document.getElementById('profilePicture');
+            const cropperModal = new bootstrap.Modal(document.getElementById('cropperModal'));
+            const cropButton = document.getElementById('cropButton');
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let cropper;
-        const fileInput = document.getElementById('ProfilePictureFile');
-        const cropperImage = document.getElementById('cropperImage');
-        const profilePicture = document.getElementById('profilePicture');
-        const cropperModal = new bootstrap.Modal(document.getElementById('cropperModal'));
-        const cropButton = document.getElementById('cropButton');
-
-        fileInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    cropperImage.src = e.target.result;
-                    cropperModal.show();
-                    if (cropper) {
-                        cropper.destroy();
-                    }
-                    cropper = new Cropper(cropperImage, {
-                        aspectRatio: 1,
-                        viewMode: 2,
-                        autoCropArea: 1,
-                        responsive: true,
-                        scalable: true,
-                        zoomable: true,
-                        minContainerWidth: 600,
-                        minContainerHeight: 400,
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        cropButton.addEventListener('click', function () {
-            if (!cropper) return;
-            const croppedCanvas = cropper.getCroppedCanvas({
-                width: 3000,
-                height: 3000
+            fileInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        cropperImage.src = e.target.result;
+                        cropperModal.show();
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+                        cropper = new Cropper(cropperImage, {
+                            aspectRatio: 1,
+                            viewMode: 2,
+                            autoCropArea: 1,
+                            responsive: true,
+                            scalable: true,
+                            zoomable: true,
+                            minContainerWidth: 600,
+                            minContainerHeight: 400,
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
-            if (croppedCanvas) {
-                profilePicture.src = croppedCanvas.toDataURL('image/png');
-                croppedCanvas.toBlob(function (blob) {
-                    const file = new File([blob], "profile.png", { type: "image/png" });
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput.files = dataTransfer.files;
+
+            cropButton.addEventListener('click', function () {
+                if (!cropper) return;
+                const croppedCanvas = cropper.getCroppedCanvas({
+                    width: 3000,
+                    height: 3000
                 });
-                cropperModal.hide();
-            }
+                if (croppedCanvas) {
+                    profilePicture.src = croppedCanvas.toDataURL('image/png');
+                    croppedCanvas.toBlob(function (blob) {
+                        const file = new File([blob], "profile.png", { type: "image/png" });
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        fileInput.files = dataTransfer.files;
+                    });
+                    cropperModal.hide();
+                }
+            });
         });
-    });
-</script>
+    </script>
+}

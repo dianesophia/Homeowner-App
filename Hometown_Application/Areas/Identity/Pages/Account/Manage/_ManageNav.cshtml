@@ -2,14 +2,84 @@
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
+
+<style>
+    :root {
+        --olive-green: #6d7349; /* Color extracted from your image */
+    }
+
+    .account-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .account-nav .nav-item {
+            margin-bottom: 0.5rem;
+            border-left: 3px solid transparent;
+        }
+
+        .account-nav .nav-link {
+            color: #4a4a4a;
+            padding: 0.5rem 0.75rem;
+            display: block;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            border-radius: 0;
+        }
+
+            .account-nav .nav-link:hover {
+                color: var(--olive-green);
+                background-color: rgba(109, 115, 73, 0.05);
+            }
+
+            .account-nav .nav-link.active {
+                color: var(--olive-green);
+                background-color: rgba(109, 115, 73, 0.08);
+                border-left: 3px solid var(--olive-green);
+                margin-left: -3px;
+                font-weight: 500;
+            }
+
+            .account-nav .nav-link i {
+                margin-right: 8px;
+                color: var(--olive-green);
+            }
+</style>
+
+<ul class="account-nav">
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">
+            <i class="fa fa-user-circle"></i> Profile
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">
+            <i class="fa fa-envelope"></i> Email
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">
+            <i class="fa fa-lock"></i> Password
+        </a>
+    </li>
     @if (hasExternalLogins)
     {
-        <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
+        <li id="external-logins" class="nav-item">
+            <a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">
+                <i class="fa fa-external-link"></i> External logins
+            </a>
+        </li>
     }
-    <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">
+            <i class="fa fa-shield"></i> Two-factor authentication
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">
+            <i class="fa fa-database"></i> Personal data
+        </a>
+    </li>
 </ul>

@@ -1,0 +1,34 @@
+﻿@model Hometown_Application.Models.ServiceRequestModel
+
+
+<h2>Submit a Service Request</h2>
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label>Category</label>
+        <input asp-for="Category" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Description</label>
+        <textarea asp-for="Description" class="form-control" required></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Urgency</label>
+        <select asp-for="Urgency" class="form-control">
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" type="email" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+    <!-- View Requests Button -->
+    <a asp-action="Index" class="btn btn-secondary">View Requests</a>
+</form>

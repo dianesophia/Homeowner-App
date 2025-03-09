@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Hometown_Application.Models.ServiceRequestModel>
+
+<h2>Service Requests</h2>
+
+<!-- Admin and Homeowner View Buttons -->
+<div class="mb-3">
+    <a href="@Url.Action("AdminView", "ServiceRequest")" class="btn btn-primary">Admin View</a>
+    <a href="@Url.Action("HomeownerView", "ServiceRequest")" class="btn btn-secondary">Homeowner View</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Urgency</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.Category</td>
+                <td>@request.Description</td>
+                <td>@request.Urgency</td>
+                <td>@request.Email</td>
+                <td>@request.Status</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning">Edit</a>
+
+                    <!-- Delete Button (Triggers Modal) -->
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            onclick="setDeleteId(@request.ServiceRequestId)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success">New Request</a>
+
+<!-- 🔴 DELETE CONFIRMATION MODAL -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this service request?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteRequestId" />
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🔹 JavaScript to Set ID in Modal -->
+<script>
+    function setDeleteId(id) {
+        document.getElementById("deleteRequestId").value = id;
+    }
+</script>

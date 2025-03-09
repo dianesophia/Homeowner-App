@@ -25,6 +25,8 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<StatusModel> Status { get; set; }
     public DbSet<ReservationModel> Reservation { get; set; }
     public DbSet<FacilityModel> Facility { get; set; }
+    public DbSet<ServiceRequestModel> ServiceRequests { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -110,6 +112,27 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .HasForeignKey(fc => fc.StatusId)
         .OnDelete(DeleteBehavior.Restrict);
 
+
+        builder.Entity<ServiceRequestModel>()
+           .HasOne(s => s.AssignedStaff)
+           .WithMany()
+           .HasForeignKey(s => s.StaffId)
+           .OnDelete(DeleteBehavior.SetNull);
+
+        
+       /* modelBuilder.Entity<ServiceRequestModel>()
+        .HasOne(sr => sr.User) // Assuming ServiceRequestModel has a User navigation property
+        .WithMany() // A User can have many service requests
+        .HasForeignKey(sr => sr.UserId)
+        .OnDelete(DeleteBehavior.Restrict);  // Prevent cascade delete
        
+
+        // You can also configure other relationships the same way
+       builder.Entity<StaffProfileModel>()
+            .HasOne(sp => sp.UserId)
+            .WithMany()
+            .HasForeignKey(sp => sp.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+       */
     }
 }

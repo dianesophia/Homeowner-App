@@ -1,0 +1,42 @@
+﻿    @model Hometown_Application.Models.ServiceRequestModel
+
+
+    <h2>Edit Service Request</h2>
+    <form asp-action="Edit">
+        <input type="hidden" asp-for="ServiceRequestId" />
+
+        <div class="form-group">
+            <label>Category</label>
+            <input asp-for="Category" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea asp-for="Description" class="form-control" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Urgency</label>
+            <select asp-for="Urgency" class="form-control">
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input asp-for="Email" class="form-control" type="email" required />
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <select asp-for="Status" class="form-control">
+                <option>Pending</option>
+                <option>In Progress</option>
+                <option>Completed</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
