@@ -1,166 +1,744 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Hometown_Application.Areas.Identity.Data
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Golden Haven</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Hometown_Application.styles.css" asp-append-version="true" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary-color: #6F754E; /* Earthy Green */
-            --secondary-color: #A08D67; /* Gold/Bronze Accent */
-            --background-color: #E6DDC4; /* Warm Beige */
-            --text-color: #2F3A31; /* Dark Greenish Gray */
-            --card-bg: #FFFFFF;
-            --border-radius: 16px;
-            --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        * {
-            font-family: 'Marcellus', serif;
-        }
-
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            min-height: 80vh;
-        }
-
-        .content {
-            flex: 1;
-        }
-
-        /* Prevent content from being hidden under the fixed header */
-        body {
-            padding-top: 70px;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            min-height: 80vh;
-        }
-
-        .container {
-            flex: 1;
-        }
-
-        /* Navbar Styling */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--primary-color);
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            min-height: 100px;
-            padding: 15px 20px;
-            font-family: 'Marcellus', serif;
-        }
-
-        .navbar-brand {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: white;
-        }
-
-        .navbar-toggler {
-            border: none;
-        }
-
-            .navbar-toggler:focus {
-                box-shadow: none;
-            }
-
-        .navbar-collapse {
-            background: var(--primary-color);
-            padding: 10px;
-        }
-
-        .navbar-nav .nav-link {
-            font-weight: 500;
-            margin: 0 10px;
-            padding: 8px 16px;
-            border-radius: var(--border-radius);
-            transition: 0.3s ease-in-out;
-        }
-
-            .navbar-nav .nav-link:hover {
-                background: var(--secondary-color);
-                color: white;
-                transform: translateY(-2px);
-            }
-
-        /* Footer Styling */
-        .footer {
-            width: 100%;
-            background-color: var(--primary-color);
-            color: white;
-            text-align: center;
-            padding: 10px 0; /* Adjust padding to balance content */
-            margin-top: auto;
-            font-size: 14px;
-            height: 100px; /* Set a fixed height */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Marcellus', serif;
-        }
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - Golden Haven</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/style.css" asp-append-version="true">
+	<link rel="stylesheet" href="~/Hometown_Application.styles.css" asp-append-version="true" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
-            .footer p {
-                margin: 0;
-            }
-    </style>
+	<style>
+		:root {
+			--primary-color: #6F754E; /* Earthy Green */
+			--secondary-color: #A08D67; /* Gold/Bronze Accent */
+			--background-color: #E6DDC4; /* Warm Beige */
+			--text-color: #2F3A31; /* Dark Greenish Gray */
+			--card-bg: #FFFFFF;
+			--border-radius: 16px;
+			--shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+			--sidebar-width: 250px;
+			--sidebar-width-collapsed: 70px;
+			--navbar-height: 100px;
+		}
+
+		* {
+			font-family: 'Marcellus', serif;
+		}
+
+		.wrapper {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			position: relative;
+			overflow-x: hidden;
+		}
+
+		body {
+			padding-top: var(--navbar-height);
+			background-color: var(--background-color);
+			color: var(--text-color);
+			margin: 0;
+			transition: all 0.3s ease;
+		}
+
+
+		/* Navbar Styling */
+		.navbar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			background-color: var(--primary-color);
+			box-shadow: var(--shadow);
+			z-index: 1030;
+			min-height: var(--navbar-height);
+			padding: 15px 20px;
+			align-items: center;
+		}
+
+		.navbar-brand {
+			font-size: 1.2rem;
+			font-weight: bold;
+			color: white;
+		}
+
+		.navbar-toggler {
+			border: none;
+		}
+
+			.navbar-toggler:focus {
+				box-shadow: none;
+			}
+
+		.navbar-collapse {
+			background: var(--primary-color);
+			padding: 10px;
+		}
+
+		.navbar-nav .nav-link {
+			font-weight: 500;
+			margin: 0 10px;
+			padding: 8px 16px;
+			border-radius: var(--border-radius);
+			transition: 0.3s ease-in-out;
+			color: white;
+		}
+
+			.navbar-nav .nav-link:hover {
+				background: var(--secondary-color);
+				color: white;
+				transform: translateY(-2px);
+			}
+
+			/* When a tab is active */
+			.navbar-nav .nav-link.active {
+				background: var(--primary-light); /* Change color when tab is active */
+				color: white;
+				font-weight: bold;
+				transform: translateY(-2px);
+			}
+
+
+		.page-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 2rem;
+			flex-wrap: wrap;
+			gap: 20px;
+		}
+		/* Sidebar Toggle Button */
+		.sidebar-toggle {
+			position: fixed;
+			bottom: 20px;
+			left: 10px;
+			z-index: 1020;
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background-color: var(--primary-color);
+			color: white;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			box-shadow: var(--shadow);
+			transition: all 0.3s ease;
+			border: none;
+		}
+
+			.sidebar-toggle:hover {
+				background-color: var(--secondary-color);
+			}
+
+		.sidebar-nav a.active {
+			background-color: var(--primary-color); /* Change to your desired color */
+			border-left: 4px solid var(--secondary-color);
+			font-weight: bold;
+		}
+
+		.dashboard-wrapper {
+			display: flex;
+			transition: all 0.3s ease;
+		}
+
+
+
+		/* Sidebar Styling */
+		.sidebar {
+			width: var(--sidebar-width);
+			background-color: var(--secondary-color);
+			height: calc(100vh - var(--navbar-height));
+			position: fixed;
+			top: var(--navbar-height);
+			padding: 20px 0;
+			box-shadow: var(--shadow);
+			z-index: 1010;
+			transition: all 0.3s ease;
+			overflow-y: auto;
+			overflow-x: hidden;
+			display: block; /* Ensure sidebar is visible by default */
+		}
+
+			.sidebar.collapsed {
+				width: var(--sidebar-width-collapsed);
+			}
+
+		.sidebar-nav {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+			.sidebar-nav li {
+				margin-bottom: 10px;
+				width: 100%;
+				position: relative; /* Added for submenu positioning */
+			}
+
+			.sidebar-nav a {
+				display: flex;
+				align-items: center;
+				padding: 10px 20px;
+				color: white;
+				text-decoration: none;
+				transition: 0.2s;
+				border-left: 4px solid transparent;
+				white-space: nowrap;
+				overflow: hidden;
+			}
+
+				.sidebar-nav a:hover,
+				.sidebar-nav a.active {
+					background-color: rgba(255, 255, 255, 0.1);
+					border-left: 4px solid white;
+				}
+
+			.sidebar-nav i {
+				margin-right: 15px;
+				width: 20px;
+				text-align: center;
+				font-size: 1.1rem;
+			}
+
+		.sidebar.collapsed .sidebar-nav span {
+			display: none;
+		}
+
+		.sidebar.collapsed .sidebar-nav a {
+			justify-content: center;
+			padding: 15px 5px;
+		}
+
+		.sidebar.collapsed .sidebar-nav i {
+			margin-right: 0;
+			font-size: 1.3rem;
+		}
+
+		.main-container {
+			display: flex;
+			flex: 1;
+			position: relative;
+		}
+
+		.main-content {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			min-height: calc(100vh - var(--navbar-height));
+		}
+
+		.main-with-sidebar {
+			margin-left: var(--sidebar-width);
+			width: calc(100% - var(--sidebar-width));
+			transition: all 0.3s ease;
+		}
+
+			.main-with-sidebar.collapsed {
+				margin-left: var(--sidebar-width-collapsed);
+				width: calc(100% - var(--sidebar-width-collapsed));
+			}
+
+		.container {
+			padding: 20px;
+			max-width: 100%;
+			transition: all 0.3s ease;
+			flex: 1;
+		}
+
+		.footer {
+			background-color: var(--primary-color);
+			color: white;
+			text-align: center;
+			padding: 15px 0;
+			width: 100%;
+			transition: all 0.3s ease;
+			overflow: hidden;
+		}
+
+		.footer-with-sidebar {
+			margin-left: 150px;
+			width: calc(100% - var(--sidebar-width));
+			transition: all 0.3s ease;
+			max-width: 100%;
+		}
+
+			.footer-with-sidebar.collapsed {
+				margin-left: var(--sidebar-width-collapsed);
+				width: calc(100% - var(--sidebar-width-collapsed));
+				max-width: 100%;
+			}
+
+		/* Dropdown styling */
+		.sidebar-category {
+			padding: 10px 20px;
+			color: white;
+			font-size: 0.9rem;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			margin-top: 15px;
+			opacity: 0.7;
+		}
+
+		.sidebar-dropdown > a {
+			position: relative;
+		}
+
+			.sidebar-dropdown > a:after {
+				content: "\f107"; /* FontAwesome arrow down icon */
+				font-family: "Font Awesome 5 Free";
+				font-weight: 900;
+				position: absolute;
+				right: 15px;
+				top: 50%;
+				transform: translateY(-50%);
+				transition: transform 0.3s;
+			}
+
+		.sidebar-dropdown.open > a:after {
+			transform: translateY(-50%) rotate(180deg); /* Rotate arrow when open */
+		}
+
+		.sidebar-submenu {
+			display: none; /* Hide submenus by default */
+			padding-left: 20px; /* Indent submenu items */
+			background-color: rgba(0, 0, 0, 0.1); /* Slightly darker background */
+			list-style: none;
+		}
+
+			.sidebar-submenu ul {
+				list-style: none;
+				padding-left: 0;
+			}
+
+		.sidebar-dropdown.open > .sidebar-submenu {
+			display: block; /* Show when open */
+		}
+
+		/* Collapsible sidebar submenu positioning */
+		.sidebar.collapsed .sidebar-dropdown.open .sidebar-submenu {
+			position: absolute;
+			left: 70px; /* Match the --sidebar-width-collapsed value */
+			top: 0;
+			min-width: 180px;
+			background-color: var(--secondary-color);
+			box-shadow: var(--shadow);
+			border-radius: 0 4px 4px 0;
+			z-index: 1000;
+		}
+
+	</style>
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Header -->
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <div class="container-fluid">
-                    <a class="navbar-brand text-white" href="#" style="font-weight: normal;">
-                        <i class="fas fa-home me-2"></i>
-                        Golden Haven
-                    </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <partial name="_LoginPartial.cshtml" />
-                    </div>
-                </div>
-            </nav>
-        </header>
+	<div class="wrapper">
+		<!-- Header -->
+		<header>
+			<nav class="navbar navbar-expand-lg navbar-light">
+				<div class="container-fluid">
+					<a class="navbar-brand text-white" href="#" style="font-weight: normal;">
+						<i class="fas fa-home me-2"></i>
+						Golden Haven
+					</a>
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarNav">
+						<partial name="_LoginPartial.cshtml" />
+					</div>
+				</div>
+			</nav>
+		</header>
 
-        <!-- Main Content -->
-        <div class="container content">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
+		<div class="d-flex">
+			<!-- Sidebar Toggle Button (Only visible when logged in) -->
+			@if (SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null)
+			{
+				<button class="sidebar-toggle" id="sidebar-toggle" title="Toggle Sidebar">
+					<i class="fas fa-bars"></i>
+				</button>
+			}
 
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="container">
-                <p>&copy; @DateTime.Now.Year Golden Haven. All rights reserved.</p>
-            </div>
-        </footer>
-    </div>
+			<!-- Sidebar (Only visible when logged in) -->
+			@if (SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null)
+			{
+				<div class="sidebar" id="sidebar">
+					<ul class="sidebar-nav">
+						@if (SignInManager.IsSignedIn(User))
+						{
+							var user = await UserManager.GetUserAsync(User);
+							if (user != null)
+							{
+								<li class="nav-item">
+									<div class="user-info">
+										@if (user.ProfilePicture != null)
+										{
+											<img src="data:image/*;base64,@(Convert.ToBase64String(user.ProfilePicture))"
+												 alt="Profile Picture"
+												 class="rounded-circle img-thumbnail"
+												 style="width: 50px; height: 50px; object-fit: cover;">
+										}
+										else
+										{
+											<i class="fas fa-user"></i>
+										}
+										<a id="manage" class="nav-link text-dark d-flex align-items-center"
+										   asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+											<span>@user.FirstName @user.LastName</span>
+										</a>
+									</div>
+								</li>
+							}
+						}
+						<li>
+							<a href="/Dashboard" data-page="dashboard">
+								<i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+							</a>
+						</li>
 
-    <!-- Scripts -->
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+						<!-- Communication Category -->
+						<div class="sidebar-category"><span>Communication</span></div>
+						<li>
+							<a href="/Contact" data-page="contact">
+								<i class="fas fa-address-book"></i> <span>Contacts</span>
+							</a>
+						</li>
+						<!--<li class="sidebar-dropdown">
+							<a href="javascript:void(0)">
+								<i class="fas fa-envelope"></i> <span>Messaging</span>
+							</a>
+							<div class="sidebar-submenu">
+								<ul>
+									<li>
+										<a href="/Message/Inbox" data-page="inbox">
+											<i class="fas fa-inbox"></i> <span>Inbox</span>
+										</a>
+									</li>
+									<li>
+										<a href="/Message/Sent" data-page="sent">
+											<i class="fas fa-paper-plane"></i> <span>Sent</span>
+										</a>
+									</li>
+									<li>
+										<a href="/Message/Compose" data-page="compose">
+											<i class="fas fa-pen"></i> <span>Compose</span>
+										</a>
+									</li>
+								</ul>
+							</div>
+				</li>-->
+
+						<!-- Management Category 
+						<div class="sidebar-category"><span>Management</span></div>
+						<li>
+							<a href="/Event" data-page="event">
+								<i class="fas fa-calendar"></i> <span>Calendar</span>
+							</a>
+						</li>
+						<li>
+							<a href="/Document" data-page="document">
+								<i class="fas fa-file-alt"></i> <span>Documents</span>
+							</a>
+						</li>
+						<li>
+							<a href="/FeedbackComplaint" data-page="issues">
+								<i class="fas fa-exclamation-circle"></i> <span>Issues</span>
+							</a>
+						</li>-->
+
+						<!-- Admin Functions -->
+						@if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+						{
+							<div class="sidebar-category"><span>Admin Management</span></div>
+							<li class="sidebar-dropdown">
+								<a href="javascript:void(0)">
+									<i class="fas fa-users-cog"></i> <span>Users</span>
+								</a>
+								<div class="sidebar-submenu">
+									<ul>
+										<li>
+											<a class="nav-link" asp-controller="ManageUsers" asp-action="Index">
+												<i class="fas fa-users"></i> <span>Manage Users</span>
+											</a>
+										</li>
+										<li>
+											<a class="nav-link" asp-controller="CreateStaff" asp-action="CreateStaff">
+												<i class="fas fa-user-plus"></i> <span>Create Staff</span>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</li>
+							<li class="sidebar-dropdown">
+								<a href="javascript:void(0)">
+									<i class="fas fa-building"></i> <span>Facility</span>
+								</a>
+								<div class="sidebar-submenu">
+									<ul>
+										<li>
+											<a class="nav-link" asp-controller="Facility" asp-action="Index">
+												<i class="fas fa-cogs"></i> <span>Facility Management</span>
+											</a>
+										</li>
+										<li>
+											<a class="nav-link" asp-controller="Reservation" asp-action="ManageReservations">
+												<i class="fas fa-calendar-check"></i> <span>Reservation Management</span>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</li>
+							<!--<li>
+								<a class="nav-link" asp-controller="ServiceRequest" asp-action="Create">
+									<i class="fas fa-tasks"></i> <span>Create Request</span>
+								</a>
+							</li>-->
+						}
+
+						<!-- Facilities & Reservations -->
+						<div class="sidebar-category"><span>Facilities</span></div>
+						<li class="sidebar-dropdown">
+							<a href="javascript:void(0)">
+								<i class="fas fa-building"></i> <span>Reservations</span>
+							</a>
+							<div class="sidebar-submenu">
+								<ul>
+									<li>
+										<a class="nav-link" asp-controller="Reservation" asp-action="AvailableFacilities">
+											<i class="fas fa-search"></i> <span>Available Facilities</span>
+										</a>
+									</li>
+									<li>
+										<a class="nav-link" asp-controller="Reservation" asp-action="ReservationStatusReport">
+											<i class="fas fa-clipboard-list"></i> <span>My Reservations</span>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</li>
+
+						<!-- Common Actions -->
+						<div class="sidebar-category"><span>Quick Access</span></div>
+						<!--<li>
+							<a class="nav-link" asp-controller="Contact" asp-action="Index">
+								<i class="fas fa-address-book"></i> <span>Contacts</span>
+							</a>
+						</li>-->
+						<li>
+							<a class="nav-link" asp-controller="Event" asp-action="Index">
+								<i class="fas fa-calendar"></i> <span>Calendar</span>
+							</a>
+						</li>
+						<li class="sidebar-dropdown">
+							<a href="javascript:void(0)">
+								<i class="fas fa-file-alt"></i> <span>Documents</span>
+							</a>
+							<div class="sidebar-submenu">
+								<ul>
+									<li>
+										<a class="nav-link" asp-controller="Document" asp-action="Index">
+											<i class="fas fa-folder-open"></i> <span>Browse</span>
+										</a>
+									</li>
+									<li>
+										<a class="nav-link" asp-controller="Document" asp-action="FileDownload">
+											<i class="fas fa-download"></i> <span>Download</span>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</li>
+						<li>
+							<a class="nav-link" asp-controller="FeedbackComplaint" asp-action="Index">
+								<i class="fas fa-exclamation-circle"></i> <span>Issues</span>
+							</a>
+						</li>
+						<li>
+							<a class="nav-link" asp-controller="Home" asp-action="Index">
+								<i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			}
+
+			<!-- Main Content -->
+			<div class="container @(SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null ? "main-with-sidebar" : "")" id="main-container">
+				<main role="main" class="pb-3">
+					@RenderBody()
+				</main>
+			</div>
+		</div>
+
+		<footer class="footer @(SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null ? "footer-with-sidebar" : "")" id="footer">
+			<div class="container">
+				<p>© @DateTime.Now.Year Golden Haven. All rights reserved.</p>
+			</div>
+		</footer>
+	</div>
+
+	<!-- Scripts -->
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+
+	<!-- Sidebar toggle script -->
+	<script>
+		$(document).ready(function () {
+			// Apply sidebar state based on localStorage
+			const sidebarState = localStorage.getItem('sidebarCollapsed');
+
+			// Get current URL path for active tab detection
+			const currentPath = window.location.pathname.toLowerCase();
+
+			// Initial setup based on saved state
+			if (sidebarState === 'true') {
+				$('#sidebar').addClass('collapsed');
+				$('#main-container').addClass('collapsed');
+				$('#footer').addClass('collapsed');
+				$('#sidebar-toggle i').removeClass('fa-bars').addClass('fa-chevron-right');
+			}
+
+			// Handle dropdown toggles
+			$('.sidebar-dropdown > a').on('click', function(e) {
+				e.preventDefault();
+				const parent = $(this).parent();
+
+				// Close other open dropdowns
+				if (!parent.hasClass('open')) {
+					$('.sidebar-dropdown.open').removeClass('open').find('.sidebar-submenu').slideUp(200);
+				}
+
+				// Toggle the clicked submenu
+				parent.toggleClass('open');
+				const submenu = parent.find('.sidebar-submenu');
+
+				if (parent.hasClass('open')) {
+					submenu.slideDown(200);
+				} else {
+					submenu.slideUp(200);
+				}
+
+				// Store the state of this dropdown in localStorage
+				const isOpen = parent.hasClass('open');
+				const dropdownId = $(this).text().trim().replace(/\s/g, '-').toLowerCase();
+				localStorage.setItem('dropdown-' + dropdownId, isOpen);
+			});
+
+			// Restore dropdown states from localStorage
+			$('.sidebar-dropdown > a').each(function() {
+				const dropdownId = $(this).text().trim().replace(/\s/g, '-').toLowerCase();
+				const isOpen = localStorage.getItem('dropdown-' + dropdownId) === 'true';
+
+				if (isOpen) {
+					$(this).parent().addClass('open');
+					$(this).parent().find('.sidebar-submenu').show();
+				}
+			});
+
+			// Set active class based on current page
+			$('.sidebar-nav a').each(function() {
+				if ($(this).attr('href') && $(this).attr('href') !== 'javascript:void(0)') {
+					const linkPath = $(this).attr('href').toLowerCase();
+
+					// Check if the current URL matches this link
+					if (currentPath === linkPath ||
+						(currentPath.startsWith(linkPath) && linkPath !== '/') ||
+						(currentPath === '/' && linkPath === '/dashboard')) {
+
+						$(this).addClass('active');
+
+						// If this is a submenu item, open its parent dropdown
+						if ($(this).closest('.sidebar-submenu').length) {
+							const parentDropdown = $(this).closest('.sidebar-dropdown');
+							parentDropdown.addClass('open');
+							parentDropdown.find('.sidebar-submenu').show();
+						}
+					}
+				}
+			});
+
+			// Store active tab when clicked
+			$('.sidebar-nav a').on('click', function() {
+				if ($(this).attr('href') && $(this).attr('href') !== 'javascript:void(0)') {
+					localStorage.setItem('activeSidebarTab', $(this).attr('href'));
+				}
+			});
+
+			// Toggle sidebar collapse
+			$('#sidebar-toggle').on('click', function () {
+				const isCollapsed = $('#sidebar').hasClass('collapsed');
+
+				if (isCollapsed) {
+					// Expand sidebar
+					$('#sidebar').removeClass('collapsed');
+					$('#main-container').removeClass('collapsed');
+					$('#footer').removeClass('collapsed');
+					$(this).find('i').removeClass('fa-chevron-right').addClass('fa-bars');
+					localStorage.setItem('sidebarCollapsed', 'false');
+				} else {
+					// Collapse sidebar
+					$('#sidebar').addClass('collapsed');
+					$('#main-container').addClass('collapsed');
+					$('#footer').addClass('collapsed');
+					$(this).find('i').removeClass('fa-bars').addClass('fa-chevron-right');
+					localStorage.setItem('sidebarCollapsed', 'true');
+				}
+			});
+
+			// Hover functionality for collapsed sidebar with dropdowns
+			if ($('#sidebar').hasClass('collapsed')) {
+				$('.sidebar-dropdown').hover(
+					function() {
+						if ($(this).hasClass('open')) {
+							const submenu = $(this).find('.sidebar-submenu');
+							submenu.show();
+						}
+					},
+					function() {
+						// Do nothing on hover out to prevent menu closing too quickly
+					}
+				);
+			}
+
+			// Mobile responsiveness
+			$('.navbar-toggler').on('click', function () {
+				if ($(window).width() < 992) {
+					$('#sidebar').toggleClass('show');
+				}
+			});
+
+			// Hide sidebar when clicking outside on mobile
+			$(document).on('click', function (e) {
+				if ($(window).width() < 992) {
+					if (!$(e.target).closest('#sidebar').length &&
+						!$(e.target).closest('.sidebar-toggle').length &&
+						!$(e.target).closest('.navbar-toggler').length) {
+						$('#sidebar').removeClass('show');
+					}
+				}
+			});
+
+			// Check window size on resize
+			$(window).resize(function () {
+				if ($(window).width() >= 992) {
+					$('#sidebar').removeClass('show');
+				}
+			});
+		});
+	</script>
+
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

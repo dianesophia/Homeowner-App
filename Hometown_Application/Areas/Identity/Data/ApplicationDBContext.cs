@@ -3,6 +3,7 @@ using Hometown_Application.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Hometown_Application.Data;
 
@@ -12,6 +13,11 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+    public DbSet<HouseModel> House { get; set; }
+    public DbSet<HomeownerProfileModel> HomeownerProfiles { get; set; }
+    public DbSet<StaffProfileModel> StaffProfiles { get; set; }
+    public DbSet<AdminProfileModel> AdminProfiles { get; set; }
+
     public DbSet<FeedbackComplaintModel> FeedbackComplaints { get; set; }
     public DbSet<EventModel> Events { get; set; }
     public DbSet<DocumentModel> Documents { get; set; }
@@ -34,7 +40,43 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             new StatusModel { StatusId = 6, StatusName = "Closed" }
         );
 
+        builder.Entity<HomeownerProfileModel>()
+          .HasOne(fc => fc.ApplicationUser)
+          .WithMany()
+          .HasForeignKey(fc => fc.UserId)
+          .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<HomeownerProfileModel>()
+        .HasOne(h => h.House)
+        .WithMany(h => h.Homeowners)
+        .HasForeignKey(h => h.HouseId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<StaffProfileModel>()
+        .HasOne(fc => fc.ApplicationUser)
+        .WithMany()
+        .HasForeignKey(fc => fc.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<StaffProfileModel>()
+     .HasOne(s => s.House)
+     .WithMany()
+     .HasForeignKey(s => s.HouseId)
+     .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<AdminProfileModel>()
+        .HasOne(fc => fc.ApplicationUser)
+        .WithMany()
+        .HasForeignKey(fc => fc.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
         builder.Entity<FeedbackComplaintModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<HouseModel>()
            .HasOne(fc => fc.ApplicationUser)
            .WithMany()
            .HasForeignKey(fc => fc.UserId)
@@ -47,6 +89,6 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .HasForeignKey(fc => fc.StatusId)
         .OnDelete(DeleteBehavior.Restrict);
 
-
+       
     }
 }

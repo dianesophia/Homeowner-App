@@ -4,217 +4,863 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #6F754E;
-            --primary-light: #8a916a;
-            --secondary-color: #A08D67;
-            --background-color: #E6DDC4;
-            --text-color: #2F3A31;
-            --card-bg: #FFFFFF;
-            --danger-color: #dc3545;
-            --success-color: #198754;
-            --border-radius: 16px;
-            --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
         }
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
 
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--primary-color);
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            min-height: 100px;
-            padding: 15px 20px;
-        }
-
-        .navbar-brand {
-            font-size: 1.2rem;
-            font-weight: normal;
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
             color: white;
-            padding-left: 12px;
+            transform: translateY(-2px);
         }
 
-            .navbar-brand:hover {
-                transform: scale(1.05);
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .action-button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+        .action-button:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+
+        .action-button i {
+            font-size: 1.1rem;
+        }
+
+    .tab-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 5rem; /* Add significant margin at the bottom */
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .nav-tabs {
+        display: flex;
+        gap: 0;
+        padding: 15px 15px 0;
+        background-color: var(--primary-color);
+        border-bottom: none;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+        .nav-tabs .nav-item {
+            margin-right: 4px;
+            margin-bottom: 0;
+        }
+
+        .nav-tabs .nav-link {
+            color: rgba(255,255,255,0.8);
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            transition: var(--transition);
+            background-color: rgba(255,255,255,0.1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .nav-tabs .nav-link:hover {
+                color: white;
+                background-color: rgba(255,255,255,0.2);
             }
 
-        .navbar-nav .nav-link {
+            .nav-tabs .nav-link.active {
+                color: var(--text-color);
+                background-color: white;
+                box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            }
+
+            .nav-tabs .nav-link i {
+                margin-right: 8px;
+                font-size: 1rem;
+            }
+
+    /* Tab Content */
+    .tab-content {
+        padding: 25px;
+        background-color: var(--card-bg);
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .users-table th {
+            background-color: var(--primary-light);
             color: white;
+            padding: 15px;
             font-weight: 500;
-            margin: 0 10px;
-            padding: 8px 16px;
-            border-radius: var(--border-radius);
+            text-align: left;
+            border: none;
+            white-space: nowrap;
+        }
+
+            .users-table th:first-child {
+                border-top-left-radius: 8px;
+                padding-left: 25px;
+            }
+
+            .users-table th:last-child {
+                border-top-right-radius: 8px;
+            }
+
+        .users-table tr {
             transition: var(--transition);
         }
 
-            .navbar-nav .nav-link:hover {
-                background: var(--primary-light);
-                color: white;
-                transform: translateY(-2px);
+            .users-table tr:hover {
+                background-color: rgba(0, 0, 0, 0.02);
             }
 
-        .user-info {
-            background: var(--primary-light);
-            padding: 8px 16px;
-            border-radius: var(--border-radius);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .users-table td {
+            padding: 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            vertical-align: middle;
         }
 
-            .user-info i {
-                font-size: 1.2rem;
+            .users-table td:first-child {
+                padding-left: 25px;
             }
 
-        .content {
-            padding: 100px 40px 40px;
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        width: auto;
+        min-width: 100px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .role-admin {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    .role-staff {
+        background-color: var(--primary-light);
+        color: white;
+    }
+
+    .role-homeowner {
+        background-color: var(--secondary-color);
+        color: white;
+    }
+
+    .approved-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .approved-yes {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .approved-no {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    .pending-approval {
+        background-color: var(--warning-color);
+        color: var(--text-color);
+    }
+
+    .search-container {
+        display: flex;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid #eee;
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        font-size: 1rem;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--primary-light);
+        }
+
+    .search-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        padding: 0 25px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+        .search-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+    .page-header {
+        display: flex;
+        flex-direction: row; /* Make sure it's in a row */
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: nowrap; /* Prevent wrapping */
+    }
+
+    .stat-cards-container {
+        display: flex;
+        flex-wrap: nowrap; /* Prevent wrapping */
+        justify-content: space-between; /* Space evenly across the container */
+        margin-bottom: 2rem;
+        overflow-x: auto; /* Allow horizontal scrolling on small screens */
+    }
+    /* Media query for responsive design */
+
+    .stat-cards-container {
+        flex-wrap: wrap;
+    }
+    .stat-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 15px 20px;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: row; /* Change to horizontal layout */
+        align-items: center;
+        justify-content: flex-start; /* Align items to the start */
+        gap: 10px;
+        flex-grow: 1;
+        flex: 1;
+        max-width: 22%;
+        min-width: 200px;
+        position: relative; /* For the before pseudo-element */
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
+            height: 4px;
         }
 
-        .users-table {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
+        .stat-card.total::before {
+            background-color: var(--info-color);
         }
 
-        .table thead {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .role-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 120px;
-            height: 40px;
-            border-radius: 20px;
-            font-weight: 500;
-        }
-
-        .role-admin {
+        .stat-card.admin::before {
             background-color: var(--danger-color);
-            color: white;
         }
 
-        .role-user {
+        .stat-card.homeowner::before {
+            background-color: var(--secondary-color);
+        }
+
+        .stat-card.staff::before {
             background-color: var(--primary-light);
-            color: white;
         }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-home me-2"></i>
-                Golden Haven
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        var user = await UserManager.GetUserAsync(User);
-                        if (user != null)
-                        {
-                            <div class="nav-item">
-                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
-                                    <i class="fas fa-user"></i>
-                                    <span>@user.FirstName @user.LastName</span>
-                                </a>
-                            </div>
-                        }
-                    }
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        if (User.IsInRole("Admin"))
-                        {
-                            <li class="nav-item">
-                                <div class="user-info @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageUser" ? "active-tab" : "")">
-                                    <i class="fas fa-users-cog me-2"></i>
-                                    <span>User Management</span>
-                                </div>
-                            </li>
-                        }
-                    }
-                    <li class="nav-item"><a class="nav-link" asp-controller="Contact" asp-action="Index"><i class="fas fa-address-book me-2"></i>Contacts</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Event" asp-action="Index"><i class="fas fa-calendar me-2"></i>Calendar</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="Index"><i class="fas fa-file-alt me-2"></i>Document</a></li>
-                    <!--<li class="nav-item"><a class="nav-link" asp-controller="Document" asp-action="FileDownload"><i class="fas fa-download me-2"></i>Download</a></li>-->
-                    <li class="nav-item"><a class="nav-link" asp-controller="FeedbackComplaint" asp-action="Index"><i class="fas fa-exclamation-circle me-2"></i>Issues</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                </ul>
 
-            </div>
-        </div>
-    </nav>
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
 
-    <div class="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>User Management</h1>
-            <a asp-controller="ManageUsers" asp-action="ChangeRole" class="btn btn-secondary">
+    .stat-icon {
+        font-size: 1.5rem;
+        background-color: rgba(0,0,0,0.05);
+        width: 50px;
+        height: 50px;
+        min-width: 50px; /* Prevent icon from shrinking */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .admin-icon {
+        color: var(--danger-color);
+    }
+
+    .homeowner-icon {
+        color: var(--secondary-color);
+    }
+
+    .staff-icon {
+        color: var(--primary-light);
+    }
+
+    .total-icon {
+        color: var(--info-color);
+    }
+
+    /* Container for stat text (number and label) */
+    .stat-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .actions-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        border: none;
+        gap: 5px;
+    }
+
+    .btn-view {
+        background-color: #e9f0fd;
+        color: #4287f5;
+    }
+
+        .btn-view:hover {
+            background-color: #d3e2fc;
+        }
+
+    .btn-approve {
+        background-color: #e3f8e9;
+        color: var(--success-color);
+    }
+
+        .btn-approve:hover {
+            background-color: #d2f3dc;
+        }
+
+    .btn-delete {
+        background-color: #fde9e9;
+        color: var(--danger-color);
+    }
+
+        .btn-delete:hover {
+            background-color: #fcd3d3;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .buttons-container {
+        display: flex;
+        flex-direction: row; /* Ensure buttons are in a row */
+        gap: 15px;
+        flex-wrap: nowrap; /* Prevent wrapping */
+    }
+
+    .action-button {
+        width: auto; /* Override the 100% width */
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+</style>
+
+<div class="content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Manage Users</h1>
+
+        <div class="buttons-container">
+            <a asp-controller="ManageUsers" asp-action="ChangeRole" class="action-button">
                 <i class="fas fa-user-cog"></i> Change Role
             </a>
-        </div>
-
-        <div class="users-table table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Username</th>
-                        <th>Role</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.User.FirstName</td>
-                            <td>@item.User.LastName</td>
-                            <td>@item.User.Email</td>
-                            <td>@item.User.UserName</td>
-                            <td>
-                                <span class="role-badge @(item.Role == "Admin" ? "role-admin" : "role-user")">
-                                    @item.Role
-                                </span>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <!--<a asp-controller="ManageUsers" asp-action="AccountApproval" class="action-button">
+                <i class="fas fa-user-check"></i> Approve Homeowner
+            </a>-->
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Statistics Cards -->
+    <div class="stat-cards-container">
+        <div class="stat-card total">
+            <div class="stat-icon total-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">@Model.Count()</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card admin">
+            <div class="stat-icon admin-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="stat-number">@Model.Count(u => u.Role == "Admin")</div>
+            <div class="stat-label">Admins</div>
+        </div>
+        <div class="stat-card homeowner">
+            <div class="stat-icon homeowner-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <div class="stat-number">@Model.Count(u => u.Role == "HomeOwner")</div>
+            <div class="stat-label">Homeowners</div>
+        </div>
+        <div class="stat-card staff">
+            <div class="stat-icon staff-icon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-number">@Model.Count(u => u.Role == "Staff")</div>
+            <div class="stat-label">Staff</div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" class="search-input" id="userSearch" placeholder="Search by name, email, or username...">
+        <button class="search-button">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+
+    <div class="tab-container">
+        <ul class="nav nav-tabs" id="userTabs">
+            <li class="nav-item">
+                <a class="nav-link" id="admin-tab" data-bs-toggle="tab" href="#admins">
+                    <i class="fas fa-user-shield"></i> Admins
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="homeowner-tab" data-bs-toggle="tab" href="#homeowners">
+                    <i class="fas fa-home"></i> Homeowners
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="staff-tab" data-bs-toggle="tab" href="#staff">
+                    <i class="fas fa-user-tie"></i> Staff
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Homeowners Tab -->
+            <div class="tab-pane fade show active" id="homeowners">
+                <div class="table-responsive">
+                    @if (Model.Any(u => u.Role == "HomeOwner"))
+                    {
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>Username</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(u => u.Role == "HomeOwner").OrderBy(u => u.User.FirstName))
+                                {
+                                    <tr>
+                                        <td>@item.User.FirstName</td>
+                                        <td>@item.User.LastName</td>
+                                        <td>@item.User.Email</td>
+                                        <td>@item.User.UserName</td>
+                                        <td>
+                                            @if (item.User.IsApproved)
+                                            {
+                                                <span class="approved-badge approved-yes">
+                                                    <i class="fas fa-check-circle me-1"></i> Approved
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="approved-badge pending-approval">
+                                                    <i class="fas fa-clock me-1"></i> Pending
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="actions-group">
+                                                <!--<a asp-controller="ManageUsers" asp-action="ViewDetails" asp-route-id="@item.User.Id"
+                                                  class="btn-action btn-view" title="View Details">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>-->
+                                                @if (!item.User.IsApproved)
+                                                {
+                                                    <a asp-controller="ManageUsers" asp-action="ApproveUser" asp-route-id="@item.User.Id"
+                                                       class="btn-action btn-approve" title="Approve">
+                                                        <i class="fas fa-check"></i> Approve
+                                                    </a>
+                                                }
+                                                <a asp-controller="ManageUsers" asp-action="DeleteUser" asp-route-id="@item.User.Id"
+                                                   class="btn-action btn-delete" title="Delete"
+                                                   onclick="return confirm('Are you sure you want to delete this user?')">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-users-slash"></i>
+                            <p>No homeowners found.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Admins Tab -->
+            <div class="tab-pane fade" id="admins">
+                <div class="table-responsive">
+                    @if (Model.Any(u => u.Role == "Admin"))
+                    {
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(u => u.Role == "Admin").OrderBy(u => u.User.FirstName))
+                                {
+                                    <tr>
+                                        <td>@item.User.FirstName</td>
+                                        <td>@item.User.LastName</td>
+                                        <td>@item.User.Email</td>
+                                        <td>@item.User.UserName</td>
+                                        <td>
+                                            <span class="role-badge role-admin">
+                                                <i class="fas fa-user-shield me-1"></i> Admin
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="actions-group">
+                                                <a asp-controller="ManageUsers" asp-action="ViewDetails" asp-route-id="@item.User.Id"
+                                                   class="btn-action btn-view" title="View Details">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-user-shield"></i>
+                            <p>No admin users found.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Staff Tab -->
+            <div class="tab-pane fade" id="staff">
+                <div class="table-responsive">
+                    @if (Model.Any(u => u.Role == "Staff"))
+                    {
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(u => u.Role == "Staff").OrderBy(u => u.User.FirstName))
+                                {
+                                    <tr>
+                                        <td>@item.User.FirstName</td>
+                                        <td>@item.User.LastName</td>
+                                        <td>@item.User.Email</td>
+                                        <td>@item.User.UserName</td>
+                                        <td>
+                                            <span class="role-badge role-staff">
+                                                <i class="fas fa-user-tie me-1"></i> Staff
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="actions-group">
+                                                <a asp-controller="ManageUsers" asp-action="ViewDetails" asp-route-id="@item.User.Id"
+                                                   class="btn-action btn-view" title="View Details">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a asp-controller="ManageUsers" asp-action="DeleteUser" asp-route-id="@item.User.Id"
+                                                   class="btn-action btn-delete" title="Delete"
+                                                   onclick="return confirm('Are you sure you want to delete this user?')">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-user-tie"></i>
+                            <p>No staff users found.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab functionality is handled by Bootstrap
+
+        // Search functionality
+        document.getElementById('userSearch').addEventListener('keyup', function() {
+            let searchTerm = this.value.toLowerCase();
+            let activeTabId = document.querySelector('.tab-pane.active').id;
+            let rows = document.querySelectorAll(`#${activeTabId} .users-table tbody tr`);
+
+            rows.forEach(row => {
+                let found = false;
+                let cells = row.querySelectorAll('td');
+
+                cells.forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                        found = true;
+                    }
+                });
+
+                if (found) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Show empty state if no results
+            let visibleRows = document.querySelectorAll(`#${activeTabId} .users-table tbody tr:not([style*="display: none"])`);
+            let emptyState = document.querySelector(`#${activeTabId} .empty-state`);
+            let table = document.querySelector(`#${activeTabId} .users-table`);
+
+            if (emptyState) {
+                if (visibleRows.length === 0 && searchTerm) {
+                    emptyState.style.display = 'block';
+                    emptyState.innerHTML = `<i class="fas fa-search"></i><p>No users found for "${searchTerm}"</p>`;
+                    if (table) table.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    if (table) table.style.display = 'table';
+                }
+            }
+        });
+    });
+</script>
