@@ -1,0 +1,40 @@
+﻿@model Hometown_Application.Models.RequestTypeModel
+
+@{
+    ViewData["Title"] = Model?.RequestTypeId == 0 ? "Create Request Type" : "Edit Request Type";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="SaveRequestType" method="post">
+    <input type="hidden" asp-for="RequestTypeId" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Request Type Name</label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description (Optional)</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AssignedDepartment" class="form-label">Assigned Department</label>
+        <select asp-for="AssignedDepartment" asp-items="Html.GetEnumSelectList<StaffDepartment>()" class="form-control" required>
+            <option value="">Select a Department</option>
+        </select>
+        <span asp-validation-for="AssignedDepartment" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label">Is Active</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+<li class="nav-item"><a class="nav-link" asp-controller="RequestType" asp-action="Index"><i class="fas fa-users-cog me-2 btn btn-primary"></i>Service List</a></li>

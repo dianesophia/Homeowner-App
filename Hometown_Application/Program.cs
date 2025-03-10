@@ -54,7 +54,7 @@ public class Program
             pattern: "{controller=Home}/{action=Index}/{id?}");
         app.MapRazorPages();
 
-        /* using (var scope = app.Services.CreateScope())
+         using (var scope = app.Services.CreateScope())
          {
              var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
              var roles = new[] { "Admin", "HomeOwner", "Staff" };
@@ -65,21 +65,21 @@ public class Program
                  if (!await roleManager.RoleExistsAsync(role))
                      await roleManager.CreateAsync(new IdentityRole(role));
              }
-         }*/
+         }
 
-        using (var scope = app.Services.CreateScope())
+       /* using (var scope = app.Services.CreateScope())
         {
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             // Define roles with fixed IDs
             var roles = new List<IdentityRole>
-    {
-        new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
-        new IdentityRole { Id = "2", Name = "HomeOwner", NormalizedName = "HOMEOWNER" },
-        new IdentityRole { Id = "3", Name = "Staff", NormalizedName = "STAFF" }
-    };
-
+            {
+                new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Id = "2", Name = "HomeOwner", NormalizedName = "HOMEOWNER" },
+                new IdentityRole { Id = "3", Name = "Staff", NormalizedName = "STAFF" }
+            };
+                 
             // Ensure roles exist in the database
             foreach (var role in roles)
             {
@@ -111,10 +111,10 @@ public class Program
                 }
             }
         }
+       */
 
 
-
-        /*   using (var scope = app.Services.CreateScope())
+           using (var scope = app.Services.CreateScope())
            {
                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>(); // FIXED
 
@@ -138,8 +138,7 @@ public class Program
                        await userManager.AddToRoleAsync(user, "Admin");
                    }
                }
-           }*/
-
+           }
 
 
 

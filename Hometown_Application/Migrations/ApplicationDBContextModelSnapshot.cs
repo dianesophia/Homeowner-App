@@ -147,7 +147,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "14ffc6db-9c2e-47c9-b96f-7e5f2792af0d",
+                            ConcurrencyStamp = "8fb2d39d-a805-47c5-adb9-ea983429e976",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -160,9 +160,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPJNv3hx2kWBbIKJYlaRHAU3U04OipfsZrGGgKN9rPjTpQkfBEejVugH8tNH2jLR0Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEO7p4DyNkx7zJRdZdjsfujUY8ZGGayWkhmwxAFb6u/mywa7N/zREsdxJB42+Hgzrjg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "66106bc4-f382-4470-860e-ac5c66090601",
+                            SecurityStamp = "3a52681d-0b88-41fc-80fb-56ad5a454a38",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -696,11 +696,19 @@ namespace Hometown_Application.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
+                    b.Property<DateTime?>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CancelReason")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description")
+                    b.Property<DateTime?>("CancelledOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CompletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Details")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -714,11 +722,27 @@ namespace Hometown_Application.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("RequestDate")
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RejectedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("RejectedReason")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RequestTypeId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Schedule")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StatusId")
+                        .IsRequired()
+                        .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(50)
@@ -734,6 +758,10 @@ namespace Hometown_Application.Migrations
                     b.HasKey("ServiceRequestId");
 
                     b.HasIndex("HomeownerId");
+
+                    b.HasIndex("RequestTypeId");
+
+                    b.HasIndex("StatusId");
 
                     b.ToTable("ServiceRequests");
                 });
@@ -1009,18 +1037,6 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "100",
-                            RoleId = "3"
-                        },
-                        new
-                        {
-                            UserId = "101",
-                            RoleId = "1"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -1150,7 +1166,23 @@ namespace Hometown_Application.Migrations
                         .HasForeignKey("HomeownerId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Hometown_Application.Models.RequestTypeModel", "RequestType")
+                        .WithMany()
+                        .HasForeignKey("RequestTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hometown_Application.Models.StatusModel", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Homeowner");
+
+                    b.Navigation("RequestType");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>

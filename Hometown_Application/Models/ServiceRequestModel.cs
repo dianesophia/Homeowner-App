@@ -2,18 +2,19 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-namespace Hometown_Application.Models;
 
+namespace Hometown_Application.Models
+{
     public class ServiceRequestModel
     {
         [Key]
         public int ServiceRequestId { get; set; }
 
-    [Required]
-        public string? Category { get; set; }
+        [Required]
+        public string? Details { get; set; }
 
         [Required]
-        public string? Description { get; set; }
+        public string? Location { get; set; }
 
         [Required]
         public string? Urgency { get; set; }
@@ -22,8 +23,18 @@ namespace Hometown_Application.Models;
         [EmailAddress]
         public string? Email { get; set; }
 
-        public string? Status { get; set; } = "Pending"; 
-        public DateTime? RequestDate { get; set; } = DateTime.Now;
+        [Required]
+        public DateTime? Schedule { get; set; }
+
+        public string? RejectedReason { get; set; }
+        public DateTime? RejectedOn { get; set; }
+
+        public string? CancelReason { get; set; }
+        public DateTime? CancelledOn { get; set; }
+
+        public DateTime? CompletedOn { get; set; }
+
+        public DateTime? AddedOn { get; set; } = DateTime.Now;
 
         [StringLength(50)]
         public string? AddedBy { get; set; }
@@ -35,12 +46,22 @@ namespace Hometown_Application.Models;
 
         public bool? IsDeleted { get; set; } = false;
 
-    public int? HomeownerId { get; set; }
+        [Required]
+        public int? RequestTypeId { get; set; }
 
-    [ForeignKey("HomeownerId")]
-    public HomeownerProfileModel? Homeowner { get; set; }
+        [ForeignKey("RequestTypeId")]
+        public RequestTypeModel? RequestType { get; set; }
 
+        public int? HomeownerId { get; set; }
 
+        [ForeignKey("HomeownerId")]
+        public HomeownerProfileModel? Homeowner { get; set; }
+
+        // 🔹 Reference to Status Table
+        [Required]
+        public int? StatusId { get; set; }
+
+        [ForeignKey("StatusId")]
+        public StatusModel? Status { get; set; }
+    }
 }
-
-

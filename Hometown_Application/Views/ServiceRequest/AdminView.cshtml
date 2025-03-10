@@ -5,8 +5,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Category</th>
-            <th>Description</th>
+           
             <th>Urgency</th>
             <th>Email</th>
             <th>Status</th>
@@ -18,8 +17,8 @@
         @foreach (var request in Model)
         {
             <tr>
-                <td>@request.Category</td>
-                <td>@request.Description</td>
+           
+                <td>@request.Details</td>
                 <td>@request.Urgency</td>
                 <td>@request.Email</td>
                 <td>@request.Status</td>

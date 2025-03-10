@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Hometown_Application.Models.RequestTypeModel>
+
+@{
+    ViewData["Title"] = "Request Types";
+}
+
+<h2>Request Types</h2>
+<a asp-action="RequestTypeForm" class="btn btn-primary mb-3">+ Add New Request Type</a>
+
+<!-- Search Form -->
+<form method="get" asp-action="Index" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Search by Name" value="@Context.Request.Query["searchQuery"]">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">@item.Name</h5>
+                    <p class="card-text">@item.Description</p>
+                    <p><strong>Department:</strong> @item.AssignedDepartment</p>
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
+                            @(item.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </p>
+                    <a asp-action="RequestTypeForm" asp-route-id="@item.RequestTypeId" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.RequestTypeId" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

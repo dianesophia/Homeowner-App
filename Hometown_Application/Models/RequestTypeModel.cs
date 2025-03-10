@@ -10,7 +10,7 @@ namespace Hometown_Application.Models
 
         [Required]
         [Column(TypeName = "nvarchar(100)")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column(TypeName = "nvarchar(255)")]
         public string? Description { get; set; } // Optional details about the request type

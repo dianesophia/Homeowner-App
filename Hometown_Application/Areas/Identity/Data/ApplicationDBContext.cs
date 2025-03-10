@@ -32,12 +32,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);
-       builder.Entity<FacilityModel>()
-            .HasMany(f => f.Reservations)
-            .WithOne(r => r.Facility)
-            .HasForeignKey(r => r.FacilityId)
-            .OnDelete(DeleteBehavior.Cascade);
+            base.OnModelCreating(builder);
+           builder.Entity<FacilityModel>()
+                .HasMany(f => f.Reservations)
+                .WithOne(r => r.Facility)
+                .HasForeignKey(r => r.FacilityId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         
         builder.Entity<ReservationModel>()
@@ -122,7 +122,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         // ✅ Seeding User Roles
         var userRoles = new List<IdentityUserRole<string>>
         {
-            new IdentityUserRole<string> { UserId = "100", RoleId = "7093ab8c-a8c0-4bda-b7df-021df94a683a" },  // Elon Musk → Staff
+          //  new IdentityUserRole<string> { UserId = "100", RoleId = "2" },  // Elon Musk → Staff
           //  new IdentityUserRole<string> { UserId = "101", RoleId = "1" }   // Admin → Admin
         };
 
@@ -199,11 +199,29 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
              .HasForeignKey(sp => sp.UserId)
              .OnDelete(DeleteBehavior.Restrict);
         */
+   
+        base.OnModelCreating(builder);
+
+        // 🔹 ServiceRequest ↔ Status (FK)
         builder.Entity<ServiceRequestModel>()
-         .HasOne(s => s.Homeowner)
-         .WithMany() // Assuming HomeownerProfileModel does not have a navigation property
-         .HasForeignKey(s => s.HomeownerId)
-         .OnDelete(DeleteBehavior.SetNull);
+            .HasOne(sr => sr.Status)
+            .WithMany() // No navigation property in StatusModel
+            .HasForeignKey(sr => sr.StatusId)
+            .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete
+
+        // 🔹 ServiceRequest ↔ RequestType (FK)
+        builder.Entity<ServiceRequestModel>()
+            .HasOne(sr => sr.RequestType)
+            .WithMany()
+            .HasForeignKey(sr => sr.RequestTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // 🔹 ServiceRequest ↔ Homeowner (FK)
+        builder.Entity<ServiceRequestModel>()
+            .HasOne(sr => sr.Homeowner)
+            .WithMany()
+            .HasForeignKey(sr => sr.HomeownerId)
+            .OnDelete(DeleteBehavior.SetNull);
 
     }
 }

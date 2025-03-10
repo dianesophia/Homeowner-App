@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class DAGADR : Migration
+    public partial class Ad : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -489,17 +489,24 @@ namespace Hometown_Application.Migrations
                 {
                     ServiceRequestId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Urgency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Schedule = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RejectedReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RejectedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CancelReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CancelledOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompletedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    HomeownerId = table.Column<int>(type: "int", nullable: true)
+                    RequestTypeId = table.Column<int>(type: "int", nullable: false),
+                    HomeownerId = table.Column<int>(type: "int", nullable: true),
+                    StatusId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -510,26 +517,24 @@ namespace Hometown_Application.Migrations
                         principalTable: "HomeownerProfiles",
                         principalColumn: "HomeownerId",
                         onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "1", null, "Admin", "ADMIN" },
-                    { "2", null, "HomeOwner", "HOMEOWNER" },
-                    { "3", null, "Staff", "STAFF" }
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_RequestTypes_RequestTypeId",
+                        column: x => x.RequestTypeId,
+                        principalTable: "RequestTypes",
+                        principalColumn: "RequestTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_Status_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "Status",
+                        principalColumn: "StatusId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AdminProfilesAdminId", "Bio", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FacebookProfile", "FirstName", "Gender", "HomeownerProfilesHomeownerId", "IsActiveUser", "IsBirthdayPublic", "IsGenderPublic", "LastName", "LinkedInProfile", "LockoutEnabled", "LockoutEnd", "MakeFacebookPublic", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "SecurityStamp", "StaffProfilesStaffId", "TwitterProfile", "TwoFactorEnabled", "UserName" },
-                values: new object[,]
-                {
-                    { "100", 0, null, null, "66c244fe-b682-4bde-b804-8cc6535a6911", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJYR05WjKvR8o/Puxg9pOxMTmGy8DSqHUuoGOZEQhAPcv7DVG9sh+bs+sZ2crakkQg==", null, false, null, "4a23466c-965a-4043-b0bf-8edf82af3566", null, null, false, "elon.musk@example.com" },
-                    { "101", 0, null, null, "35547b8f-ed51-43b0-82a8-3d6fc8930097", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@admin.com", true, null, "Admin", null, null, true, false, false, "User", null, false, null, false, "ADMIN@ADMIN.COM", "ADMIN@ADMIN.COM", "AQAAAAIAAYagAAAAELSfe20AFXBGcgmuN3/usvNj17LQBNkuUfMsxbQn+imRdWhR+N213vnF6BUT8v9Idg==", null, false, null, "b2688c8c-53b5-4dcd-86c8-fbe0012cce77", null, null, false, "admin@admin.com" }
-                });
+                values: new object[] { "100", 0, null, null, "d045cebe-4110-4aa1-9052-c6d3fb794e36", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEEqkxVZ19YDwGaLrBknKuc6KEGGNjg0Losw5kdQH5YSPDBxUsodiN13mBh1YZJRTsw==", null, false, null, "d660e383-71b2-4297-9db6-429927deb192", null, null, false, "elon.musk@example.com" });
 
             migrationBuilder.InsertData(
                 table: "RequestTypes",
@@ -556,15 +561,6 @@ namespace Hometown_Application.Migrations
                     { 4, "In Progress" },
                     { 5, "Resolved" },
                     { 6, "Closed" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUserRoles",
-                columns: new[] { "RoleId", "UserId" },
-                values: new object[,]
-                {
-                    { "3", "100" },
-                    { "1", "101" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -665,6 +661,16 @@ namespace Hometown_Application.Migrations
                 name: "IX_ServiceRequests_HomeownerId",
                 table: "ServiceRequests",
                 column: "HomeownerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequests_RequestTypeId",
+                table: "ServiceRequests",
+                column: "RequestTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequests_StatusId",
+                table: "ServiceRequests",
+                column: "StatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StaffProfiles_HouseId",
@@ -770,9 +776,6 @@ namespace Hometown_Application.Migrations
                 name: "FeedbackComplaints");
 
             migrationBuilder.DropTable(
-                name: "RequestTypes");
-
-            migrationBuilder.DropTable(
                 name: "Reservation");
 
             migrationBuilder.DropTable(
@@ -785,10 +788,13 @@ namespace Hometown_Application.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Status");
+                name: "Facility");
 
             migrationBuilder.DropTable(
-                name: "Facility");
+                name: "RequestTypes");
+
+            migrationBuilder.DropTable(
+                name: "Status");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
