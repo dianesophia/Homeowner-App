@@ -10,6 +10,7 @@
             <th>Urgency</th>
             <th>Email</th>
             <th>Status</th>
+            <th>Assign Staff</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -22,6 +23,19 @@
                 <td>@request.Urgency</td>
                 <td>@request.Email</td>
                 <td>@request.Status</td>
+                <td>
+                    <form asp-action="AssignStaff" method="post">
+                        <input type="hidden" name="id" value="@request.ServiceRequestId" />
+                        <select name="staffId" class="form-select">
+                            <option value="">Select Staff</option>
+                            @foreach (var staff in ViewBag.StaffProfiles)
+                            {
+                                <option value="@staff.Value">@staff.Text</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary mt-2">Assign</button>
+                    </form>
+                </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning">Edit</a>
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"

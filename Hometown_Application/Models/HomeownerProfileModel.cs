@@ -33,10 +33,10 @@ namespace Hometown_Application.Models
         public HouseModel House { get; set; }
 
         [PersonalData]
-        public DateTime? MoveInDate { get; set; } = DateTime.MinValue;
+        public DateTime? MoveInDate { get; set; } = DateTime.UtcNow;
 
         [PersonalData]
-        public DateTime? MoveOutDate { get; set; } = DateTime.MinValue;
+        public DateTime? MoveOutDate { get; set; } = DateTime.UtcNow;
 
         [PersonalData]
         public bool? IsBanned { get; set; } = false;

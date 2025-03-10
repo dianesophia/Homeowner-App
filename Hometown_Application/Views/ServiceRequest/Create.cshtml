@@ -1,34 +1,32 @@
 ﻿@model Hometown_Application.Models.ServiceRequestModel
 
 
-<h2>Submit a Service Request</h2>
+
+<h2>Create Service Request</h2>
+
 <form asp-action="Create" method="post">
-    <div class="form-group">
-        <label>Category</label>
-        <input asp-for="Category" class="form-control" required />
-    </div>
-
-    <div class="form-group">
-        <label>Description</label>
-        <textarea asp-for="Description" class="form-control" required></textarea>
-    </div>
-
-    <div class="form-group">
-        <label>Urgency</label>
-        <select asp-for="Urgency" class="form-control">
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
+    @Html.AntiForgeryToken()
+    
+    <div class="mb-3">
+        <label for="Category" class="form-label">Request Type</label>
+        <select asp-for="Category" class="form-control" asp-items="@(new SelectList(ViewBag.RequestTypes, "Name", "Name"))">
+            <option value="">-- Select a Request Type --</option>
         </select>
     </div>
 
-    <div class="form-group">
-        <label>Email</label>
-        <input asp-for="Email" class="form-control" type="email" required />
+    <div class="mb-3">
+        <label for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
     </div>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="mb-3">
+        <label for="Urgency" class="form-label">Urgency</label>
+        <select asp-for="Urgency" class="form-control">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select>
+    </div>
 
-    <!-- View Requests Button -->
-    <a asp-action="Index" class="btn btn-secondary">View Requests</a>
+    <button type="submit" class="btn btn-success">Submit</button>
 </form>

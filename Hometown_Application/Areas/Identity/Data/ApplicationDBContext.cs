@@ -27,6 +27,9 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<FacilityModel> Facility { get; set; }
     public DbSet<ServiceRequestModel> ServiceRequests { get; set; }
 
+    public DbSet<RequestTypeModel> RequestTypes { get; set; }
+    public DbSet<ServiceStaffAssignmentModel> ServiceStaffAssignments { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -63,6 +66,68 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             new StatusModel { StatusId = 6, StatusName = "Closed" }
         );
 
+        builder.Entity<RequestTypeModel>().HasData(
+                new RequestTypeModel { RequestTypeId = 1, Name = "Pool Cleaning", AssignedDepartment = StaffDepartment.Amenities, Description = "Request for pool maintenance." },
+                new RequestTypeModel { RequestTypeId = 2, Name = "Lost and Found Inquiry", AssignedDepartment = StaffDepartment.CustomerSupport, Description = "Report or ask about lost items." },
+                new RequestTypeModel { RequestTypeId = 3, Name = "Billing Issue", AssignedDepartment = StaffDepartment.Finance, Description = "Concerns about billing and payments." },
+                new RequestTypeModel { RequestTypeId = 4, Name = "Internet Issue", AssignedDepartment = StaffDepartment.IT, Description = "Report issues with internet connectivity." },
+                new RequestTypeModel { RequestTypeId = 5, Name = "Lawn Mowing", AssignedDepartment = StaffDepartment.Landscaping, Description = "Request lawn maintenance services." },
+                new RequestTypeModel { RequestTypeId = 6, Name = "Plumbing Repair", AssignedDepartment = StaffDepartment.Maintenance, Description = "Report plumbing issues like leaks." },
+                new RequestTypeModel { RequestTypeId = 7, Name = "Suspicious Activity", AssignedDepartment = StaffDepartment.Security, Description = "Report security concerns or suspicious activity." }
+            );
+
+
+
+        // ✅ Seeding Roles
+       /* var roles = new List<IdentityRole>
+        {
+            new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
+            new IdentityRole { Id = "2", Name = "HomeOwner", NormalizedName = "HOMEOWNER" },
+            new IdentityRole { Id = "3", Name = "Staff", NormalizedName = "STAFF" }
+        };
+        builder.Entity<IdentityRole>().HasData(roles);*/
+
+        // ✅ Seeding Users
+        var hasher = new PasswordHasher<ApplicationUser>();
+
+        var users = new List<ApplicationUser>
+        {
+            new ApplicationUser
+            {
+                Id = "100",  // Unique GUID
+                UserName = "elon.musk@example.com",
+                NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
+                Email = "elon.musk@example.com",
+                NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
+                EmailConfirmed = true,
+                FirstName = "Elon",
+                LastName = "Musk",
+                PasswordHash = hasher.HashPassword(null, "ElonMusk123*")
+            },
+            /*new ApplicationUser
+            {
+                Id = "101",
+                UserName = "admin@admin.com",
+                NormalizedUserName = "ADMIN@ADMIN.COM",
+                Email = "admin@admin.com",
+                NormalizedEmail = "ADMIN@ADMIN.COM",
+                EmailConfirmed = true,
+                FirstName = "Admin",
+                LastName = "User",
+                PasswordHash = hasher.HashPassword(null, "Admin123*")
+            }*/
+        };
+        builder.Entity<ApplicationUser>().HasData(users);
+
+        // ✅ Seeding User Roles
+        var userRoles = new List<IdentityUserRole<string>>
+        {
+            new IdentityUserRole<string> { UserId = "100", RoleId = "7093ab8c-a8c0-4bda-b7df-021df94a683a" },  // Elon Musk → Staff
+          //  new IdentityUserRole<string> { UserId = "101", RoleId = "1" }   // Admin → Admin
+        };
+
+
+        builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
         builder.Entity<HomeownerProfileModel>()
           .HasOne(fc => fc.ApplicationUser)
           .WithMany()
@@ -113,26 +178,32 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .OnDelete(DeleteBehavior.Restrict);
 
 
+        /*  builder.Entity<ServiceRequestModel>()
+             .HasOne(s => s.AssignedStaff)
+             .WithMany()
+             .HasForeignKey(s => s.StaffId)
+             .OnDelete(DeleteBehavior.SetNull);
+        */
+
+        /* modelBuilder.Entity<ServiceRequestModel>()
+         .HasOne(sr => sr.User) // Assuming ServiceRequestModel has a User navigation property
+         .WithMany() // A User can have many service requests
+         .HasForeignKey(sr => sr.UserId)
+         .OnDelete(DeleteBehavior.Restrict);  // Prevent cascade delete
+
+
+         // You can also configure other relationships the same way
+        builder.Entity<StaffProfileModel>()
+             .HasOne(sp => sp.UserId)
+             .WithMany()
+             .HasForeignKey(sp => sp.UserId)
+             .OnDelete(DeleteBehavior.Restrict);
+        */
         builder.Entity<ServiceRequestModel>()
-           .HasOne(s => s.AssignedStaff)
-           .WithMany()
-           .HasForeignKey(s => s.StaffId)
-           .OnDelete(DeleteBehavior.SetNull);
+         .HasOne(s => s.Homeowner)
+         .WithMany() // Assuming HomeownerProfileModel does not have a navigation property
+         .HasForeignKey(s => s.HomeownerId)
+         .OnDelete(DeleteBehavior.SetNull);
 
-        
-       /* modelBuilder.Entity<ServiceRequestModel>()
-        .HasOne(sr => sr.User) // Assuming ServiceRequestModel has a User navigation property
-        .WithMany() // A User can have many service requests
-        .HasForeignKey(sr => sr.UserId)
-        .OnDelete(DeleteBehavior.Restrict);  // Prevent cascade delete
-       
-
-        // You can also configure other relationships the same way
-       builder.Entity<StaffProfileModel>()
-            .HasOne(sp => sp.UserId)
-            .WithMany()
-            .HasForeignKey(sp => sp.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-       */
     }
 }

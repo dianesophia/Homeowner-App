@@ -5,24 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hometown_Application.Models
 {
-    public enum StaffDepartment
-    {
-        Administration,
-        Finance,
-        Security,
-        Maintenance,
-        CustomerSupport,
-        Legal,
-        CommunityManagement,
-        IT,
-        Amenities,
-        Landscaping,
-        VendorManagement
-    }
 
     public class StaffProfileModel
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int StaffId { get; set; }
 
         [Required]

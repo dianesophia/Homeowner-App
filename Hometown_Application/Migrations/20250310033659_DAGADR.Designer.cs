@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250309031920_ADd")]
-    partial class ADd
+    [Migration("20250310033659_DAGADR")]
+    partial class DAGADR
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -144,6 +144,54 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("StaffProfilesStaffId");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "100",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "66c244fe-b682-4bde-b804-8cc6535a6911",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "elon.musk@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Elon",
+                            IsActiveUser = true,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Musk",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
+                            NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJYR05WjKvR8o/Puxg9pOxMTmGy8DSqHUuoGOZEQhAPcv7DVG9sh+bs+sZ2crakkQg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "4a23466c-965a-4043-b0bf-8edf82af3566",
+                            TwoFactorEnabled = false,
+                            UserName = "elon.musk@example.com"
+                        },
+                        new
+                        {
+                            Id = "101",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "35547b8f-ed51-43b0-82a8-3d6fc8930097",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@admin.com",
+                            EmailConfirmed = true,
+                            FirstName = "Admin",
+                            IsActiveUser = true,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "User",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "ADMIN@ADMIN.COM",
+                            NormalizedUserName = "ADMIN@ADMIN.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAELSfe20AFXBGcgmuN3/usvNj17LQBNkuUfMsxbQn+imRdWhR+N213vnF6BUT8v9Idg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "b2688c8c-53b5-4dcd-86c8-fbe0012cce77",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@admin.com"
+                        });
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.AdminProfileModel", b =>
@@ -519,6 +567,90 @@ namespace Hometown_Application.Migrations
                     b.ToTable("House");
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.RequestTypeModel", b =>
+                {
+                    b.Property<int>("RequestTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestTypeId"));
+
+                    b.Property<int>("AssignedDepartment")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("RequestTypeId");
+
+                    b.ToTable("RequestTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            RequestTypeId = 1,
+                            AssignedDepartment = 0,
+                            Description = "Request for pool maintenance.",
+                            IsActive = true,
+                            Name = "Pool Cleaning"
+                        },
+                        new
+                        {
+                            RequestTypeId = 2,
+                            AssignedDepartment = 1,
+                            Description = "Report or ask about lost items.",
+                            IsActive = true,
+                            Name = "Lost and Found Inquiry"
+                        },
+                        new
+                        {
+                            RequestTypeId = 3,
+                            AssignedDepartment = 2,
+                            Description = "Concerns about billing and payments.",
+                            IsActive = true,
+                            Name = "Billing Issue"
+                        },
+                        new
+                        {
+                            RequestTypeId = 4,
+                            AssignedDepartment = 3,
+                            Description = "Report issues with internet connectivity.",
+                            IsActive = true,
+                            Name = "Internet Issue"
+                        },
+                        new
+                        {
+                            RequestTypeId = 5,
+                            AssignedDepartment = 4,
+                            Description = "Request lawn maintenance services.",
+                            IsActive = true,
+                            Name = "Lawn Mowing"
+                        },
+                        new
+                        {
+                            RequestTypeId = 6,
+                            AssignedDepartment = 5,
+                            Description = "Report plumbing issues like leaks.",
+                            IsActive = true,
+                            Name = "Plumbing Repair"
+                        },
+                        new
+                        {
+                            RequestTypeId = 7,
+                            AssignedDepartment = 6,
+                            Description = "Report security concerns or suspicious activity.",
+                            IsActive = true,
+                            Name = "Suspicious Activity"
+                        });
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
                 {
                     b.Property<int>("ReservationId")
@@ -602,6 +734,9 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("HomeownerId")
+                        .HasColumnType("int");
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -624,7 +759,42 @@ namespace Hometown_Application.Migrations
 
                     b.HasKey("ServiceRequestId");
 
+                    b.HasIndex("HomeownerId");
+
                     b.ToTable("ServiceRequests");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.ServiceStaffAssignmentModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("AcceptedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUnavailable")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ServiceRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StaffId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceStaffAssignments");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
@@ -776,6 +946,26 @@ namespace Hometown_Application.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "HomeOwner",
+                            NormalizedName = "HOMEOWNER"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            Name = "Staff",
+                            NormalizedName = "STAFF"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -865,6 +1055,18 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "100",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "101",
+                            RoleId = "1"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -985,6 +1187,16 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Facility");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.ServiceRequestModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Models.HomeownerProfileModel", "Homeowner")
+                        .WithMany()
+                        .HasForeignKey("HomeownerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Homeowner");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>

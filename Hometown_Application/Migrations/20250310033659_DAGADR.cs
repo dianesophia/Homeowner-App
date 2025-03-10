@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class ADd : Migration
+    public partial class DAGADR : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -114,25 +114,37 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceRequests",
+                name: "RequestTypes",
                 columns: table => new
                 {
-                    ServiceRequestId = table.Column<int>(type: "int", nullable: false)
+                    RequestTypeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Urgency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    AssignedDepartment = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServiceRequests", x => x.ServiceRequestId);
+                    table.PrimaryKey("PK_RequestTypes", x => x.RequestTypeId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServiceStaffAssignments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServiceRequestId = table.Column<int>(type: "int", nullable: false),
+                    StaffId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    IsAccepted = table.Column<bool>(type: "bit", nullable: false),
+                    IsUnavailable = table.Column<bool>(type: "bit", nullable: false),
+                    AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AcceptedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceStaffAssignments", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -471,6 +483,68 @@ namespace Hometown_Application.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ServiceRequests",
+                columns: table => new
+                {
+                    ServiceRequestId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Urgency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    HomeownerId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceRequests", x => x.ServiceRequestId);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_HomeownerProfiles_HomeownerId",
+                        column: x => x.HomeownerId,
+                        principalTable: "HomeownerProfiles",
+                        principalColumn: "HomeownerId",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "1", null, "Admin", "ADMIN" },
+                    { "2", null, "HomeOwner", "HOMEOWNER" },
+                    { "3", null, "Staff", "STAFF" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "AdminProfilesAdminId", "Bio", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FacebookProfile", "FirstName", "Gender", "HomeownerProfilesHomeownerId", "IsActiveUser", "IsBirthdayPublic", "IsGenderPublic", "LastName", "LinkedInProfile", "LockoutEnabled", "LockoutEnd", "MakeFacebookPublic", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "SecurityStamp", "StaffProfilesStaffId", "TwitterProfile", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { "100", 0, null, null, "66c244fe-b682-4bde-b804-8cc6535a6911", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJYR05WjKvR8o/Puxg9pOxMTmGy8DSqHUuoGOZEQhAPcv7DVG9sh+bs+sZ2crakkQg==", null, false, null, "4a23466c-965a-4043-b0bf-8edf82af3566", null, null, false, "elon.musk@example.com" },
+                    { "101", 0, null, null, "35547b8f-ed51-43b0-82a8-3d6fc8930097", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@admin.com", true, null, "Admin", null, null, true, false, false, "User", null, false, null, false, "ADMIN@ADMIN.COM", "ADMIN@ADMIN.COM", "AQAAAAIAAYagAAAAELSfe20AFXBGcgmuN3/usvNj17LQBNkuUfMsxbQn+imRdWhR+N213vnF6BUT8v9Idg==", null, false, null, "b2688c8c-53b5-4dcd-86c8-fbe0012cce77", null, null, false, "admin@admin.com" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "RequestTypes",
+                columns: new[] { "RequestTypeId", "AssignedDepartment", "Description", "IsActive", "Name" },
+                values: new object[,]
+                {
+                    { 1, 0, "Request for pool maintenance.", true, "Pool Cleaning" },
+                    { 2, 1, "Report or ask about lost items.", true, "Lost and Found Inquiry" },
+                    { 3, 2, "Concerns about billing and payments.", true, "Billing Issue" },
+                    { 4, 3, "Report issues with internet connectivity.", true, "Internet Issue" },
+                    { 5, 4, "Request lawn maintenance services.", true, "Lawn Mowing" },
+                    { 6, 5, "Report plumbing issues like leaks.", true, "Plumbing Repair" },
+                    { 7, 6, "Report security concerns or suspicious activity.", true, "Suspicious Activity" }
+                });
+
             migrationBuilder.InsertData(
                 table: "Status",
                 columns: new[] { "StatusId", "StatusName" },
@@ -482,6 +556,15 @@ namespace Hometown_Application.Migrations
                     { 4, "In Progress" },
                     { 5, "Resolved" },
                     { 6, "Closed" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { "3", "100" },
+                    { "1", "101" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -577,6 +660,11 @@ namespace Hometown_Application.Migrations
                 name: "IX_Reservation_UserId",
                 table: "Reservation",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequests_HomeownerId",
+                table: "ServiceRequests",
+                column: "HomeownerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StaffProfiles_HouseId",
@@ -682,10 +770,16 @@ namespace Hometown_Application.Migrations
                 name: "FeedbackComplaints");
 
             migrationBuilder.DropTable(
+                name: "RequestTypes");
+
+            migrationBuilder.DropTable(
                 name: "Reservation");
 
             migrationBuilder.DropTable(
                 name: "ServiceRequests");
+
+            migrationBuilder.DropTable(
+                name: "ServiceStaffAssignments");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

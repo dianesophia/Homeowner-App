@@ -30,16 +30,29 @@ namespace Hometown_Application.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.RequestTypes = _context.RequestTypes.ToList(); // Fetch request types
             return View();
         }
+        /*  public IActionResult AdminView()
+          {
+              var serviceRequests = _context.ServiceRequests.ToList(); // Admin has access to all requests
+              return View(serviceRequests);
+          }*/
 
         public IActionResult AdminView()
         {
-            var serviceRequests = _context.ServiceRequests.ToList(); // Admin has access to all requests
+            var serviceRequests = _context.ServiceRequests
+                .Where(r => r.IsDeleted == false || r.IsDeleted == null)
+                .ToList();
+
+            var staffProfiles = _context.StaffProfiles.ToList(); // Fetch all staff
+
+            ViewBag.StaffProfiles = new SelectList(staffProfiles, "StaffId", "FullName");
+
             return View(serviceRequests);
         }
 
-         public IActionResult HomeownerView()
+        public IActionResult HomeownerView()
     {
         var homeownerRequests = _context.ServiceRequests
             .Where(r => r.Email == User.Identity.Name) // Assuming you use the logged-in user's email to filter requests
@@ -65,13 +78,23 @@ namespace Hometown_Application.Controllers
 
 
         // Display form to edit request
-        [HttpGet]
+        /* [HttpGet]
+         public IActionResult Edit(int id)
+         {
+             var request = _context.ServiceRequests.Find(id);
+             if (request == null) return NotFound();
+             return View(request);
+         }*/
+
         public IActionResult Edit(int id)
         {
             var request = _context.ServiceRequests.Find(id);
             if (request == null) return NotFound();
+
+            ViewBag.RequestTypes = _context.RequestTypes.ToList(); // Fetch request types
             return View(request);
         }
+
 
         // Handle edit request
         [HttpPost]
@@ -120,15 +143,15 @@ namespace Hometown_Application.Controllers
             var request = _context.ServiceRequests.Find(id);
             if (request == null) return NotFound();
 
+            // Find staff members in the same department as the request category
             var staff = _context.StaffProfiles
-                                .Where(s => s.Department.ToString() == request.Category) // Convert Department to string
+                                .Where(s => s.Department.ToString() == request.Category)
                                 .ToList();
 
             ViewBag.StaffList = new SelectList(staff, "StaffId", "FullName");
             return View(request);
         }
 
-        // Handle staff assignment after form submission
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AssignStaff(int id, int staffId)
@@ -136,37 +159,61 @@ namespace Hometown_Application.Controllers
             var request = _context.ServiceRequests.Find(id);
             if (request == null) return NotFound();
 
-            // Update the staff assignment
-            request.StaffId = staffId;
-            request.Status = "Assigned"; // Update status to "Assigned" if needed
+            // Save the assignment in ServiceStaffAssignmentModel
+            var assignment = new ServiceStaffAssignmentModel
+            {
+                ServiceRequestId = id,
+                StaffId = staffId.ToString(),
+                AssignedAt = DateTime.UtcNow,
+                IsAccepted = false, // The staff still needs to accept the request
+                IsUnavailable = false
+            };
+
+            _context.ServiceStaffAssignments.Add(assignment);
+
+            // Update request status
+            request.Status = "Assigned";
             _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
+
 
         public IActionResult AutoAssignStaff(int requestId)
         {
             var request = _context.ServiceRequests.Find(requestId);
             if (request == null) return NotFound();
 
-            // Find available staff based on department (convert Department to string)
+            // Find the first available staff in the same department
             var availableStaff = _context.StaffProfiles
-                .Where(s => s.Department.ToString() == request.Category && !_context.ServiceRequests
-                    .Any(r => r.StaffId == s.StaffId && r.Status == "Assigned"))
+                .Where(s => s.Department.ToString() == request.Category &&
+                            !_context.ServiceStaffAssignments
+                            .Any(a => a.StaffId == s.StaffId.ToString() && !a.IsUnavailable)) // Ensure staff is available
                 .FirstOrDefault();
 
             if (availableStaff != null)
             {
-                request.StaffId = availableStaff.StaffId;
+                // Create a new staff assignment
+                var assignment = new ServiceStaffAssignmentModel
+                {
+                    ServiceRequestId = requestId,
+                    StaffId = availableStaff.StaffId.ToString(),
+                    AssignedAt = DateTime.UtcNow,
+                    IsAccepted = false, // The staff still needs to confirm
+                    IsUnavailable = false
+                };
+
+                _context.ServiceStaffAssignments.Add(assignment);
+
+                // Update request status
                 request.Status = "Assigned";
                 _context.SaveChanges();
+
                 return RedirectToAction("Index");
             }
 
-            // If no available staff, handle this case (e.g., show message)
-            return View("NoAvailableStaff");
+            return View("NoAvailableStaff"); // Redirect to a view showing no staff available
         }
-
 
     }
 }

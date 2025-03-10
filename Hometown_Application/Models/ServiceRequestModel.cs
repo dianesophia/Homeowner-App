@@ -9,14 +9,6 @@ namespace Hometown_Application.Models;
         [Key]
         public int ServiceRequestId { get; set; }
 
-  /*  [Required]
-    public string UserId { get; set; }
-
-    [ForeignKey("UserId")]
-    public ApplicationUser ApplicationUser { get; set; }
-  */
-
-
     [Required]
         public string? Category { get; set; }
 
@@ -43,12 +35,12 @@ namespace Hometown_Application.Models;
 
         public bool? IsDeleted { get; set; } = false;
 
-    public int? StaffId { get; set; }
+    public int? HomeownerId { get; set; }
 
-    // Navigation Property
-    public StaffProfileModel? AssignedStaff { get; set; }
+    [ForeignKey("HomeownerId")]
+    public HomeownerProfileModel? Homeowner { get; set; }
 
-    
+
 }
 
 
