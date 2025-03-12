@@ -39,7 +39,7 @@ namespace Hometown_Application.Controllers
             return View(userRoles);
         }
 
-        public async Task<IActionResult> ViewDetails(string id)
+        /* async Task<IActionResult> ViewDetails(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -63,7 +63,7 @@ namespace Hometown_Application.Controllers
 
             // Redirect back to the index page
             return RedirectToAction(nameof(Index));
-        }
+        }*/
 
         public async Task<IActionResult> DeleteUser(string id)
         {
@@ -101,19 +101,27 @@ namespace Hometown_Application.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> ApproveHomeowner(string userId)
         {
             var homeownerProfile = await _dbContext.HomeownerProfiles.FirstOrDefaultAsync(h => h.UserId == userId);
-
             if (homeownerProfile == null)
                 return NotFound("Homeowner profile not found.");
 
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return NotFound("User not found.");
+
             homeownerProfile.IsApproved = true;
+            user.IsApproved = true;
+
             _dbContext.HomeownerProfiles.Update(homeownerProfile);
+            _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
+
 
         public async Task<IActionResult> AccountApproval()
         {

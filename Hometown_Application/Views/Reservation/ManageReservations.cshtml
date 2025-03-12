@@ -6,140 +6,455 @@
     var activeTab = TempData["ActiveTab"] as string ?? "Pending"; // Default to "Pending" if not set
 }
 
-<h2>Manage Reservations</h2>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<!-- Display success message if present -->
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+
+    .reservations-container {
+        width: 100%;
+        margin: 2rem auto;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid var(--primary-light);
+        margin-bottom: 20px;
+    }
+
+        .nav-tabs .nav-item {
+            margin-bottom: -1px;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-color);
+            border: 1px solid transparent;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            transition: var(--transition);
+        }
+
+            .nav-tabs .nav-link:hover {
+                border-color: var(--primary-light);
+                background-color: rgba(111, 117, 78, 0.1);
+            }
+
+            .nav-tabs .nav-link.active {
+                color: var(--primary-dark);
+                background-color: white;
+                border-color: var(--primary-light) var(--primary-light) transparent;
+                font-weight: 600;
+            }
+
+    .tab-content {
+        padding: 20px 0;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(111, 117, 78, 0.05);
+    }
+
+    .table thead th {
+        vertical-align: middle;
+        padding: 0.75rem;
+        border-bottom: 2px solid var(--primary-light);
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 500;
+    }
+
+    .table tbody td {
+        padding: 0.75rem;
+        vertical-align: middle;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .btn {
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.875rem;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+        color: white;
+    }
+
+        .btn-success:hover {
+            background-color: #157347;
+            border-color: #146c43;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-danger {
+        background-color: var(--danger-color);
+        border-color: var(--danger-color);
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        }
+
+    .form-select {
+        display: block;
+        padding: 0.75rem 2.25rem 0.75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        }
+
+    .alert-success {
+        background-color: rgba(25, 135, 84, 0.1);
+        border: 1px solid rgba(25, 135, 84, 0.2);
+        color: var(--success-color);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-filter-form {
+        background-color: rgba(111, 117, 78, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(111, 117, 78, 0.1);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+        .pagination span {
+            padding: 8px 16px;
+            background-color: rgba(111, 117, 78, 0.05);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+    .facility-image {
+        max-width: 100px;
+        max-height: 100px;
+        border-radius: 8px;
+        border: 3px solid var(--primary-light);
+        object-fit: cover;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+    }
+</style>
+
+<div class="content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Manage Reservations</h1>
+        </div>
     </div>
-}
 
-<!-- Search and Filter Form -->
-<form method="get" class="mb-3">
-    <div class="input-group">
-        <input type="text" name="search" placeholder="Search by Facility" value="@Model.SearchQuery" class="form-control" />
-        <select name="statusFilter" class="form-select">
-            <option value="">All Statuses</option>
+    <div class="reservations-container">
+        <!-- Display success message if present -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Search and Filter Form -->
+        <form method="get" class="search-filter-form">
+            <div class="input-group d-flex gap-2">
+                <input type="text" name="search" placeholder="Search by Facility" value="@Model.SearchQuery" class="form-control" />
+                <select name="statusFilter" class="form-select">
+                    <option value="">All Statuses</option>
+                    @foreach (var status in statuses)
+                    {
+                        <option value="@status" selected="@(Model.StatusFilter == status ? "selected" : null)">@status</option>
+                    }
+                </select>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        <!-- Bootstrap 5 Tabs -->
+        <ul class="nav nav-tabs" id="reservationStatusTabs" role="tablist">
             @foreach (var status in statuses)
             {
-                <option value="@status" selected="@(Model.StatusFilter == status ? "selected" : null)">@status</option>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @(status == activeTab ? "active" : "")"
+                            id="tab-@status.Replace(" ", "")"
+                            data-bs-toggle="tab"
+                            data-bs-target="#reservation-@status.Replace(" ", "")"
+                            type="button"
+                            role="tab"
+                            aria-controls="reservation-@status.Replace(" ", "")"
+                            aria-selected="@(status == activeTab ? "true" : "false")">
+                        @status
+                    </button>
+                </li>
             }
-        </select>
-        <button type="submit" class="btn btn-primary">Search</button>
-    </div>
-</form>
+        </ul>
 
-<!-- Bootstrap 5 Tabs -->
-<ul class="nav nav-tabs" id="reservationStatusTabs" role="tablist">
-    @foreach (var status in statuses)
-    {
-        <li class="nav-item" role="presentation">
-            <button class="nav-link @(status == activeTab ? "active" : "")"
-                    id="tab-@status.Replace(" ", "")"
-                    data-bs-toggle="tab"
-                    data-bs-target="#reservation-@status.Replace(" ", "")"
-                    type="button"
-                    role="tab"
-                    aria-controls="reservation-@status.Replace(" ", "")"
-                    aria-selected="@(status == activeTab ? "true" : "false")">
-                @status
-            </button>
-        </li>
-    }
-</ul>
-
-<!-- Tab Content -->
-<div class="tab-content mt-3" id="reservationTabContent">
-    @foreach (var status in statuses)
-    {
-        var reservationsByStatus = Model.Reservations
-        .Where(item => item.Status == status && !item.IsDeleted)
-        .ToList();
-
-        <div class="tab-pane fade @(status == activeTab ? "show active" : "")"
-             id="reservation-@status.Replace(" ", "")"
-             role="tabpanel"
-             aria-labelledby="tab-@status.Replace(" ", "")">
-
-            @if (reservationsByStatus.Any())
+        <!-- Tab Content -->
+        <div class="tab-content mt-3" id="reservationTabContent">
+            @foreach (var status in statuses)
             {
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Facility Image</th>
-                            <th>Facility</th>
-                            <th>User</th> <!-- Changed from UserId to User (FirstName + LastName) -->
-                            <th>Reservation Date</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in reservationsByStatus)
-                        {
-                            <tr>
-                                <td>
-                                    @if (item.Facility?.Image != null && item.Facility.Image.Length > 0)
-                                    {
-                                        var base64Image = Convert.ToBase64String(item.Facility.Image);
-                                        var imgSrc = $"data:image/jpeg;base64,{base64Image}";
-                                        <img src="@imgSrc" alt="@item.Facility.Name" style="max-width: 100px; max-height: 100px;" />
-                                    }
-                                    else
-                                    {
-                                        <span>No Image</span>
-                                    }
-                                </td>
-                                <td>@(item.Facility?.Name ?? "Unknown Facility")</td>
-                                <td>@(item.ApplicationUser?.FirstName + " " + item.ApplicationUser?.LastName ?? "Unknown User")</td> <!-- Display FirstName + LastName -->
-                                <td>@item.ReservationDate.ToString("yyyy-MM-dd")</td>
-                                <td>@item.StartTime.ToString("hh:mm tt")</td>
-                                <td>@item.EndTime.ToString("hh:mm tt")</td>
-                                <td>@item.Status</td>
-                                <td>
-                                    @if (item.Status == "Pending")
-                                    {
-                                        <form asp-action="UpdateReservationStatus" asp-route-id="@item.ReservationId" method="post" style="display:inline;">
-                                            <input type="hidden" name="newStatus" value="Approved" />
-                                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                        </form>
-                                        <form asp-action="UpdateReservationStatus" asp-route-id="@item.ReservationId" method="post" style="display:inline;">
-                                            <input type="hidden" name="newStatus" value="Declined" />
-                                            <button type="submit" class="btn btn-danger btn-sm">Decline</button>
-                                        </form>
-                                    }
-                                    <form asp-action="Delete" asp-route-id="@item.ReservationId" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                var reservationsByStatus = Model.Reservations
+                .Where(item => item.Status == status && !item.IsDeleted)
+                .ToList();
 
-                <!-- Pagination -->
-                <div class="pagination">
-                    @if (Model.PageNumber > 1)
+                <div class="tab-pane fade @(status == activeTab ? "show active" : "")"
+                     id="reservation-@status.Replace(" ", "")"
+                     role="tabpanel"
+                     aria-labelledby="tab-@status.Replace(" ", "")">
+
+                    @if (reservationsByStatus.Any())
                     {
-                        <a href="@Url.Action("ManageReservations", new { search = Model.SearchQuery, statusFilter = status, pageNumber = Model.PageNumber - 1 })" class="btn btn-secondary">Previous</a>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Facility Image</th>
+                                    <th class="text-center">Facility</th>
+                                    <th class="text-center">User</th>
+                                    <th class="text-center">Reservation Date</th>
+                                    <th class="text-center">Start Time</th>
+                                    <th class="text-center">End Time</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in reservationsByStatus)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            @if (item.Facility?.Image != null && item.Facility.Image.Length > 0)
+                                            {
+                                                var base64Image = Convert.ToBase64String(item.Facility.Image);
+                                                var imgSrc = $"data:image/jpeg;base64,{base64Image}";
+                                                <img src="@imgSrc" alt="@item.Facility.Name" class="facility-image" />
+                                            }
+                                            else
+                                            {
+                                                <span>No Image</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">@(item.Facility?.Name ?? "Unknown Facility")</td>
+                                        <td class="text-center">@(item.ApplicationUser?.FirstName + " " + item.ApplicationUser?.LastName ?? "Unknown User")</td>
+                                        <td class="text-center">@item.ReservationDate.ToString("yyyy-MM-dd")</td>
+                                        <td class="text-center">@item.StartTime.ToString("hh:mm tt")</td>
+                                        <td class="text-center">@item.EndTime.ToString("hh:mm tt")</td>
+                                        <td class="text-center">@item.Status</td>
+                                        <td class="text-center">
+                                            <div class="action-buttons">
+                                                @if (item.Status == "Pending")
+                                                {
+                                                    <form asp-action="UpdateReservationStatus" asp-route-id="@item.ReservationId" method="post" style="display:inline;">
+                                                        <input type="hidden" name="newStatus" value="Approved" />
+                                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                                    </form>
+                                                    <form asp-action="UpdateReservationStatus" asp-route-id="@item.ReservationId" method="post" style="display:inline;">
+                                                        <input type="hidden" name="newStatus" value="Declined" />
+                                                        <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                                                    </form>
+                                                }
+                                                <form asp-action="Delete" asp-route-id="@item.ReservationId" method="post" style="display:inline;">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <!-- Pagination -->
+                        <div class="pagination">
+                            @if (Model.PageNumber > 1)
+                            {
+                                <a href="@Url.Action("ManageReservations", new { search = Model.SearchQuery, statusFilter = status, pageNumber = Model.PageNumber - 1 })" class="btn btn-secondary">Previous</a>
+                            }
+                            <span>Page @Model.PageNumber of @Model.TotalPages</span>
+                            @if (Model.PageNumber < Model.TotalPages)
+                            {
+                                <a href="@Url.Action("ManageReservations", new { search = Model.SearchQuery, statusFilter = status, pageNumber = Model.PageNumber + 1 })" class="btn btn-secondary">Next</a>
+                            }
+                        </div>
                     }
-                    <span>Page @Model.PageNumber of @Model.TotalPages</span>
-                    @if (Model.PageNumber < Model.TotalPages)
+                    else
                     {
-                        <a href="@Url.Action("ManageReservations", new { search = Model.SearchQuery, statusFilter = status, pageNumber = Model.PageNumber + 1 })" class="btn btn-secondary">Next</a>
+                        <p class="text-muted text-center">No reservations available for @status.</p>
                     }
                 </div>
             }
-            else
-            {
-                <p class="text-muted">No reservations available for @status.</p>
-            }
         </div>
-    }
+    </div>
 </div>
 
 <!-- Bootstrap 5 JavaScript -->

@@ -29,8 +29,8 @@
 			--card-bg: #FFFFFF;
 			--border-radius: 16px;
 			--shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-			--sidebar-width: 250px;
-			--sidebar-width-collapsed: 70px;
+			--sidebar-width: 280px;
+			--sidebar-width-collapsed: 90px;
 			--navbar-height: 100px;
 		}
 
@@ -171,6 +171,8 @@
 			overflow-y: auto;
 			overflow-x: hidden;
 			display: block; /* Ensure sidebar is visible by default */
+			scrollbar-width: thin;
+			scrollbar-color: var(--primary-color) rgba(255, 255, 255, 0.1);
 		}
 
 			.sidebar.collapsed {
@@ -186,7 +188,7 @@
 			.sidebar-nav li {
 				margin-bottom: 10px;
 				width: 100%;
-				position: relative; /* Added for submenu positioning */
+				position: relative;
 			}
 
 			.sidebar-nav a {
@@ -227,6 +229,26 @@
 			margin-right: 0;
 			font-size: 1.3rem;
 		}
+		.sidebar::-webkit-scrollbar {
+			width: 8px; 
+			display: none;
+		}
+
+		.sidebar::-webkit-scrollbar-track {
+			background: rgba(255, 255, 255, 0.1); 
+			border-radius: 10px;
+		}
+
+		.sidebar::-webkit-scrollbar-thumb {
+			background: var(--primary-color);
+			border-radius: 10px;
+			transition: 0.3s;
+		}
+
+			.sidebar::-webkit-scrollbar-thumb:hover {
+				background: var(--secondary-color); 
+			}
+
 
 		.main-container {
 			display: flex;
@@ -345,21 +367,34 @@
 <body>
     <div class="wrapper">
         <!-- Header -->
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <div class="container-fluid">
-                    <a class="navbar-brand text-white" asp-controller="Dashboard" asp-action="Index" style="font-weight: normal;">
-                        <i class="fas fa-home me-2"></i>
-                        Golden Haven
-                    </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <partial name="_LoginPartial.cshtml" />
-                    </div>
-                </div>
-            </nav>
+		<header>
+			<nav class="navbar navbar-expand-lg navbar-light">
+				<div class="container-fluid">
+					@if (SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null)
+					{
+						<a class="navbar-brand text-white" asp-controller="Dashboard" asp-action="Index" style="font-weight: normal;">
+							<i class="fas fa-home me-2"></i>
+							Golden Haven
+						</a>
+					}
+					else
+					{
+						<span class="navbar-brand text-white" style="font-weight: normal;">
+							<i class="fas fa-home me-2"></i>
+							Golden Haven
+						</span>
+					}
+
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarNav">
+						<partial name="_LoginPartial.cshtml" />
+					</div>
+				</div>
+			</nav>
+		</header>
+
         </header>
 
 		<div class="d-flex">

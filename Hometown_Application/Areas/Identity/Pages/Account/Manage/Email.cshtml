@@ -1,44 +1,285 @@
-﻿    @page
-    @model EmailModel
-    @{
-        ViewData["Title"] = "Manage Email";
-        ViewData["ActivePage"] = ManageNavPages.Email;
+﻿@page
+@model EmailModel
+@{
+    ViewData["Title"] = "Manage Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
     }
 
-    <h3>@ViewData["Title"]</h3>
-    <partial name="_StatusMessage" for="StatusMessage" />
-    <div class="row">
-        <div class="col-md-6">
-            <form id="email-form" method="post">
-                <div asp-validation-summary="All" class="text-danger" role="alert"></div>
-                @if (Model.IsEmailConfirmed)
-                {
-                    <div class="form-floating mb-3 input-group">
-                        <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
-                            <div class="input-group-append">
-                                <span class="h-100 input-group-text text-success font-weight-bold">✓</span>
-                            </div>
-                        <label asp-for="Email" class="form-label"></label>
-                    </div>
-                }
-                else
-                {
-                    <div class="form-floating mb-3">
-                        <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
-                        <label asp-for="Email" class="form-label"></label>
-                        <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-link">Send verification email</button>
-                    </div>
-                }
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
-                    <label asp-for="Input.NewEmail" class="form-label"></label>
-                    <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
-                </div>
-                <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary">Change email</button>
-            </form> 
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .email-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .action-button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        justify-content: center;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        text-decoration: none;
+    }
+
+        .action-button:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+
+    .input-container {
+        margin-bottom: 1.25rem;
+        position: relative;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+        .form-input:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--primary-light);
+            border-color: var(--primary-light);
+        }
+
+        .form-input:disabled {
+            background-color: #f8f8f8;
+            cursor: not-allowed;
+        }
+
+    .form-label {
+        position: absolute;
+        left: 12px;
+        top: -10px;
+        background-color: white;
+        padding: 0 8px;
+        font-size: 0.85rem;
+        color: var(--text-color);
+    }
+
+    .input-group {
+        display: flex;
+        position: relative;
+    }
+
+        .input-group .form-input {
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+        }
+
+    .input-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--success-color);
+        color: white;
+        width: 50px;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    }
+
+    .verification-button {
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        padding: 5px 0;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: underline;
+    }
+
+        .verification-button:hover {
+            color: var(--primary-dark);
+        }
+
+    .validation-error {
+        color: var(--danger-color);
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+
+    .status-message {
+        padding: 12px 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        background-color: #e3f8e9;
+        color: var(--success-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .status-message i {
+            font-size: 1.2rem;
+        }
+
+        .status-message.error {
+            background-color: #fde9e9;
+            color: var(--danger-color);
+        }
+</style>
+
+<div class="content">
+    <!-- Page Header -->
+    <h1 class="page-title">@ViewData["Title"]</h1>
+
+    <!-- Status Message (if any) -->
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        <div class="status-message @(Model.StatusMessage.Contains("Error") ? "error" : "")">
+            <i class="fas @(Model.StatusMessage.Contains("Error") ? "fa-exclamation-circle" : "fa-check-circle")"></i>
+            <span>@Model.StatusMessage</span>
         </div>
-    </div>
-
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
     }
+
+    <div class="email-container">
+        <form id="email-form" method="post">
+            <div asp-validation-summary="All" class="validation-error" role="alert"></div>
+
+            @if (Model.IsEmailConfirmed)
+            {
+                <div class="input-container">
+                    <div class="input-group">
+                        <input asp-for="Email" class="form-input" placeholder="Your current email" disabled />
+                        <div class="input-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <label asp-for="Email" class="form-label">Current Email</label>
+                </div>
+            }
+            else
+            {
+                <div class="input-container">
+                    <input asp-for="Email" class="form-input" placeholder="Your current email" disabled />
+                    <label asp-for="Email" class="form-label">Current Email</label>
+                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="verification-button">
+                        <i class="fas fa-envelope-open-text"></i> Send verification email
+                    </button>
+                </div>
+            }
+
+            <div class="input-container">
+                <input asp-for="Input.NewEmail" class="form-input" autocomplete="email" aria-required="true" placeholder="Enter your new email address" />
+                <label asp-for="Input.NewEmail" class="form-label">New Email</label>
+                <span asp-validation-for="Input.NewEmail" class="validation-error"></span>
+            </div>
+
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="action-button">
+                <i class="fas fa-envelope"></i> Change Email
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
