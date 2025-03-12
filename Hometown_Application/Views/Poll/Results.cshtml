@@ -1,0 +1,244 @@
+@model Hometown_Application.ViewModel.PollResultsViewModel
+
+@{
+    ViewData["Title"] = "Poll Results";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">@Model.Title - Results</h1>
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <p class="lead">@Model.Description</p>
+            }
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-4 flex-wrap">
+                        <div class="mb-3">
+                            <h5>Total Responses</h5>
+                            <h2 class="text-primary">@Model.TotalResponses</h2>
+                        </div>
+                        <div class="mb-3">
+                            <h5>Created Date</h5>
+                            <p>@Model.CreatedDate.ToString("MMM dd, yyyy")</p>
+                        </div>
+                        <div class="mb-3">
+                            <h5>Expiry Date</h5>
+                            <p>@(Model.ExpiryDate.HasValue ? Model.ExpiryDate.Value.ToString("MMM dd, yyyy") : "No expiry date")</p>
+                        </div>
+                        <div class="mb-3">
+                            <h5>Status</h5>
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="text-end mb-3">
+                        <a asp-action="Edit" asp-route-id="@Model.PollId" class="btn btn-outline-primary" aria-label="Edit this poll">
+                            <i class="fas fa-edit"></i> Edit Poll
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary" aria-label="Return to polls list">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @foreach (var question in Model.Questions)
+    {
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">@question.QuestionText</h5>
+                        <small class="text-muted">@question.ResponseCount responses</small>
+                    </div>
+                    <div class="card-body">
+                        @if (question.QuestionType == Hometown_Application.Data.QuestionType.MultipleChoice)
+                        {
+                            <div class="chart-container">
+                                <canvas id="chart_@question.QuestionId"></canvas>
+                            </div>
+                            <div class="table-responsive mt-4">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Option</th>
+                                            <th>Count</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var option in question.Options.OrderByDescending(o => o.Count))
+                                        {
+                                            <tr>
+                                                <td>@option.OptionText</td>
+                                                <td>@option.Count</td>
+                                                <td>@option.Percentage%</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <h6>Text Responses:</h6>
+                            <div class="text-responses mt-3">
+                                @if (question.TextResponses.Any())
+                                {
+                                    <div class="list-group">
+                                        @foreach (var response in question.TextResponses)
+                                        {
+                                            <div class="list-group-item">
+                                                @response
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info">
+                                        No text responses received yet.
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+
+            .chart-container canvas {
+                width: 100% !important;
+                height: auto !important;
+                max-height: 300px;
+            }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var colors = [
+                "rgba(54, 162, 235, 0.5)", "rgba(255, 99, 132, 0.5)", "rgba(255, 206, 86, 0.5)",
+                "rgba(75, 192, 192, 0.5)", "rgba(153, 102, 255, 0.5)", "rgba(255, 159, 64, 0.5)",
+                "rgba(199, 199, 199, 0.5)", "rgba(83, 102, 255, 0.5)", "rgba(255, 159, 159, 0.5)"
+            ];
+            var borderColors = colors.map(color => color.replace("0.5", "1"));
+
+            const QuestionType = {
+                MultipleChoice: @((int)Hometown_Application.Data.QuestionType.MultipleChoice),
+                OpenEnded: @((int)Hometown_Application.Data.QuestionType.OpenEnded)
+            };
+
+            function initializeCharts(questionId, labels, data, optionCount) {
+                if (optionCount === 0) return;
+
+                var ctx = document.getElementById("chart_" + questionId).getContext("2d");
+                var backgroundColor = [];
+                var borderColor = [];
+                for (var i = 0; i < optionCount; i++) {
+                    backgroundColor.push(colors[i % colors.length]);
+                    borderColor.push(borderColors[i % borderColors.length]);
+                }
+
+                var chart = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Responses",
+                            data: data,
+                            backgroundColor: backgroundColor,
+                            borderColor: borderColor,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                var pieCanvas = document.createElement("canvas");
+                pieCanvas.id = "pie_chart_" + questionId;
+                document.querySelector("#chart_" + questionId).parentNode.appendChild(pieCanvas);
+
+                var pieCtx = pieCanvas.getContext("2d");
+                var pieChart = new Chart(pieCtx, {
+                    type: "pie",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: backgroundColor,
+                            borderColor: borderColor,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                position: "right"
+                            }
+                        }
+                    }
+                });
+            }
+
+            const questions = [];
+        @foreach (var question in Model.Questions)
+        {
+            <text>
+                                questions.push({
+                                    questionId: @question.QuestionId,
+                                    questionType: @((int)question.QuestionType),
+                                    optionLabels: [@Html.Raw(string.Join(",", question.Options.Select(o => $"\"{System.Net.WebUtility.HtmlEncode(o.OptionText)}\"")))],
+                                    optionData: [@Html.Raw(string.Join(",", question.Options.Select(o => o.Count)))],
+                                    optionCount: @question.Options.Count
+                                });
+            </text>
+        }
+
+            questions.forEach(function (question) {
+                if (question.questionType === QuestionType.MultipleChoice) {
+                    initializeCharts(question.questionId, question.optionLabels, question.optionData, question.optionCount);
+                }
+            });
+        });
+    </script>
+}

@@ -2,58 +2,113 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Hometown_Application.Data;
 using Hometown_Application.Areas.Identity.Data;
-using System.ComponentModel;
+using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.HttpOverrides;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
-
         var builder = WebApplication.CreateBuilder(args);
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
+        // Add DbContext
         builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(connectionString));
 
+        // Add Identity
         builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDBContext>();
 
+        // Configure JSON serialization
         builder.Services.AddControllers().AddNewtonsoftJson(options =>
         {
             options.SerializerSettings.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat;
-
         });
 
-
-        // Add services to the container.
+        // Add services to the container
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
 
+        // Add IHttpContextAccessor for accessing user identity in controllers
+        builder.Services.AddHttpContextAccessor();
+
+        // Add CORS policy with dynamic origin
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowLocalhost", builder =>
+            {
+                builder
+                    .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost") // Allow any localhost origin
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    .WithExposedHeaders("*"); // Allow all exposed headers
+            });
+        });
+
+        // Configure cookie policy to require HTTPS
+        builder.Services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.CheckConsentNeeded = context => true;
+            options.MinimumSameSitePolicy = SameSiteMode.Lax;
+            options.Secure = CookieSecurePolicy.Always; // Enforce cookies over HTTPS only
+        });
+
+        // Configure Identity cookies to require HTTPS
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Cookies only sent over HTTPS
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
+
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+        // Configure the HTTP request pipeline
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
+            app.UseHsts(); // Enforce HTTPS with HSTS in production
         }
 
-        app.UseHttpsRedirection();
+        // Forward headers to handle reverse proxy or load balancer scenarios
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedProto
+        });
+
+        // Custom middleware to log requests and debug HTTPS redirection
+        app.Use(async (context, next) =>
+        {
+            Console.WriteLine($"Request: {context.Request.Scheme}://{context.Request.Host}{context.Request.Path}");
+            if (!context.Request.IsHttps)
+            {
+                Console.WriteLine("Redirecting to HTTPS...");
+            }
+            await next();
+        });
+
+        app.UseHttpsRedirection(); // Redirect all HTTP requests to HTTPS
         app.UseStaticFiles();
 
         app.UseRouting();
 
-        app.UseAuthentication();
+        // Enable CORS before authentication and authorization
+        app.UseCors("AllowLocalhost");
 
+        app.UseAuthentication();
         app.UseAuthorization();
+
+        // Apply cookie policy
+        app.UseCookiePolicy();
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
         app.MapRazorPages();
 
+        // Seed roles
         using (var scope = app.Services.CreateScope())
         {
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -66,9 +121,10 @@ public class Program
             }
         }
 
+        // Seed admin user
         using (var scope = app.Services.CreateScope())
         {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>(); // FIXED
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
             string email = "admin@admin.com";
             string password = "Admin1234*";
@@ -92,6 +148,6 @@ public class Program
             }
         }
 
-            app.Run();
-    } 
+        app.Run();
+    }
 }

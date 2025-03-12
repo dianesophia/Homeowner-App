@@ -25,6 +25,13 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<StatusModel> Status { get; set; }
     public DbSet<ReservationModel> Reservation { get; set; }
     public DbSet<FacilityModel> Facility { get; set; }
+    
+    // Add Poll and Survey related DbSets
+    public DbSet<PollModel> Polls { get; set; }
+    public DbSet<PollQuestionModel> PollQuestions { get; set; }
+    public DbSet<QuestionOptionModel> QuestionOptions { get; set; }
+    public DbSet<PollResponseModel> PollResponses { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -110,6 +117,47 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .HasForeignKey(fc => fc.StatusId)
         .OnDelete(DeleteBehavior.Restrict);
 
-       
+        // Configure Poll-related relationships
+        builder.Entity<PollModel>()
+            .HasOne(p => p.Creator)
+            .WithMany()
+            .HasForeignKey(p => p.CreatorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<PollQuestionModel>()
+            .HasOne(q => q.Poll)
+            .WithMany(p => p.Questions)
+            .HasForeignKey(q => q.PollId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<QuestionOptionModel>()
+            .HasOne(o => o.Question)
+            .WithMany(q => q.Options)
+            .HasForeignKey(o => o.QuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<PollResponseModel>()
+            .HasOne(r => r.Question)
+            .WithMany(q => q.Responses)
+            .HasForeignKey(r => r.QuestionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<PollResponseModel>()
+            .HasOne(r => r.Respondent)
+            .WithMany()
+            .HasForeignKey(r => r.RespondentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<PollResponseModel>()
+            .HasOne(r => r.Poll)
+            .WithMany()
+            .HasForeignKey(r => r.PollId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<PollResponseModel>()
+            .HasOne(r => r.SelectedOption)
+            .WithMany(o => o.Responses)
+            .HasForeignKey(r => r.SelectedOptionId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
