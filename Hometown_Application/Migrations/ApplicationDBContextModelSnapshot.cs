@@ -150,7 +150,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "03ed13d5-1edc-4247-9de8-58960f4e7520",
+                            ConcurrencyStamp = "cff96399-bbd4-4133-afd5-0e9e4cb46802",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -164,9 +164,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKT1JI9bfqHMqVOVnsUX2eUJwDURwTUkJTbCUc2yEDIzth8jnD0Qf3vCerCiRBQgpA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDwIgd6RiqSL5icv/BwEyY4PPsHmoG/l4AQ3oYieYn24UMaT+ChjWX244ih+m2eS6w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0b105e95-32f9-4e5f-bdff-77eb15be221a",
+                            SecurityStamp = "6df2d75f-6310-440d-a845-2a9988078b8e",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });

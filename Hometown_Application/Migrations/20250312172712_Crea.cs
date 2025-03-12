@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class Poll : Migration
+    public partial class Crea : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -646,7 +646,7 @@ namespace Hometown_Application.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AdminProfilesAdminId", "Bio", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FacebookProfile", "FirstName", "Gender", "HomeownerProfilesHomeownerId", "IsActiveUser", "IsApproved", "IsBirthdayPublic", "IsGenderPublic", "LastName", "LinkedInProfile", "LockoutEnabled", "LockoutEnd", "MakeFacebookPublic", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "SecurityStamp", "StaffProfilesStaffId", "TwitterProfile", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "100", 0, null, null, "03ed13d5-1edc-4247-9de8-58960f4e7520", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEKT1JI9bfqHMqVOVnsUX2eUJwDURwTUkJTbCUc2yEDIzth8jnD0Qf3vCerCiRBQgpA==", null, false, null, "0b105e95-32f9-4e5f-bdff-77eb15be221a", null, null, false, "elon.musk@example.com" });
+                values: new object[] { "100", 0, null, null, "cff96399-bbd4-4133-afd5-0e9e4cb46802", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEDwIgd6RiqSL5icv/BwEyY4PPsHmoG/l4AQ3oYieYn24UMaT+ChjWX244ih+m2eS6w==", null, false, null, "6df2d75f-6310-440d-a845-2a9988078b8e", null, null, false, "elon.musk@example.com" });
 
             migrationBuilder.InsertData(
                 table: "RequestTypes",
