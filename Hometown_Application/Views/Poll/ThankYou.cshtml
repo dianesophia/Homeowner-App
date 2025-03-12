@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Thank You";
+    var pollTitle = ViewData["PollTitle"]?.ToString() ?? "the poll";
+}
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm text-center">
+                <div class="card-body py-5" aria-live="polite">
+                    <div class="mb-4">
+                        <style>
+                            .success-icon {
+                                font-size: 5rem;
+                            }
+                        </style>
+                        <i class="fas fa-check-circle text-success success-icon"></i>
+                    </div>
+                    <h1 class="display-4 mb-4">Thank You!</h1>
+                    <p class="lead mb-4">Your response to "@pollTitle" has been successfully submitted.</p>
+                    <p class="mb-5">Your feedback is valuable and helps us make better decisions.</p>
+                    <a asp-action="Index" class="btn btn-primary btn-lg" aria-label="Return to polls list">
+                        <i class="fas fa-home"></i> Back to Polls
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

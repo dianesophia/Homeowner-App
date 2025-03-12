@@ -1,0 +1,91 @@
+@using Microsoft.AspNetCore.Identity
+@using Hometown_Application.Areas.Identity.Data
+@inject UserManager<ApplicationUser> UserManager
+@model Hometown_Application.ViewModel.PollViewModel
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    ViewData["Title"] = "Create a new poll or survey";
+}
+
+<h2>Create a new poll or survey</h2>
+
+<form id="PollForm" asp-action="Create" asp-controller="Poll" onsubmit="return validatePollForm()">
+    <input type="hidden" name="PollId" value="@Model?.PollId" />
+    <input type="hidden" name="CreatorId" value="@(Model?.CreatorId ?? user?.Id)" />
+
+    <div class="mb-3">
+        <label for="Title" class="form-label">Title</label>
+        <input class="form-control" id="Title" name="Title" value="@Model?.Title" placeholder="Enter the concise title for your poll" required />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label for="Description" class="form-label">Description</label>
+        <textarea class="form-control" id="Description" name="Description" placeholder="Provide a brief description of the poll (optional)">@Model?.Description</textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label for="ExpiryDate" class="form-label">Expiry Date</label>
+        @{
+            string expiryDateValue = "";
+            if (Model != null && Model.ExpiryDate.HasValue)
+            {
+                expiryDateValue = Model.ExpiryDate.Value.ToString("yyyy-MM-dd");
+            }
+        }
+        <input class="form-control" id="ExpiryDate" type="date" name="ExpiryDate" value="@expiryDateValue" />
+        <small class="form-text text-muted">Leave blank for no expiry date.</small>
+        <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" id="IsActive" type="checkbox" name="IsActive" value="true" @(Model != null && Model.IsActive ? "checked" : "") />
+        <label class="form-check-label" for="IsActive">
+            Make this poll active and available to users
+        </label>
+        <span asp-validation-for="IsActive" class="text-danger"></span>
+    </div>
+
+    <div class="alert alert-info mb-3">
+        After creating the poll, you will be redirected to the edit page where you can add questions and options.
+    </div>
+
+    <button class="btn btn-primary mt-3" type="submit">Create Poll</button>
+    <a asp-action="Index" asp-controller="Poll" class="btn btn-secondary mt-3">Back to List</a>
+
+    @Html.AntiForgeryToken()
+</form>
+
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Validation Errors:</strong>
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script>
+    function validatePollForm() {
+        var title = document.querySelector('input[name="Title"]').value;
+
+        if (!title || title.trim() === "") {
+            alert("Please fill in all required fields, including the poll title.");
+            return false;
+        }
+
+        return true;
+    }
+</script>

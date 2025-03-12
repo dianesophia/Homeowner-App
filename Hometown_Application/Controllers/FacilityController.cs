@@ -130,7 +130,13 @@ namespace Hometown_Application.Controllers
             if (facility != null)
             {
                 facility.IsDeleted = true;
+                _context.Update(facility);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Facility has been soft deleted and can be restored by an admin.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Facility not found.";
             }
 
             return RedirectToAction(nameof(Index));

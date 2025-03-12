@@ -1,0 +1,141 @@
+@model Hometown_Application.ViewModel.PollResponseViewModel
+@using Hometown_Application.Models
+
+@{
+    ViewData["Title"] = "Take Poll";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">@Model.PollTitle</h1>
+            @if (!string.IsNullOrEmpty(Model.PollDescription))
+            {
+                <p class="lead">@Model.PollDescription</p>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="SubmitPoll" method="post">
+                        <input type="hidden" name="PollId" value="@Model.PollId" />
+                        <input type="hidden" name="PollTitle" value="@Model.PollTitle" />
+                        <input type="hidden" name="PollDescription" value="@Model.PollDescription" />
+
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                @Html.ValidationSummary()
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        <div class="progress mb-4">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width: @(Model.Questions.Count > 0 ? (100 / Model.Questions.Count) * 100 / Model.Questions.Count : 0)%"
+                                 aria-valuenow="@(Model.Questions.Count > 0 ? (100 / Model.Questions.Count) * 100 / Model.Questions.Count : 0)"
+                                 aria-valuemin="0" aria-valuemax="100">
+                                @(Model.Questions.Count > 0 ? $"1/{Model.Questions.Count}" : "0/0")
+                            </div>
+                        </div>
+
+                        @for (int i = 0; i < Model.Questions.Count; i++)
+                        {
+                            var question = Model.Questions[i];
+                            <div class="question-container mb-4 p-3 border rounded @(question.IsRequired ? "border-danger" : "")">
+                                <input type="hidden" name="Questions[@i].QuestionId" value="@question.QuestionId" />
+                                <input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
+                                <input type="hidden" name="Questions[@i].QuestionType" value="@((int)question.QuestionType)" />
+                                <input type="hidden" name="Questions[@i].IsRequired" value="@question.IsRequired.ToString()" />
+                                <input type="hidden" name="Questions[@i].DisplayOrder" value="@question.DisplayOrder.ToString()" />
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="mb-0">@question.QuestionText</h5>
+                                    <span class="badge bg-@(question.IsRequired ? "danger" : "secondary")" aria-label="@(question.IsRequired ? "Required question" : "Optional question")">
+                                        @(question.IsRequired ? "Required" : "Optional")
+                                    </span>
+                                </div>
+
+                                @if (question.QuestionType == Hometown_Application.Data.QuestionType.MultipleChoice)
+                                {
+                                    <div class="options-list mt-3">
+                                        @for (int j = 0; j < question.Options.Count; j++)
+                                        {
+                                            var option = question.Options[j];
+                                            <input type="hidden" name="Questions[@i].Options[@j].OptionId" value="@option.OptionId" />
+                                            <input type="hidden" name="Questions[@i].Options[@j].OptionText" value="@option.OptionText" />
+                                            <input type="hidden" name="Questions[@i].Options[@j].DisplayOrder" value="@option.DisplayOrder.ToString()" />
+                                            <input type="hidden" name="Questions[@i].Options[@j].QuestionId" value="@option.QuestionId" />
+
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="radio" name="Questions[@i].SelectedOptionId"
+                                                       id="option_@option.OptionId" value="@option.OptionId"
+                                                       aria-label="Select option @option.OptionText" />
+                                                <label class="form-check-label" for="option_@option.OptionId">
+                                                    @option.OptionText
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else if (question.QuestionType == Hometown_Application.Data.QuestionType.OpenEnded)
+                                {
+                                    <div class="form-group mt-3">
+                                        <label for="TextResponse_@i" class="visually-hidden">Answer for @question.QuestionText</label>
+                                        <textarea class="form-control" name="Questions[@i].TextResponse" id="TextResponse_@i"
+                                                  rows="3" placeholder="Enter your answer here..." aria-describedby="textResponseHelp_@i"></textarea>
+                                        <span asp-validation-for="Questions[@i].TextResponse" class="text-danger"></span>
+                                        <small id="textResponseHelp_@i" class="form-text text-muted">Provide your answer here.</small>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary" aria-label="Submit poll responses">
+                                <i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Responses
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary" aria-label="Cancel and return to polls">
+                                <i class="fas fa-times" aria-hidden="true"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            const QuestionType = {
+                MultipleChoice: @((int)Hometown_Application.Data.QuestionType.MultipleChoice),
+                OpenEnded: @((int)Hometown_Application.Data.QuestionType.OpenEnded)
+            };
+
+            $("form").on("submit", function (e) {
+                let hasErrors = false;
+                $(".question-container.border-danger").each(function (index) {
+                    const questionType = parseInt($(this).find("input[name$='.QuestionType']").val());
+                    if (questionType === QuestionType.MultipleChoice && !$(this).find("input[name$='.SelectedOptionId']:checked").length) {
+                        hasErrors = true;
+                        alert("Please answer all required multiple-choice questions.");
+                    } else if (questionType === QuestionType.OpenEnded && !$(this).find("textarea").val().trim()) {
+                        hasErrors = true;
+                        alert("Please answer all required open-ended questions.");
+                    }
+                });
+                if (hasErrors) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+}

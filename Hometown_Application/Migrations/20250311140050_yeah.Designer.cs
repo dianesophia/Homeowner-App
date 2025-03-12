@@ -4,6 +4,7 @@ using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250311140050_yeah")]
+    partial class yeah
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,34 +144,6 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("StaffProfilesStaffId");
 
                     b.ToTable("AspNetUsers", (string)null);
-<<<<<<< HEAD
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "100",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "8fb2d39d-a805-47c5-adb9-ea983429e976",
-                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "elon.musk@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "Elon",
-                            IsActiveUser = true,
-                            IsBirthdayPublic = false,
-                            IsGenderPublic = false,
-                            LastName = "Musk",
-                            LockoutEnabled = false,
-                            MakeFacebookPublic = false,
-                            NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
-                            NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO7p4DyNkx7zJRdZdjsfujUY8ZGGayWkhmwxAFb6u/mywa7N/zREsdxJB42+Hgzrjg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "3a52681d-0b88-41fc-80fb-56ad5a454a38",
-                            TwoFactorEnabled = false,
-                            UserName = "elon.musk@example.com"
-                        });
-=======
->>>>>>> origin/PollAndSurvey
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.AdminProfileModel", b =>
@@ -544,21 +519,6 @@ namespace Hometown_Application.Migrations
                     b.ToTable("House");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Hometown_Application.Models.RequestTypeModel", b =>
-                {
-                    b.Property<int>("RequestTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestTypeId"));
-
-                    b.Property<int>("AssignedDepartment")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(255)");
-=======
             modelBuilder.Entity("Hometown_Application.Models.PollModel", b =>
                 {
                     b.Property<int>("PollId")
@@ -581,78 +541,10 @@ namespace Hometown_Application.Migrations
 
                     b.Property<DateTime?>("ExpiryDate")
                         .HasColumnType("datetime2");
->>>>>>> origin/PollAndSurvey
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-<<<<<<< HEAD
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("RequestTypeId");
-
-                    b.ToTable("RequestTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            RequestTypeId = 1,
-                            AssignedDepartment = 0,
-                            Description = "Request for pool maintenance.",
-                            IsActive = true,
-                            Name = "Pool Cleaning"
-                        },
-                        new
-                        {
-                            RequestTypeId = 2,
-                            AssignedDepartment = 1,
-                            Description = "Report or ask about lost items.",
-                            IsActive = true,
-                            Name = "Lost and Found Inquiry"
-                        },
-                        new
-                        {
-                            RequestTypeId = 3,
-                            AssignedDepartment = 2,
-                            Description = "Concerns about billing and payments.",
-                            IsActive = true,
-                            Name = "Billing Issue"
-                        },
-                        new
-                        {
-                            RequestTypeId = 4,
-                            AssignedDepartment = 3,
-                            Description = "Report issues with internet connectivity.",
-                            IsActive = true,
-                            Name = "Internet Issue"
-                        },
-                        new
-                        {
-                            RequestTypeId = 5,
-                            AssignedDepartment = 4,
-                            Description = "Request lawn maintenance services.",
-                            IsActive = true,
-                            Name = "Lawn Mowing"
-                        },
-                        new
-                        {
-                            RequestTypeId = 6,
-                            AssignedDepartment = 5,
-                            Description = "Report plumbing issues like leaks.",
-                            IsActive = true,
-                            Name = "Plumbing Repair"
-                        },
-                        new
-                        {
-                            RequestTypeId = 7,
-                            AssignedDepartment = 6,
-                            Description = "Report security concerns or suspicious activity.",
-                            IsActive = true,
-                            Name = "Suspicious Activity"
-                        });
-=======
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -764,7 +656,6 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("QuestionId");
 
                     b.ToTable("QuestionOptions");
->>>>>>> origin/PollAndSurvey
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
@@ -826,124 +717,6 @@ namespace Hometown_Application.Migrations
                     b.ToTable("Reservation");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Hometown_Application.Models.ServiceRequestModel", b =>
-                {
-                    b.Property<int>("ServiceRequestId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceRequestId"));
-
-                    b.Property<string>("AddedBy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("AddedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CancelReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CancelledOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CompletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Details")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("HomeownerId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RejectedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RejectedReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("RequestTypeId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("Schedule")
-                        .IsRequired()
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("StatusId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Urgency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ServiceRequestId");
-
-                    b.HasIndex("HomeownerId");
-
-                    b.HasIndex("RequestTypeId");
-
-                    b.HasIndex("StatusId");
-
-                    b.ToTable("ServiceRequests");
-                });
-
-            modelBuilder.Entity("Hometown_Application.Models.ServiceStaffAssignmentModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("AcceptedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAccepted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUnavailable")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ServiceRequestId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StaffId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServiceStaffAssignments");
-                });
-
-=======
->>>>>>> origin/PollAndSurvey
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
                 {
                     b.Property<int>("StaffId")
@@ -1285,8 +1058,6 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-<<<<<<< HEAD
-=======
             modelBuilder.Entity("Hometown_Application.Models.PollModel", b =>
                 {
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "Creator")
@@ -1353,7 +1124,6 @@ namespace Hometown_Application.Migrations
                     b.Navigation("Question");
                 });
 
->>>>>>> origin/PollAndSurvey
             modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.FacilityModel", "Facility")
@@ -1373,35 +1143,6 @@ namespace Hometown_Application.Migrations
                     b.Navigation("Facility");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Hometown_Application.Models.ServiceRequestModel", b =>
-                {
-                    b.HasOne("Hometown_Application.Models.HomeownerProfileModel", "Homeowner")
-                        .WithMany()
-                        .HasForeignKey("HomeownerId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Hometown_Application.Models.RequestTypeModel", "RequestType")
-                        .WithMany()
-                        .HasForeignKey("RequestTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Hometown_Application.Models.StatusModel", "Status")
-                        .WithMany()
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Homeowner");
-
-                    b.Navigation("RequestType");
-
-                    b.Navigation("Status");
-                });
-
-=======
->>>>>>> origin/PollAndSurvey
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.HouseModel", "House")
@@ -1480,8 +1221,6 @@ namespace Hometown_Application.Migrations
                 {
                     b.Navigation("Homeowners");
                 });
-<<<<<<< HEAD
-=======
 
             modelBuilder.Entity("Hometown_Application.Models.PollModel", b =>
                 {
@@ -1499,7 +1238,6 @@ namespace Hometown_Application.Migrations
                 {
                     b.Navigation("Responses");
                 });
->>>>>>> origin/PollAndSurvey
 #pragma warning restore 612, 618
         }
     }
