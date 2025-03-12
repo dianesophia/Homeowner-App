@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Hometown_Application.Data;
-using Hometown_Application.ViewModel;
+using Hometown_Application.Models;
 
 
 namespace Hometown_Application.Controllers

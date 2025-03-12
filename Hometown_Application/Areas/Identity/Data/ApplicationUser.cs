@@ -49,7 +49,7 @@ public class ApplicationUser : IdentityUser
     [Column(TypeName = "nvarchar(255)")]
     public string? LinkedInProfile { get; set; }
 
-
+    public bool IsApproved { get; set; }
 
     public AdminProfileModel? AdminProfiles { get; set; }
     public HomeownerProfileModel? HomeownerProfiles { get; set; }

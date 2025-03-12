@@ -1,347 +1,367 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
+﻿@{
+	ViewData["Title"] = "Home Page";
+	ViewData["HideSidebar"] = true;
+}
+<style>
+			:root {
+					--primary-color: #6F754E;
+					--secondary-color: #A08D67;
+					--background-color: #E6DDC4;
+					--text-color: #2F3A31;
+					--card-bg: #FFFFFF;
+					--border-radius: 16px;
+					--shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
 
-    <style>
-        :root {
-            --primary-color: #6F754E;
-            --secondary-color: #A08D67;
-            --background-color: #E6DDC4;
-            --text-color: #2F3A31;
-            --card-bg: #FFFFFF;
-            --border-radius: 16px;
-            --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-        }
+	}
 
-        body {
-            padding-top: 70px;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            font-family: 'Marcellus', serif;
-            min-height: 100vh;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
+			body {
+					padding-top: 70px;
+					background-color: var(--background-color);
+					color: var(--text-color);
+					font-family: 'Marcellus', serif;
+					min-height: 100vh;
+					width: 100%;
+					margin: 0;
+					padding: 0;
 
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--primary-color);
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            min-height: 100px;
-            padding: 15px 20px;
-        }
+	}
 
-        .navbar-brand {
-            font-size: 1.2rem;
-            font-weight: normal;
-            color: white;
-            padding-left:12px;
-        }
+			.navbar {
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					background-color: var(--primary-color);
+					box-shadow: var(--shadow);
+					z-index: 1000;
+					min-height: 100px;
+					padding: 15px 20px;
 
-        .hero-section {
-            padding-top: 50px;
-            position: relative;
-            height: 70vh;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.5); /* Adjust transparency here */
-        }
+	}
+
+			.navbar-brand {
+					font-size: 1.2rem;
+					font-weight: normal;
+					color: white;
+					padding-left:12px;
+
+	}
+
+			.hero-section {
+					padding-top: 50px;
+					position: relative;
+					height: 70vh;
+					overflow: hidden;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					background: rgba(0, 0, 0, 0.5); /* Adjust transparency here */
+
+	}
 
 
-        .hero-image {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.7);
-        }
+			.hero-image {
+					position: absolute;
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+					filter: brightness(0.7);
 
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            color: white;
-            max-width: 800px;
-        }
+	}
 
-        .features-section {
-            padding: 3rem 50px;
-        }
+			.hero-content {
+					position: relative;
+					z-index: 2;
+					text-align: center;
+					color: white;
+					max-width: 800px;
 
-        .feature-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-            box-shadow: var(--shadow);
-            height: 100%;
-        }
+	}
 
-            .feature-card:hover {
-                transform: translateY(-5px);
-            }
+			.features-section {
+					padding: 3rem 50px;
 
-        .feature-icon {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
+	}
 
-        .feature-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: var(--border-radius);
-            margin-bottom: 1.5rem;
-        }
+			.feature-card {
+					background: var(--card-bg);
+					border-radius: var(--border-radius);
+					padding: 2rem;
+					margin-bottom: 2rem;
+					text-align: center;
+					transition: transform 0.3s ease;
+					box-shadow: var(--shadow);
+					height: 100%;
 
-        .btn-login {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 0.8rem 2.5rem;
-            border-radius: var(--border-radius);
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            border: none;
-        }
+	}
 
-            .btn-login:hover {
-                background-color: var(--primary-color);
-                transform: translateY(-2px);
-                box-shadow: var(--shadow);
-                color: white;
-            }
+				.feature-card:hover {
+						transform: translateY(-5px);
 
-        .gallery-section {
-            padding: 2rem 50px;
-            background: #6F754E;
-        }
+	}
 
-        .gallery-title {
-            text-align: center;
-            color: white;
-            margin-bottom: 3rem;
-        }
+			.feature-icon {
+					font-size: 2.5rem;
+					color: var(--primary-color);
+					margin-bottom: 1rem;
 
-        .gallery-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            border-radius: var(--border-radius);
-            margin-bottom: 2rem;
-            transition: transform 0.3s ease;
-        }
+	}
 
-            .gallery-image:hover {
-                transform: scale(1.05);
-            }
+			.feature-image {
+					width: 100%;
+					height: 200px;
+					object-fit: cover;
+					border-radius: var(--border-radius);
+					margin-bottom: 1.5rem;
 
-        .amenities-section {
-            padding: 4rem 50px;
-            background-color: rgba(111, 117, 78, 0.1);
-            margin-bottom: 4rem;
-        }
+	}
 
-        .section-title {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 3rem;
-        }
+			.btn-login {
+					background-color: var(--secondary-color);
+					color: white;
+					padding: 0.8rem 2.5rem;
+					border-radius: var(--border-radius);
+					font-size: 1.1rem;
+					transition: all 0.3s ease;
+					text-decoration: none;
+					display: inline-block;
+					border: none;
 
-        .location-section {
-            padding: 4rem 0;
-            background-color: white;
-        }
+	}
 
-        .location-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
-        }
+				.btn-login:hover {
+						background-color: var(--primary-color);
+						transform: translateY(-2px);
+						box-shadow: var(--shadow);
+						color: white;
 
-        .container, .container-fluid {
-            width: 100%;
-            max-width: 100%;
-            padding: 0;
-            margin: 0;
-        }
-    </style>
-</head>
+	}
+
+			.gallery-section {
+					padding: 2rem 50px;
+					background: #6F754E;
+
+	}
+
+			.gallery-title {
+					text-align: center;
+					color: white;
+					margin-bottom: 3rem;
+
+	}
+
+			.gallery-image {
+					width: 100%;
+					height: 300px;
+					object-fit: cover;
+					border-radius: var(--border-radius);
+					margin-bottom: 2rem;
+					transition: transform 0.3s ease;
+
+	}
+
+				.gallery-image:hover {
+						transform: scale(1.05);
+
+	}
+
+			.amenities-section {
+					padding: 4rem 50px;
+					background-color: rgba(111, 117, 78, 0.1);
+					margin-bottom: 4rem;
+
+	}
+
+			.section-title {
+					text-align: center;
+					color: var(--primary-color);
+					margin-bottom: 3rem;
+
+	}
+
+			.location-section {
+					padding: 4rem 0;
+					background-color: white;
+
+	}
+
+			.location-card {
+					background: var(--card-bg);
+					border-radius: var(--border-radius);
+					padding: 2rem;
+					box-shadow: var(--shadow);
+					margin-bottom: 2rem;
+
+	}
+
+			.container, .container-fluid {
+					width: 100%;
+					max-width: 100%;
+					padding: 0;
+					margin: 0;
+
+	}
+
+
+</style>
 <body>
-    <!-- Header -->
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container-fluid">
-                <a class="navbar-brand text-white" href="#" style="font-weight: normal;">
-                    <i class="fas fa-home me-2"></i>
-                    Golden Haven
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-        </nav>
-    </header>
+	<!-- Header -->
+	<header>
+		<nav class="navbar navbar-expand-lg navbar-light">
+			<div class="container-fluid">
+				<a class="navbar-brand text-white" href="#" style="font-weight: normal;">
+					<i class="fas fa-home me-2"></i>
+					Golden Haven
+				</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+			</div>
+		</nav>
+	</header>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <img src="/images/land8.png" alt="Beautiful subdivision entrance" class="hero-image">
-        <div class="hero-content">
-            <h1 class="display-3 mb-4">Welcome to Golden Haven</h1>
-            <p class="lead mb-4">Experience modern living in our carefully planned community</p>
-            <a href="/Identity/Account/Login" class="btn-login">
-                <i class="fas fa-sign-in-alt me-2"></i>
-                Log in to Your Account
-            </a>
-        </div>
-    </section>
+	<!-- Hero Section -->
+	<section class="hero-section">
+		<img src="/images/land8.png" alt="Beautiful subdivision entrance" class="hero-image">
+		<div class="hero-content">
+			<h1 class="display-3 mb-4">Welcome to Golden Haven</h1>
+			<p class="lead mb-4">Experience modern living in our carefully planned community</p>
+			<a href="/Identity/Account/Login" class="btn-login">
+				<i class="fas fa-sign-in-alt me-2"></i>
+				Log in to Your Account
+			</a>
+		</div>
+	</section>
 
-    <!-- Features Section -->
-    <section class="features-section">
-        <div class="container">
-            <h2 class="section-title">Community Features</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <img src="/images/green.jpg" alt="Community feature" class="feature-image">
-                        <i class="fas fa-tree feature-icon"></i>
-                        <h3>Green Spaces</h3>
-                        <p>Enjoy beautiful parks and gardens throughout the community</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <img src="/images/security.jpg" alt="Security feature" class="feature-image">
-                        <i class="fas fa-shield-alt feature-icon"></i>
-                        <h3>24/7 Security</h3>
-                        <p>Rest easy with our comprehensive security system</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <img src="/images/facilities.jpg" alt="Amenities feature" class="feature-image">
-                        <i class="fas fa-swimming-pool feature-icon"></i>
-                        <h3>Modern Amenities</h3>
-                        <p>Access to premium facilities for all residents</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+	<!-- Features Section -->
+	<section class="features-section">
+		<div class="container">
+			<h2 class="section-title">Community Features</h2>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="feature-card">
+						<img src="/images/green.jpg" alt="Community feature" class="feature-image">
+						<i class="fas fa-tree feature-icon"></i>
+						<h3>Green Spaces</h3>
+						<p>Enjoy beautiful parks and gardens throughout the community</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="feature-card">
+						<img src="/images/security.jpg" alt="Security feature" class="feature-image">
+						<i class="fas fa-shield-alt feature-icon"></i>
+						<h3>24/7 Security</h3>
+						<p>Rest easy with our comprehensive security system</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="feature-card">
+						<img src="/images/facilities.jpg" alt="Amenities feature" class="feature-image">
+						<i class="fas fa-swimming-pool feature-icon"></i>
+						<h3>Modern Amenities</h3>
+						<p>Access to premium facilities for all residents</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 
-    <!-- Gallery Section -->
-    <section class="gallery-section">
-        <div class="container">
-            <h2 class="gallery-title">Discover Our Community</h2>
-            <div class="row">
-                <div class="col-md-6 col-lg-4">
-                    <img src="/images/gym.jpg" alt="Community view 1" class="gallery-image">
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <img src="/images/swim.jpg" alt="Community view 2" class="gallery-image">
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <img src="/images/playground.jpg" alt="Community view 3" class="gallery-image">
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <img src="/images/court.jpg" alt="Community view 4" class="gallery-image">
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <img src="/images/jog.jpg" alt="Community view 5" class="gallery-image">
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <img src="/images/clubhouse.jpg" alt="Community view 6" class="gallery-image">
-                </div>
-            </div>
-        </div>
-    </section>
+	<!-- Gallery Section -->
+	<section class="gallery-section">
+		<div class="container">
+			<h2 class="gallery-title">Discover Our Community</h2>
+			<div class="row">
+				<div class="col-md-6 col-lg-4">
+					<img src="/images/gym.jpg" alt="Community view 1" class="gallery-image">
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<img src="/images/swim.jpg" alt="Community view 2" class="gallery-image">
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<img src="/images/playground.jpg" alt="Community view 3" class="gallery-image">
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<img src="/images/court.jpg" alt="Community view 4" class="gallery-image">
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<img src="/images/jog.jpg" alt="Community view 5" class="gallery-image">
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<img src="/images/clubhouse.jpg" alt="Community view 6" class="gallery-image">
+				</div>
+			</div>
+		</div>
+	</section>
 
-    <!-- Amenities Section -->
-    <section class="amenities-section">
-        <div class="container">
-            <h2 class="section-title">Premium Amenities</h2>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="feature-card">
-                        <i class="fas fa-dumbbell feature-icon"></i>
-                        <h4>Fitness Center</h4>
-                        <p>State-of-the-art gym equipment</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="feature-card">
-                        <i class="fas fa-basketball-ball feature-icon"></i>
-                        <h4>Sports Complex</h4>
-                        <p>Multiple sports facilities</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="feature-card">
-                        <i class="fas fa-child feature-icon"></i>
-                        <h4>Children's Park</h4>
-                        <p>Safe and fun playground</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="feature-card">
-                        <i class="fas fa-umbrella-beach feature-icon"></i>
-                        <h4>Swimming Pool</h4>
-                        <p>Resort-style pool area</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+	<!-- Amenities Section -->
+	<section class="amenities-section">
+		<div class="container">
+			<h2 class="section-title">Premium Amenities</h2>
+			<div class="row">
+				<div class="col-md-3">
+					<div class="feature-card">
+						<i class="fas fa-dumbbell feature-icon"></i>
+						<h4>Fitness Center</h4>
+						<p>State-of-the-art gym equipment</p>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="feature-card">
+						<i class="fas fa-basketball-ball feature-icon"></i>
+						<h4>Sports Complex</h4>
+						<p>Multiple sports facilities</p>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="feature-card">
+						<i class="fas fa-child feature-icon"></i>
+						<h4>Children's Park</h4>
+						<p>Safe and fun playground</p>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="feature-card">
+						<i class="fas fa-umbrella-beach feature-icon"></i>
+						<h4>Swimming Pool</h4>
+						<p>Resort-style pool area</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 
-    <!-- Location Section
-    <section class="location-section">
-        <div class="container">
-            <h2 class="section-title">Prime Location</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="location-card">
-                        <img src="/api/placeholder/800/500" alt="Location map" class="feature-image">
-                        <h3 class="mt-4">Strategic Location</h3>
-                        <p>Located in the heart of the city, with easy access to:</p>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-shopping-cart me-2"></i> Shopping Centers</li>
-                            <li><i class="fas fa-graduation-cap me-2"></i> Educational Institutions</li>
-                            <li><i class="fas fa-hospital me-2"></i> Medical Facilities</li>
-                            <li><i class="fas fa-bus me-2"></i> Public Transportation</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="location-card">
-                        <img src="/api/placeholder/800/500" alt="Aerial view" class="feature-image">
-                        <h3 class="mt-4">Connected Community</h3>
-                        <p>Enjoy the perfect balance of urban convenience and suburban tranquility</p>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-clock me-2"></i> 15 mins to CBD</li>
-                            <li><i class="fas fa-plane me-2"></i> 30 mins to Airport</li>
-                            <li><i class="fas fa-tree me-2"></i> Near Parks and Recreation</li>
-                            <li><i class="fas fa-road me-2"></i> Easy Highway Access</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> -->
+	<!-- Location Section
+	<section class="location-section">
+		<div class="container">
+			<h2 class="section-title">Prime Location</h2>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="location-card">
+						<img src="/api/placeholder/800/500" alt="Location map" class="feature-image">
+						<h3 class="mt-4">Strategic Location</h3>
+						<p>Located in the heart of the city, with easy access to:</p>
+						<ul class="list-unstyled">
+							<li><i class="fas fa-shopping-cart me-2"></i> Shopping Centers</li>
+							<li><i class="fas fa-graduation-cap me-2"></i> Educational Institutions</li>
+							<li><i class="fas fa-hospital me-2"></i> Medical Facilities</li>
+							<li><i class="fas fa-bus me-2"></i> Public Transportation</li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="location-card">
+						<img src="/api/placeholder/800/500" alt="Aerial view" class="feature-image">
+						<h3 class="mt-4">Connected Community</h3>
+						<p>Enjoy the perfect balance of urban convenience and suburban tranquility</p>
+						<ul class="list-unstyled">
+							<li><i class="fas fa-clock me-2"></i> 15 mins to CBD</li>
+							<li><i class="fas fa-plane me-2"></i> 30 mins to Airport</li>
+							<li><i class="fas fa-tree me-2"></i> Near Parks and Recreation</li>
+							<li><i class="fas fa-road me-2"></i> Easy Highway Access</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section> -->
 </body>
-</html>
