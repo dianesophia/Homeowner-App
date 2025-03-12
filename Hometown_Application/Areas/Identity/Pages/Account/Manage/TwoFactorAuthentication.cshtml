@@ -5,66 +5,293 @@
     ViewData["Title"] = "Two-factor authentication (2FA)";
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
-@{
-    var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
-    @if (consentFeature?.CanTrack ?? true)
-    {
-        @if (Model.Is2faEnabled)
-        {
-            if (Model.RecoveryCodesLeft == 0)
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: var(--text-color);
+        margin: 1.5rem 0 1rem 0;
+        font-weight: 600;
+    }
+
+    .tfa-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .action-button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        text-decoration: none;
+        min-width: 150px;
+    }
+
+        .action-button:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+
+    .danger-button {
+        background-color: var(--danger-color);
+    }
+
+        .danger-button:hover {
+            background-color: #e34c59;
+        }
+
+    .success-button {
+        background-color: var(--success-color);
+    }
+
+        .success-button:hover {
+            background-color: #1ea266;
+        }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+    }
+
+    .alert-danger {
+        background-color: #fde9e9;
+        color: var(--danger-color);
+        border-left: 4px solid var(--danger-color);
+    }
+
+    .alert-warning {
+        background-color: #fff8e1;
+        color: #856404;
+        border-left: 4px solid var(--warning-color);
+    }
+
+    .alert a {
+        color: inherit;
+        text-decoration: underline;
+        font-weight: 600;
+    }
+
+        .alert a:hover {
+            opacity: 0.8;
+        }
+
+    .status-message {
+        padding: 12px 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        background-color: #e3f8e9;
+        color: var(--success-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .status-message i {
+            font-size: 1.2rem;
+        }
+
+        .status-message.error {
+            background-color: #fde9e9;
+            color: var(--danger-color);
+        }
+</style>
+
+<div class="content">
+    <!-- Page Header -->
+    <h1 class="page-title">@ViewData["Title"]</h1>
+
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <div class="tfa-container">
+        @{
+            var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+            @if (consentFeature?.CanTrack ?? true)
+            {
+                @if (Model.Is2faEnabled)
+                {
+                    if (Model.RecoveryCodesLeft == 0)
+                    {
+                        <div class="alert alert-danger">
+                            <strong>You have no recovery codes left.</strong>
+                            <p>You must <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can log in with a recovery code.</p>
+                        </div>
+                    }
+                    else if (Model.RecoveryCodesLeft == 1)
+                    {
+                        <div class="alert alert-danger">
+                            <strong>You have 1 recovery code left.</strong>
+                            <p>You can <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
+                        </div>
+                    }
+                    else if (Model.RecoveryCodesLeft <= 3)
+                    {
+                        <div class="alert alert-warning">
+                            <strong>You have @Model.RecoveryCodesLeft recovery codes left.</strong>
+                            <p>You should <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
+                        </div>
+                    }
+
+                    <div class="action-buttons">
+                        @if (Model.IsMachineRemembered)
+                        {
+                            <form method="post">
+                                <button type="submit" class="action-button">
+                                    <i class="fas fa-desktop"></i> Forget this browser
+                                </button>
+                            </form>
+                        }
+                        <a asp-page="./Disable2fa" class="action-button danger-button">
+                            <i class="fas fa-shield-alt"></i> Disable 2FA
+                        </a>
+                        <a asp-page="./GenerateRecoveryCodes" class="action-button">
+                            <i class="fas fa-key"></i> Reset recovery codes
+                        </a>
+                    </div>
+                }
+
+                <h2 class="section-title">Authenticator app</h2>
+                <div class="action-buttons">
+                    @if (!Model.HasAuthenticator)
+                    {
+                        <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="action-button success-button">
+                            <i class="fas fa-plus-circle"></i> Add authenticator app
+                        </a>
+                    }
+                    else
+                    {
+                        <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="action-button">
+                            <i class="fas fa-cog"></i> Set up authenticator app
+                        </a>
+                        <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="action-button danger-button">
+                            <i class="fas fa-redo"></i> Reset authenticator app
+                        </a>
+                    }
+                </div>
+            }
+            else
             {
                 <div class="alert alert-danger">
-                    <strong>You have no recovery codes left.</strong>
-                    <p>You must <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can log in with a recovery code.</p>
+                    <strong>Privacy and cookie policy have not been accepted.</strong>
+                    <p>You must accept the policy before you can enable two factor authentication.</p>
                 </div>
             }
-            else if (Model.RecoveryCodesLeft == 1)
-            {
-                <div class="alert alert-danger">
-                    <strong>You have 1 recovery code left.</strong>
-                    <p>You can <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
-                </div>
-            }
-            else if (Model.RecoveryCodesLeft <= 3)
-            {
-                <div class="alert alert-warning">
-                    <strong>You have @Model.RecoveryCodesLeft recovery codes left.</strong>
-                    <p>You should <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
-                </div>
-            }
-
-            if (Model.IsMachineRemembered)
-            {
-                <form method="post" style="display: inline-block">
-                    <button type="submit" class="btn btn-primary">Forget this browser</button>
-                </form>
-            }
-            <a asp-page="./Disable2fa" class="btn btn-primary">Disable 2FA</a>
-            <a asp-page="./GenerateRecoveryCodes" class="btn btn-primary">Reset recovery codes</a>
         }
-
-        <h4>Authenticator app</h4>
-        @if (!Model.HasAuthenticator)
-        {
-            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Add authenticator app</a>
-        }
-        else
-        {
-            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Set up authenticator app</a>
-            <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-primary">Reset authenticator app</a>
-        }
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <strong>Privacy and cookie policy have not been accepted.</strong>
-            <p>You must accept the policy before you can enable two factor authentication.</p>
-        </div>
-    }
-}
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
