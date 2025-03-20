@@ -1,0 +1,5 @@
+﻿<form asp-action="TestFormSubmit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="text" name="testInput" />
+    <button type="submit">Submit</button>
+</form>

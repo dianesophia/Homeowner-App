@@ -6,6 +6,7 @@ using System.ComponentModel;
 using Hometown_Application.Seed;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
+using Hometown_Application.Controllers;
 
 public class Program
 {
@@ -14,6 +15,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+        builder.Services.AddScoped<CustomValidateAntiForgeryTokenAttribute>();
 
         // Add DbContext
         builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(connectionString));

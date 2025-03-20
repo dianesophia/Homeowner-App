@@ -1,5 +1,4 @@
 using Hometown_Application.Data;
-using Hometown_Application.Models;// Removed Hometown_Application.Data
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -49,7 +48,7 @@ namespace Hometown_Application.ViewModel
 
         public int PollId { get; set; }
 
-        public List<OptionViewModel> Options { get; set; } = new List<OptionViewModel>();  // Added default initialization
+        public List<OptionViewModel> Options { get; set; } = new List<OptionViewModel>();
     }
 
     public class OptionViewModel
@@ -79,14 +78,25 @@ namespace Hometown_Application.ViewModel
     {
         public int QuestionId { get; set; }
         public string QuestionText { get; set; }
-        public Data.QuestionType QuestionType { get; set; }
+        public QuestionType QuestionType { get; set; }
         public bool IsRequired { get; set; }
         public int DisplayOrder { get; set; }
 
+        [CustomValidation(typeof(QuestionResponseViewModel), nameof(ValidateTextResponse))]
         public string TextResponse { get; set; }
 
         public int? SelectedOptionId { get; set; }
-        public List<OptionViewModel> Options { get; set; } = new List<OptionViewModel>();  // Added default initialization
+        public List<OptionViewModel> Options { get; set; } = new List<OptionViewModel>();
+
+        public static ValidationResult ValidateTextResponse(string textResponse, ValidationContext context)
+        {
+            var instance = (QuestionResponseViewModel)context.ObjectInstance;
+            if (instance.IsRequired && instance.QuestionType == QuestionType.OpenEnded && string.IsNullOrWhiteSpace(textResponse))
+            {
+                return new ValidationResult("The TextResponse field is required.");
+            }
+            return ValidationResult.Success;
+        }
     }
 
     public class PollResultsViewModel
@@ -105,7 +115,7 @@ namespace Hometown_Application.ViewModel
     {
         public int QuestionId { get; set; }
         public string QuestionText { get; set; }
-        public Data.QuestionType QuestionType { get; set; }
+        public QuestionType QuestionType { get; set; }
         public int ResponseCount { get; set; }
 
         public List<OptionResultViewModel> Options { get; set; } = new List<OptionResultViewModel>();
