@@ -20,5 +20,8 @@ namespace Hometown_Application.Models
         public string VehiclePlateNumber { get; set; }
 
         public bool IsDeleted { get; set; }
+
+
+
     }
 }

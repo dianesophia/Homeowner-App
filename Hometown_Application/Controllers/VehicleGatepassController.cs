@@ -43,12 +43,15 @@ namespace Hometown_Application.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> Edit(int id)
+        /*public async Task<IActionResult> Edit(int id)
         {
             Console.WriteLine($"Edit action reached with id: {id}");
+
+            // Fetch the vehicle gate pass based on its VehicleId
             var vehicleGatePass = await _context.VehicleGatepasses
                 .FirstOrDefaultAsync(v => v.VehicleId == id && !v.IsDeleted);
 
+            // If not found, return NotFound
             if (vehicleGatePass == null)
             {
                 return NotFound();
@@ -57,9 +60,6 @@ namespace Hometown_Application.Controllers
             return View(vehicleGatePass);
         }
 
-
-
-        // POST: VehicleGatePass/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, VehicleGatepassModel model)
@@ -79,6 +79,7 @@ namespace Hometown_Application.Controllers
 
             try
             {
+                // Update the model fields
                 vehicleGatePass.VehicleBrand = model.VehicleBrand;
                 vehicleGatePass.VehicleColor = model.VehicleColor;
                 vehicleGatePass.VehiclePlateNumber = model.VehiclePlateNumber;
@@ -101,6 +102,8 @@ namespace Hometown_Application.Controllers
             }
         }
 
+        */
+
         // GET: VehicleGatePass/Index
         public async Task<IActionResult> Index()
         {
@@ -111,6 +114,47 @@ namespace Hometown_Application.Controllers
 
             return View(vehicleGatePasses);
         }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var vehicleGatePass = await _context.VehicleGatepasses
+                .Include(v => v.ApplicationUser)
+                .FirstOrDefaultAsync(v => v.VehicleId == id);
+
+            if (vehicleGatePass == null)
+            {
+                return NotFound();
+            }
+
+            return View(vehicleGatePass);
+        }
+
+        // POST: VehicleGatePass/DeleteConfirmed/{id}
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, VehicleGatepassModel model)
+        {
+            var vehicleGatePass = await _context.VehicleGatepasses.FindAsync(id);
+            if (vehicleGatePass == null)
+            {
+                return NotFound();
+            }
+
+            vehicleGatePass.VehicleBrand = model.VehicleBrand;
+            vehicleGatePass.VehicleColor = model.VehicleColor;
+            vehicleGatePass.VehiclePlateNumber = model.VehiclePlateNumber;
+
+            _context.Update(vehicleGatePass);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+
+            
+        }
+
+
+
+
 
         // GET: VehicleGatePass/Delete/{id}
         public async Task<IActionResult> Delete(int id)
@@ -127,9 +171,10 @@ namespace Hometown_Application.Controllers
             return View(vehicleGatePass);
         }
 
-        // POST: VehicleGatePass/DeleteConfirmed/{id}
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
+        [ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
+        [Route("VehicleGatePass/DeleteConfirmed/{id}")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var vehicleGatePass = await _context.VehicleGatepasses.FindAsync(id);
@@ -143,5 +188,7 @@ namespace Hometown_Application.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+
     }
 }
