@@ -16,6 +16,9 @@ namespace Hometown_Application.Models
         public ApplicationUser ApplicationUser { get; set; }
         public string VehicleBrand { get; set; }
 
+        public string VehicleColor { get; set; }
+        public string VehiclePlateNumber { get; set; }
 
+        public bool IsDeleted { get; set; }
     }
 }

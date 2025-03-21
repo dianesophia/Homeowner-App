@@ -150,7 +150,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "6fa13552-03f2-4049-843e-9d8bcee79413",
+                            ConcurrencyStamp = "030fffd6-7c15-469d-9042-e3e68d32790c",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -164,9 +164,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDUlsKZEZhFiJZd6vAS5z98z3i9eJHqDnw60rrRp2UJr4muVKH8KxWocjkelCQas+A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAED1sMwuH79dQgfqq34CAmx+rT3WDQ9eVFfbuw0+zhw9BsexxwwgagiNHlmSvYE2enA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0534b559-8188-431d-bb8c-73a77628284f",
+                            SecurityStamp = "78336188-eca4-4b3d-923b-ebf2765d9121",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -1153,11 +1153,22 @@ namespace Hometown_Application.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleId"));
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("VehicleBrand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleColor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehiclePlateNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
