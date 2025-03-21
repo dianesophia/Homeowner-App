@@ -9,20 +9,27 @@
 <a asp-controller="VehicleGatepass" asp-action="Create" class="btn btn-secondary">
     <i class="fas fa-comment"></i>Create
 </a>
+
 <table class="table">
     <thead>
         <tr>
             <th>Vehicle Brand</th>
-            <th>Added By</th>
+            <th>Vehicle Color</th>
+            <th>Plate Number</th>
+            <th>Owner</th>
+            <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Where(v => !v.IsDeleted))
+        @foreach (var item in Model.Where(v => !v.IsDeleted && v.IsApproved == true))  
         {
             <tr>
                 <td>@item.VehicleBrand</td>
+                <td>@item.VehicleColor</td>
+                <td>@item.VehiclePlateNumber</td>
                 <td>@item.ApplicationUser.UserName</td>
+                <td>@item.ApprovalStatus</td>
                 <td>
                     <a asp-controller="VehicleGatePass" asp-action="Edit" asp-route-id="@item.VehicleId" class="btn btn-primary">
                         Edit
@@ -38,7 +45,105 @@
     </tbody>
 </table>
 
-<!-- Modal -->
+
+<!-- Tabs for Approve/Reject -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="true">Pending</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="approved-tab" data-bs-toggle="tab" href="#approved" role="tab" aria-controls="approved" aria-selected="false">Approved</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="rejected-tab" data-bs-toggle="tab" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">Rejected</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <!-- Pending Tab -->
+    <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+        <h3>Pending Approvals</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Vehicle Brand</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(v => !v.IsDeleted && !(v.IsApproved ?? false) && !(v.IsRejected ?? false)))
+                {
+                    <tr>
+                        <td>@item.VehicleBrand</td>
+                        <td>
+                            <!-- Approve Button triggers Modal -->
+                            <button class="btn btn-success" data-toggle="modal" data-target="#approveRejectModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand" data-action="approve">
+                                Approve
+                            </button>
+
+                            <!-- Reject Button triggers Modal -->
+                            <button class="btn btn-warning" data-toggle="modal" data-target="#approveRejectModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand" data-action="reject">
+                                Reject
+                            </button>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Approved Tab -->
+    <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+        <h3>Approved Gate Passes</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Vehicle Brand</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsApproved ?? false)))  
+                {
+                    <tr>
+                        <td>@item.VehicleBrand</td>
+                        <td>
+                            <span class="badge badge-success">Approved</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Rejected Tab -->
+    <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+        <h3>Rejected Gate Passes</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Vehicle Brand</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsRejected ?? true)))  
+                {
+                    <tr>
+                        <td>@item.VehicleBrand</td>
+                        <td>@item.RejectionReason</td>
+                        <td>
+                            <span class="badge badge-danger">Rejected</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for Delete -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -62,22 +167,93 @@
     </div>
 </div>
 
+<!-- Modal for Approve/Reject -->
+<div class="modal fade" id="approveRejectModal" tabindex="-1" role="dialog" aria-labelledby="approveRejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveRejectModalLabel">Approve/Reject Gate Pass</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to <span id="actionType"></span> the vehicle gate pass for "<span id="vehicleBrand"></span>"?
+
+                <!-- Rejection Reason (Appears when Reject is selected) -->
+                <div id="rejectionReasonContainer" style="display:none;">
+                    <label for="RejectionReason">Rejection Reason:</label>
+                    <textarea class="form-control" id="RejectionReason" name="RejectionReason"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form id="approveRejectForm" method="post" action="#">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Hidden field for action (approve/reject) -->
+                    <input type="hidden" id="action" name="action" value="" />
+
+                    <button type="submit" id="approveRejectButton" class="btn btn-success">Approve</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        $('#deleteModal').on('show.bs.modal', function (event) {
+        // Handle Approve/Reject Modal dynamic data
+        $('#approveRejectModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             var vehicleId = button.data('id'); // Extract info from data-* attributes
             var vehicleBrand = button.data('name');
+            var action = button.data('action'); // Get the action (approve or reject)
 
             // Update the modal's content
             var modal = $(this);
             modal.find('.modal-body #vehicleBrand').text(vehicleBrand);
+            modal.find('.modal-body #actionType').text(action.charAt(0).toUpperCase() + action.slice(1)); // Capitalize action (approve/reject)
 
-            // Dynamically set the action URL of the form
-            modal.find('form').attr('action', '@Url.Action("DeleteConfirmed", "VehicleGatePass")/' + vehicleId);
+            // Set the form action URL
+            var formActionUrl = '@Url.Action("ApproveRejectConfirmed", "VehicleGatePass")/' + vehicleId;
+            modal.find('form').attr('action', formActionUrl);
+
+            // Set action in hidden field
+            modal.find('#action').val(action);
+
+            // Show rejection reason only if rejecting
+            if (action === "reject") {
+                $('#rejectionReasonContainer').show();
+                $('#approveRejectButton').text("Reject");
+                $('#approveRejectButton').removeClass('btn-success').addClass('btn-warning');
+            } else {
+                $('#rejectionReasonContainer').hide();
+                $('#approveRejectButton').text("Approve");
+                $('#approveRejectButton').removeClass('btn-warning').addClass('btn-success');
+            }
         });
+
+                // Handle Delete Modal dynamic data
+               // Handle Delete Modal dynamic data
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var vehicleId = button.data('id'); // Extract the vehicleId
+            var vehicleBrand = button.data('name'); // Extract the vehicleBrand
+
+            // Update the modal's content
+            var modal = $(this);
+            modal.find('.modal-body #vehicleBrand').text(vehicleBrand);
+            modal.find('.modal-body #vehicleId').val(vehicleId); // Set vehicleId for the form
+
+            // Set the action URL for the form
+            var formActionUrl = '@Url.Action("DeleteConfirmed", "VehicleGatePass")/' + vehicleId;
+            modal.find('form').attr('action', formActionUrl);
+        });
+
+
     </script>
 }

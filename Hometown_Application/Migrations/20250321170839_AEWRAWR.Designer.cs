@@ -4,6 +4,7 @@ using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250321170839_AEWRAWR")]
+    partial class AEWRAWR
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,7 +153,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1e71e1c9-f942-4426-8ff5-399b269c2683",
+                            ConcurrencyStamp = "90f88048-643b-4a23-b551-0780da70b783",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -164,9 +167,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOYsEOEcnEWEX+HMC1QDKHnKG72R+W0PrNdJoUxpF2qxg4BRaQQ1b2AI43YgA1QUKw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJASqs91EU47Rn/bqo3CNZQxyLtcckOOnyZ+xHi2P4IxFvwIJZbWlYkSW8V+4Xzk+w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "35858f0f-5b48-47ce-9810-27c6fd91e5e6",
+                            SecurityStamp = "3b948c05-dd85-4e35-ad79-3cb32af960eb",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -1163,10 +1166,6 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("ApprovalDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ApprovalStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("GatePassDocument")
                         .HasColumnType("nvarchar(max)");
 
@@ -1176,13 +1175,10 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("GatePassIssuedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("IsApproved")
+                    b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsRejected")
                         .HasColumnType("bit");
 
                     b.Property<string>("QRCode")

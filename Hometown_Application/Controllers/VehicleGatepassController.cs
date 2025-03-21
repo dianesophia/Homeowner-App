@@ -39,70 +39,13 @@ namespace Hometown_Application.Controllers
             if (user == null) return RedirectToAction("Index");
 
             model.UserId = user.Id;
+            model.AddedOn = DateTime.UtcNow;
+            model.AddedBy = user.Id;
             _context.VehicleGatepasses.Add(model);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        /*public async Task<IActionResult> Edit(int id)
-        {
-            Console.WriteLine($"Edit action reached with id: {id}");
-
-            // Fetch the vehicle gate pass based on its VehicleId
-            var vehicleGatePass = await _context.VehicleGatepasses
-                .FirstOrDefaultAsync(v => v.VehicleId == id && !v.IsDeleted);
-
-            // If not found, return NotFound
-            if (vehicleGatePass == null)
-            {
-                return NotFound();
-            }
-
-            return View(vehicleGatePass);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, VehicleGatepassModel model)
-        {
-            if (id != model.VehicleId)
-            {
-                return NotFound();
-            }
-
-            var vehicleGatePass = await _context.VehicleGatepasses
-                .FirstOrDefaultAsync(v => v.VehicleId == id && !v.IsDeleted);
-
-            if (vehicleGatePass == null)
-            {
-                return NotFound();
-            }
-
-            try
-            {
-                // Update the model fields
-                vehicleGatePass.VehicleBrand = model.VehicleBrand;
-                vehicleGatePass.VehicleColor = model.VehicleColor;
-                vehicleGatePass.VehiclePlateNumber = model.VehiclePlateNumber;
-
-                _context.Update(vehicleGatePass);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.VehicleGatepasses.Any(e => e.VehicleId == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        */
+      
 
         // GET: VehicleGatePass/Index
         public async Task<IActionResult> Index()
@@ -135,6 +78,8 @@ namespace Hometown_Application.Controllers
         public async Task<IActionResult> Edit(int id, VehicleGatepassModel model)
         {
             var vehicleGatePass = await _context.VehicleGatepasses.FindAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Index");
             if (vehicleGatePass == null)
             {
                 return NotFound();
@@ -143,6 +88,8 @@ namespace Hometown_Application.Controllers
             vehicleGatePass.VehicleBrand = model.VehicleBrand;
             vehicleGatePass.VehicleColor = model.VehicleColor;
             vehicleGatePass.VehiclePlateNumber = model.VehiclePlateNumber;
+            vehicleGatePass.UpdatedBy = user.Id;
+            vehicleGatePass.UpdatedOn = DateTime.UtcNow;
 
             _context.Update(vehicleGatePass);
             await _context.SaveChangesAsync();
@@ -171,6 +118,59 @@ namespace Hometown_Application.Controllers
             return View(vehicleGatePass);
         }
 
+
+        // GET: VehicleGatePass/Approve/{id}
+        public async Task<IActionResult> Approve(int id)
+        {
+            var vehicleGatePass = await _context.VehicleGatepasses
+                .Include(v => v.ApplicationUser)
+                .FirstOrDefaultAsync(v => v.VehicleId == id);
+
+            if (vehicleGatePass == null)
+            {
+                return NotFound();
+            }
+
+            return View(vehicleGatePass);  // Display the vehicle gate pass to be approved
+        }
+        [HttpPost, ActionName("ApproveRejectConfirmed")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveRejectConfirmed(int id, string action, string rejectionReason)
+        {
+            var vehicleGatePass = await _context.VehicleGatepasses.FindAsync(id);
+            if (vehicleGatePass == null)
+            {
+                return NotFound();
+            }
+
+            if (action == "reject")
+            {
+                // Reject the gate pass
+                vehicleGatePass.IsApproved = false;
+                vehicleGatePass.RejectionReason = rejectionReason;
+                vehicleGatePass.ApprovalStatus = "Rejected";
+                vehicleGatePass.IsRejected = true;
+            }
+            else if (action == "approve")
+            {
+                // Approve the gate pass
+                vehicleGatePass.IsApproved = true;
+                vehicleGatePass.ApprovalStatus = "Approved";
+                vehicleGatePass.ApprovalDate = DateTime.UtcNow;
+                vehicleGatePass.GatePassIssuedDate = DateTime.UtcNow;
+                vehicleGatePass.IsRejected = false;
+
+                // Automatically set expiry date to one year from the issued date
+                vehicleGatePass.GatePassExpiryDate = DateTime.UtcNow.AddYears(1); // Set expiry to 1 year after issued date
+            }
+                
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index)); // Redirect back to the list after approval/rejection
+        }
+
+
+
         [HttpPost]
         [ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
@@ -188,6 +188,7 @@ namespace Hometown_Application.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
 
     }
