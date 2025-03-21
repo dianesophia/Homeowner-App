@@ -45,40 +45,39 @@ namespace Hometown_Application.Controllers
             return View();
         }
 
+        // POST: Save Request Type
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ServiceRequestModel serviceRequest)
+        [HttpPost]
+        public IActionResult CreateRequest(ServiceRequestModel model)
         {
             if (!ModelState.IsValid)
             {
-                // Log errors to see why it's failing
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                Console.WriteLine("Validation Errors: " + string.Join(", ", errors));
-
+                // Reload dropdowns in case of validation failure
                 ViewBag.RequestTypes = _context.RequestTypes.Where(rt => rt.IsActive).OrderBy(rt => rt.Name).ToList();
                 ViewBag.Statuses = _context.Status.OrderBy(s => s.StatusName).ToList();
-
-                return View(serviceRequest);
+                return View("Create", model);
             }
 
-            try
+            // Ensure that the model has necessary fields before adding
+            var newRequest = new ServiceRequestModel
             {
-                string loggedInUser = User.Identity?.Name ?? "Anonymous";
-                serviceRequest.AddedOn = DateTime.Now;
-                serviceRequest.Email = loggedInUser;
+                RequestTypeId = model.RequestTypeId,
+                StatusId = model.StatusId,
+                Details = model.Details,
+                AddedOn = DateTime.UtcNow,
+                IsDeleted = false
+            };
 
-                _context.ServiceRequests.Add(serviceRequest);
-                _context.SaveChanges(); // Ensure this line executes
-                return RedirectToAction("RequestConfirmation", new { id = serviceRequest.ServiceRequestId });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error Saving Data: " + ex.Message);
-                ModelState.AddModelError("", "An error occurred while saving the request.");
-            }
+            _context.ServiceRequests.Add(newRequest);
+            _context.SaveChanges();
 
-            return View(serviceRequest);
+            return RedirectToAction("Index"); // Redirect to service request list
         }
+
+
+
+
 
 
 

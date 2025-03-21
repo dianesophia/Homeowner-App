@@ -16,8 +16,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
+ <!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- jQuery (required for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 
 
 	<style>
@@ -395,7 +402,6 @@
 			</nav>
 		</header>
 
-        </header>
 
 		<div class="d-flex">
 			<!-- Sidebar Toggle Button (Only visible when logged in) -->
@@ -616,6 +622,18 @@
 						<li>
 							<a class="nav-link" asp-controller="ServiceRequest" asp-action="Create">
 								<i class="fas fa-poll"></i> <span>Create Request</span>
+							</a>
+						</li>
+
+						<li>
+							<a class="nav-link" asp-controller="Gatepass" asp-action="Index">
+				 				<i class="fas fa-poll"></i> <span>Create Gatepass</span>
+							</a>
+						</li
+
+						<li>
+							<a class="nav-link" asp-controller="VehicleGatepass" asp-action="Index">
+				 				<i class="fas fa-poll"></i> <span>Create Vehicle Gatepass</span>
 							</a>
 						</li>
 

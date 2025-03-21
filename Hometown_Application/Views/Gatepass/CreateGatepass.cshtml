@@ -1,0 +1,27 @@
+﻿@model Hometown_Application.Models.GatepassModel
+
+<h2>Create Gate Pass</h2>
+
+<form asp-action="CreateGatepass" method="post">
+    <div class="form-group">
+        <label asp-for="VisitorName"></label>
+        <input asp-for="VisitorName" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Purpose"></label>
+        <input asp-for="Purpose" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="VisitDate"></label>
+        <input asp-for="VisitDate" type="date" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NumberOfVisitors"></label>
+        <input asp-for="NumberOfVisitors" type="number" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

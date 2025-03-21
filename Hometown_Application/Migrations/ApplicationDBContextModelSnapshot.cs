@@ -150,7 +150,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cff96399-bbd4-4133-afd5-0e9e4cb46802",
+                            ConcurrencyStamp = "6fa13552-03f2-4049-843e-9d8bcee79413",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -164,9 +164,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDwIgd6RiqSL5icv/BwEyY4PPsHmoG/l4AQ3oYieYn24UMaT+ChjWX244ih+m2eS6w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDUlsKZEZhFiJZd6vAS5z98z3i9eJHqDnw60rrRp2UJr4muVKH8KxWocjkelCQas+A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6df2d75f-6310-440d-a845-2a9988078b8e",
+                            SecurityStamp = "0534b559-8188-431d-bb8c-73a77628284f",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -461,6 +461,85 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("FeedbackComplaints");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.GatepassModel", b =>
+                {
+                    b.Property<int>("GatepassId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GatepassId"));
+
+                    b.Property<string>("AdminNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ContactNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpectedArrivalTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("NumberOfVisitors")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PassNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PdfPath")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Purpose")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("VisitDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VisitorName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("VisitorVehicleDetails")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("GatepassId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Gatepass");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.HomeownerProfileModel", b =>
@@ -1066,6 +1145,29 @@ namespace Hometown_Application.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.VehicleGatepassModel", b =>
+                {
+                    b.Property<int>("VehicleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleId"));
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VehicleBrand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("VehicleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("VehicleGatepasses");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -1254,6 +1356,17 @@ namespace Hometown_Application.Migrations
                     b.Navigation("Status");
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.GatepassModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.HomeownerProfileModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.HouseModel", "House")
@@ -1410,6 +1523,17 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("House");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.VehicleGatepassModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

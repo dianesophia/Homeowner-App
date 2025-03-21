@@ -25,7 +25,10 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<StatusModel> Status { get; set; }
     public DbSet<ReservationModel> Reservation { get; set; }
     public DbSet<FacilityModel> Facility { get; set; }
-    
+    public DbSet<GatepassModel> Gatepass { get; set; }
+    public DbSet<VehicleGatepassModel> VehicleGatepasses { get; set; }
+
+
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
     public DbSet<PollQuestionModel> PollQuestions { get; set; }
@@ -60,8 +63,13 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .HasForeignKey(fc => fc.UserId)
            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<IdentityRole>().ToTable("AspNetRoles").HasKey(r => r.Id);
-        builder.Entity<ApplicationUser>().ToTable("AspNetUsers").HasKey(u => u.Id);
+        builder.Entity<VehicleGatepassModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
+
+       
 
   
         builder.Entity<StatusModel>().HasData(
@@ -126,15 +134,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         };
         builder.Entity<ApplicationUser>().HasData(users);
 
-        // ✅ Seeding User Roles
-        var userRoles = new List<IdentityUserRole<string>>
-        {
-          //  new IdentityUserRole<string> { UserId = "100", RoleId = "2" },  // Elon Musk → Staff
-          //  new IdentityUserRole<string> { UserId = "101", RoleId = "1" }   // Admin → Admin
-        };
-
-
-        builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
+      
         builder.Entity<HomeownerProfileModel>()
           .HasOne(fc => fc.ApplicationUser)
           .WithMany()
@@ -207,7 +207,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
              .OnDelete(DeleteBehavior.Restrict);
         */
    
-        base.OnModelCreating(builder);
+     
 
         // 🔹 ServiceRequest ↔ Status (FK)
         builder.Entity<ServiceRequestModel>()
@@ -272,5 +272,11 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             .WithMany(o => o.Responses)
             .HasForeignKey(r => r.SelectedOptionId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<GatepassModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
     }
 }

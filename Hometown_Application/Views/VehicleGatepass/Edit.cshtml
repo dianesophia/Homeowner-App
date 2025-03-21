@@ -1,0 +1,30 @@
+﻿@model Hometown_Application.Models.VehicleGatepassModel
+
+@{
+    ViewData["Title"] = "Edit Vehicle Gatepass";
+}
+
+<h1>Edit Vehicle Gatepass</h1>
+
+<h4>VehicleGatepassModel</h4>
+<hr />
+
+<form asp-action="Edit" method="post">
+    <div class="form-group">
+        <label asp-for="UserId" class="control-label"></label>
+        <input asp-for="UserId" class="form-control" />
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="VehicleBrand" class="control-label"></label>
+        <input asp-for="VehicleBrand" class="form-control" />
+        <span asp-validation-for="VehicleBrand" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>
+
+<a href="@Url.Action("Index", "VehicleGatepass")" class="btn btn-secondary">Back to List</a>

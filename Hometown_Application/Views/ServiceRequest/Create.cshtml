@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Request a Service";
 }
+@Html.AntiForgeryToken()
+
 
 <h2>Request a Service</h2>
 
@@ -45,7 +47,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form asp-action="Create" method="post">
+                <form asp-action="CreateRequest" method="post">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="selectedRequestTypeId" name="RequestTypeId" required>
 
                     <div class="mb-3">
@@ -55,7 +58,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Details</label>
-                        <textarea asp-for="Details" class="form-control" required></textarea>
+                        <textarea class="form-control" id="Details" name="Details" required></textarea>
                     </div>
 
                     <div class="mb-3">
@@ -119,4 +122,4 @@
             border: 2px solid #007bff;
             background-color: #f8f9fa;
         }
-</style>
+2\;</style>

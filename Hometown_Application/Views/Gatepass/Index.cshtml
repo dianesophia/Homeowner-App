@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Hometown_Application.Models.GatepassModel>
+
+<h2>Gate Passes</h2>
+
+<a asp-action="CreateGatepass" class="btn btn-primary">Create New Gate Pass</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Visitor Name</th>
+            <th>Purpose</th>
+            <th>Visit Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.VisitorName</td>
+                <td>@item.Purpose</td>
+                <td>@item.VisitDate.ToShortDateString()</td>
+                <td>
+                    @if (item.Status == 0)
+                    {
+                        <span class="badge bg-warning">Pending</span>
+                    }
+                    else if (item.Status == 1)
+                    {
+                        <span class="badge bg-success">Approved</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Rejected</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.GatepassId" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.GatepassId" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

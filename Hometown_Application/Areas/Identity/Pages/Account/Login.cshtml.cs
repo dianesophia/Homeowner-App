@@ -158,9 +158,10 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
                 var dbContext = HttpContext.RequestServices.GetRequiredService<ApplicationDBContext>();
                 var homeownerProfile = dbContext.HomeownerProfiles.FirstOrDefault(h => h.UserId == user.Id);
                 var isAdmin = await _signInManager.UserManager.IsInRoleAsync(user, "Admin");
+                var isStaff = await _signInManager.UserManager.IsInRoleAsync(user, "Staff");
 
                 // ✅ Allow Admins to log in without checking approval
-                if (isAdmin || (homeownerProfile != null && homeownerProfile.IsApproved))
+                if (isAdmin || isStaff || (homeownerProfile != null && homeownerProfile.IsApproved))
                 {
                     var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
 

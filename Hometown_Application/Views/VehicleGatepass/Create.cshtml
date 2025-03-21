@@ -1,0 +1,16 @@
+﻿@model Hometown_Application.Models.VehicleGatepassModel
+
+@{
+    ViewData["Title"] = "Create Vehicle Gate Pass";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="VehicleBrand">Vehicle Brand</label>
+        <input type="text" class="form-control" id="VehicleBrand" name="VehicleBrand" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
