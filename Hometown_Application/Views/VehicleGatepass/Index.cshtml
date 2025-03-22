@@ -27,7 +27,14 @@
         {
             <tr>
                 <td>
-                    <img src="@Url.Content("~/images/" + item.VehicleImage)" alt="Vehicle Image" width="100" height="60" class="img-thumbnail" />
+                    @if (item.VehicleImage != null)
+                    {
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.VehicleImage)" alt="Feedback Image" width="100" height="100" />
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
     
                 </td>
                 <td>@item.VehicleBrand</td>
