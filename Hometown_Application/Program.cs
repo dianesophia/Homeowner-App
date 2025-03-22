@@ -6,11 +6,15 @@ using System.ComponentModel;
 using Hometown_Application.Seed;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
+using QuestPDF;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
+        QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+
         var builder = WebApplication.CreateBuilder(args);
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -195,7 +199,6 @@ public class Program
                    }
                }
            }
-
 
 
         app.Run();
