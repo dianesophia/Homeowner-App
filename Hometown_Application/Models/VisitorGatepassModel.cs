@@ -4,11 +4,10 @@ using Hometown_Application.Areas.Identity.Data;
 
 namespace Hometown_Application.Models
 {
-    public class GatepassModel
+    public class VisitorGatepassModel
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int GatepassId { get; set; }
+        public int VisitorId { get; set; }
 
         [Required]
         public string UserId { get; set; }
@@ -16,7 +15,7 @@ namespace Hometown_Application.Models
         [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
 
-       
+
         [StringLength(100)]
         public string? VisitorName { get; set; }
 
@@ -32,21 +31,30 @@ namespace Hometown_Application.Models
         
         public int? NumberOfVisitors { get; set; }
 
-        [StringLength(100)]
-        public string? VisitorVehicleDetails { get; set; }
+        [StringLength(50)]
+        public string? VehicleType { get; set; }  // Example: Car, Motorcycle, Truck
 
-        
+        [StringLength(20)]
+        public string? VehiclePlateNumber { get; set; }  // License Plate Number
+
+        [StringLength(20)]
+        public string? VehicleColor { get; set; }  // Example: Red, Blue, Black
+
+
+
         [StringLength(50)]
         public string? ContactNumber { get; set; }
 
-        
-        [StringLength(50)]
-        public string? PassNumber { get; set; }
+        public DateTime? GatePassIssuedDate { get; set; }
 
-        public DateTime? ExpirationDate { get; set; }
+        // Expiry date of the gate pass (optional)
+        public DateTime? GatePassExpiryDate { get; set; }
 
-        
-        public int? Status { get; set; }  // Enum recommended
+
+        public bool? IsApproved { get; set; }
+
+        public bool? IsRejected { get; set; }
+        public string ApprovalStatus { get; set; } = "Pending";
 
         public string? AdminNotes { get; set; }
 
@@ -54,17 +62,13 @@ namespace Hometown_Application.Models
         public string? ApprovedBy { get; set; }  // Admin ID or Name
 
         public DateTime? ApprovedDate { get; set; }
-
       
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
-
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime? AddedOn { get; set; } = DateTime.UtcNow;
+        public string AddedBy { get; set; }
+        public DateTime? UpdatedOn { get; set; }
+        public string? UpdatedBy { get; set; }
 
         public bool? IsDeleted { get; set; } = false;
 
-        public DateTime? DeletedAt { get; set; }
-
-        [StringLength(255)]
-        public string? PdfPath { get; set; }
     }
 }

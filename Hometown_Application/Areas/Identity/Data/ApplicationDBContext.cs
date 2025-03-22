@@ -25,7 +25,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<StatusModel> Status { get; set; }
     public DbSet<ReservationModel> Reservation { get; set; }
     public DbSet<FacilityModel> Facility { get; set; }
-    public DbSet<GatepassModel> Gatepass { get; set; }
+    public DbSet<VisitorGatepassModel> VisitorGatepasses { get; set; }
     public DbSet<VehicleGatepassModel> VehicleGatepasses { get; set; }
 
 
@@ -273,10 +273,6 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(r => r.SelectedOptionId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Entity<GatepassModel>()
-           .HasOne(fc => fc.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(fc => fc.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
+       
     }
 }

@@ -4,6 +4,7 @@ using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250322143949_AWERAWER")]
+    partial class AWERAWER
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,7 +153,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f7a7f707-bb40-40a6-9be7-97bdeed5d89e",
+                            ConcurrencyStamp = "6124b3f6-12df-478a-8e3f-6257c0fb8a16",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -164,9 +167,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHcHp2KxydElBA2iiDURkxnEFHAImLDZyElsibeaWM2S9mlfWi+otI3FG7KRyN4QqQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEODrO/IBI2mzAdNlqPylfmxW7UWRwQ+aQaZRxJT1XlB81l5XztPDq8Utc32ZwQLB1g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "886a8e88-ace6-4aea-9c24-64fad5d034b4",
+                            SecurityStamp = "48a90d95-f86e-40f5-b644-23c3cf76fd82",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -1182,10 +1185,7 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("ExpectedArrivalTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("GatePassExpiryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("GatePassIssuedDate")
+                    b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool?>("IsApproved")
@@ -1204,6 +1204,7 @@ namespace Hometown_Application.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedOn")
@@ -1213,22 +1214,14 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("VehicleColor")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("VehiclePlateNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("VehicleType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime>("VisitDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("VisitorName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("VisitorVehicleDetails")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 

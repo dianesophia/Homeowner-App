@@ -57,30 +57,7 @@ namespace Hometown_Application.Controllers
               return RedirectToAction(nameof(Index));
           }
        
-        /*
-        [HttpPost]
-        public async Task<IActionResult> Create(VehicleGatepassModel model, IFormFile vehicleImage)
-        {
-            if (ModelState.IsValid)
-            {
-                if (vehicleImage != null && vehicleImage.Length > 0)
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await vehicleImage.CopyToAsync(memoryStream);
-                        model.VehicleImage = memoryStream.ToArray();
-                    }
-                }
-
-                _context.VehicleGatepasses.Add(model);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("Index");
-            }
-
-            return View(model);
-        }
-        */
+      
 
         // GET: VehicleGatePass/Index
         public async Task<IActionResult> Index()
@@ -224,94 +201,7 @@ namespace Hometown_Application.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        /*   public async Task<IActionResult> GenerateGatePass(int id)
-           {
-               var user = await _userManager.GetUserAsync(User);
-               // Fetch vehicle data from the database asynchronously
-               var vehicle = await _context.VehicleGatepasses
-                   .Where(v => v.VehicleId == id)
-                   .FirstOrDefaultAsync();
-
-               if (vehicle == null)
-               {
-                   return NotFound();
-               }
-
-               // Create the PDF document
-               var document = Document.Create(container =>
-               {
-                   container.Page(page =>
-                   {
-                       page.Size(PageSizes.A4);
-                       page.Margin(30);
-                       page.DefaultTextStyle(x => x.FontSize(14));
-
-                       // Header Section
-                       page.Header()
-                           .AlignCenter()
-                           .Column(col =>
-                           {
-                               col.Item().Text("Hometown Security Department").FontSize(22).Bold();
-                               col.Item().Text("Official Gate Pass").FontSize(18).Bold().Underline();
-                               col.Item().Text($"Issued Date: {DateTime.Now.ToShortDateString()}").FontSize(12);
-                           });
-
-                       // Content Section
-                       page.Content()
-                           .PaddingVertical(20)
-                           .Column(col =>
-                           {
-                               // Vehicle Information Box
-                               col.Item()
-                                   .Border(1)
-                                   .BorderColor(Colors.Black)
-                                   .Background(Colors.Grey.Lighten3)
-                                   .Padding(10)
-                                   .Column(innerCol =>
-                                   {
-                                       innerCol.Item().Text("Vehicle Details").FontSize(16).Bold().Underline();
-                                       innerCol.Item().Text($"Vehicle ID: {user.UserName}").FontSize(14);
-                                       innerCol.Item().Text($"Brand: {vehicle.VehicleBrand}").FontSize(14);
-                                       innerCol.Item().Text($"Color: {vehicle.VehicleColor}").FontSize(14);
-                                       innerCol.Item().Text($"Plate Number: {vehicle.VehiclePlateNumber}").FontSize(14);
-                                   });
-
-                               // Gate Pass Approval Status
-                               col.Item().PaddingTop(10)
-                                   .Border(1)
-                                   .BorderColor(Colors.Black)
-                                   .Padding(10)
-                                   .Column(innerCol =>
-                                   {
-                                       innerCol.Item().Text("Gate Pass Information").FontSize(16).Bold().Underline();
-                                       innerCol.Item().Text($"Approval Status: {vehicle.ApprovalStatus}").FontSize(14).Bold();
-                                       innerCol.Item().Text($"Issued Date: {vehicle.GatePassIssuedDate?.ToShortDateString()}").FontSize(14);
-                                       innerCol.Item().Text($"Expiry Date: {vehicle.GatePassExpiryDate?.ToShortDateString()}").FontSize(14);
-                                   });
-
-                               // Signature Section
-                               col.Item().PaddingTop(20).AlignCenter().Column(innerCol =>
-                               {
-                                   innerCol.Item().Text("________________________").FontSize(14);
-                                   innerCol.Item().Text("Security Officer").FontSize(12).Italic();
-                               });
-                           });
-
-                       // Footer Section
-                       page.Footer()
-                           .AlignCenter()
-                           .Text("Generated by the Hometown Gate Pass System")
-                           .FontSize(10)
-                           .Italic();
-                   });
-               });
-
-               // Convert PDF to bytes
-               var pdfBytes = document.GeneratePdf();
-
-               // Return PDF as a preview in the browser
-               return File(pdfBytes, "application/pdf");
-           }*/
+        
         private async Task<IDocument> GenerateGatePassDocument(VehicleGatepassModel vehicle)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -330,10 +220,10 @@ namespace Hometown_Application.Controllers
                         .Column(col =>
                         {
                             col.Item()
-    .AlignCenter()
-    .Width(100) // Set width first
-    .Height(100) // Optional, to maintain proportions
-    .Image("wwwroot/images/picc.png");
+                                .AlignCenter()
+                                .Width(100) // Set width first
+                                .Height(100) // Optional, to maintain proportions
+                                .Image("wwwroot/images/picc.png");
 
 
 
@@ -419,95 +309,6 @@ public async Task<IActionResult> DownloadPDF(int id)
 }
 
 
-        /*
-        public async Task<IActionResult> DownloadPDF(int id)
-        {
-            // Fetch the vehicle details from the database
-            var vehicle = await _context.VehicleGatepasses
-                .Where(v => v.VehicleId == id)
-                .FirstOrDefaultAsync();
-
-            if (vehicle == null)
-            {
-                return NotFound();
-            }
-
-            // Generate the PDF document
-            var document = Document.Create(container =>
-            {
-                container.Page(page =>
-                {
-                    page.Size(PageSizes.A4);
-                    page.Margin(30);
-                    page.DefaultTextStyle(x => x.FontSize(14));
-
-                    // Header - Organization Name
-                    page.Header()
-                        .AlignCenter()
-                        .Column(col =>
-                        {
-                            col.Item().Text("Hometown Security Department").FontSize(22).Bold();
-                            col.Item().Text("Official Gate Pass").FontSize(18).Bold().Underline();
-                            col.Item().Text($"Issued Date: {DateTime.Now.ToShortDateString()}").FontSize(12);
-                        });
-
-                    // Content Section
-                    page.Content()
-                        .PaddingVertical(20)
-                        .Column(col =>
-                        {
-                            // Vehicle Information Section
-                            col.Item()
-                                .Border(1)
-                                .BorderColor(Colors.Black)
-                                .Background(Colors.Grey.Lighten3)
-                                .Padding(10)
-                                .Column(innerCol =>
-                                {
-                                    innerCol.Item().Text("Vehicle Details").FontSize(16).Bold().Underline();
-                                    innerCol.Item().Text($"Vehicle ID: {vehicle.VehicleId}").FontSize(14);
-                                    innerCol.Item().Text($"Brand: {vehicle.VehicleBrand}").FontSize(14);
-                                    innerCol.Item().Text($"Color: {vehicle.VehicleColor}").FontSize(14);
-                                    innerCol.Item().Text($"Plate Number: {vehicle.VehiclePlateNumber}").FontSize(14);
-                                });
-
-                            // Gate Pass Approval Status Section
-                            col.Item().PaddingTop(10)
-                                .Border(1)
-                                .BorderColor(Colors.Black)
-                                .Padding(10)
-                                .Column(innerCol =>
-                                {
-                                    innerCol.Item().Text("Gate Pass Information").FontSize(16).Bold().Underline();
-                                    innerCol.Item().Text($"Approval Status: {vehicle.ApprovalStatus}").FontSize(14).Bold();
-                                    innerCol.Item().Text($"Issued Date: {vehicle.GatePassIssuedDate?.ToShortDateString()}").FontSize(14);
-                                    innerCol.Item().Text($"Expiry Date: {vehicle.GatePassExpiryDate?.ToShortDateString()}").FontSize(14);
-                                });
-
-                            // Signature Section
-                            col.Item().PaddingTop(20).AlignCenter().Column(innerCol =>
-                            {
-                                innerCol.Item().Text("________________________").FontSize(14);
-                                innerCol.Item().Text("Security Officer").FontSize(12).Italic();
-                            });
-                        });
-
-                    // Footer
-                    page.Footer()
-                        .AlignCenter()
-                        .Text("Generated by the Hometown Gate Pass System")
-                        .FontSize(10)
-                        .Italic();
-                });
-            });
-
-            // Convert to PDF bytes
-            var pdfBytes = document.GeneratePdf();
-
-            // Return as a downloadable file
-            return File(pdfBytes, "application/pdf", $"GatePass_{vehicle.VehiclePlateNumber}.pdf");
-
-        }
-        */  
+       
     }
 }

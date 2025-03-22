@@ -4,6 +4,7 @@ using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250322174856_ASDAWER")]
+    partial class ASDAWER
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,7 +153,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f7a7f707-bb40-40a6-9be7-97bdeed5d89e",
+                            ConcurrencyStamp = "32aa269c-5c8f-4959-a306-d9dffea0f329",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -164,9 +167,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHcHp2KxydElBA2iiDURkxnEFHAImLDZyElsibeaWM2S9mlfWi+otI3FG7KRyN4QqQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECWjMCkcUF9IU/ucEekBG5SAl/cWphXbuDE+M0DWCKl7ntdDpXGTNFpk82MA72PXHQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "886a8e88-ace6-4aea-9c24-64fad5d034b4",
+                            SecurityStamp = "ca3cf0fe-52d0-4de5-b3a7-0e5dc7da62e8",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -1213,22 +1216,14 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("VehicleColor")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("VehiclePlateNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("VehicleType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime>("VisitDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("VisitorName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("VisitorVehicleDetails")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 

@@ -36,13 +36,8 @@ namespace Hometown_Application.Models
         public string ApprovalStatus { get; set; } = "Pending";
         public string? RejectionReason { get; set; }
 
-        // Gate pass document path (URL or file path to the generated gate pass document)
-        public string? GatePassDocument { get; set; }
-
-        // Gate pass QR code (file path or base64 string representing the QR code image)
         public string? QRCode { get; set; }
 
-        // Date when the gate pass was issued (i.e., when the document or QR code was generated)
         public DateTime? GatePassIssuedDate { get; set; }
 
         // Expiry date of the gate pass (optional)

@@ -70,7 +70,7 @@ namespace Hometown_Application.Controllers
             };
 
             _context.ServiceRequests.Add(newRequest);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             return RedirectToAction("Index"); // Redirect to service request list
         }
