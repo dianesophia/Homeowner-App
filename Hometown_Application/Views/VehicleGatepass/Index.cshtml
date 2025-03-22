@@ -108,40 +108,25 @@
     <!-- Approved Tab -->
     <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
         <h3>Approved Gate Passes</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Vehicle Brand</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsApproved ?? false)))  
-                {
-                    <tr>
-                        <td>@item.VehicleBrand</td>
-                        <td>
-                            <span class="badge badge-success">Approved</span>
-                        </td>
-
-                        <td>
-
-                            <!-- Button to open the modal -->
-                            <button class="btn btn-primary preview-pdf-btn" data-toggle="modal" data-target="#pdfPreviewModal" data-url="@Url.Action("PreviewPDF", "VehicleGatePass", new { id = item.VehicleId })">
-                                Preview PDF
-                            </button>
-
-
-                            <a asp-controller="VehicleGatePass" asp-action="DownloadPDF" asp-route-id="@item.VehicleId" class="btn btn-secondary">
+        <div class="row">
+            @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsApproved ?? false)))
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.VehicleBrand</h5>
+                            <span class="badge badge-success mb-2">Approved</span>
+                            <br>
+                            <a asp-controller="VehicleGatePass" asp-action="DownloadPDF" asp-route-id="@item.VehicleId" class="btn btn-primary btn-sm">
                                 Download PDF
                             </a>
-
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
+
 
     <!-- Rejected Tab -->
     <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
