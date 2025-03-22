@@ -6,8 +6,21 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label asp-for="VehicleType" class="control-label"></label>
+        <select asp-for="VehicleType" class="form-control">
+            <option value="">-- Select Vehicle Type --</option>
+            <option value="Van">Van</option>
+            <option value="Sedan">Sedan</option>
+            <option value="SUV">SUV</option>
+            <option value="Motorcycle">Motorcycle</option>
+            <option value="Truck">Truck</option>
+        </select>
+        <span asp-validation-for="VehicleType" class="text-danger"></span>
+    </div>
 
     <div class="form-group">
         <label asp-for="VehicleBrand" class="control-label"></label>
@@ -27,6 +40,17 @@
         <span asp-validation-for="VehiclePlateNumber" class="text-danger"></span>
     </div>
 
+    <div class="form-group">
+        <label for="vehicleImage" class="control-label">Upload Vehicle Image</label>
+        <input type="file" name="vehicleImage" class="form-control" accept="image/*" required />
+    </div>
+
     <button type="submit" class="btn btn-primary">Create Vehicle Gate Pass</button>
     <a href="@Url.Action("Index", "VehicleGatePass")" class="btn btn-secondary">Cancel</a>
 </form>
+
+@if (Model?.VehicleImage != null)
+{
+    <h3>Uploaded Image</h3>
+    <img src="data:image/png;base64,@Convert.ToBase64String(Model.VehicleImage)" alt="Vehicle Image" width="200" />
+}

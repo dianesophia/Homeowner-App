@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250321170839_AEWRAWR")]
-    partial class AEWRAWR
+    [Migration("20250322052814_WERAWERWER")]
+    partial class WERAWERWER
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -153,7 +153,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "90f88048-643b-4a23-b551-0780da70b783",
+                            ConcurrencyStamp = "64382108-2240-42f8-9809-3893cb0763a7",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -167,9 +167,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJASqs91EU47Rn/bqo3CNZQxyLtcckOOnyZ+xHi2P4IxFvwIJZbWlYkSW8V+4Xzk+w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEInI6qqPlrNMykRzcxWBvXaxzlUKP1s8rPLuSeDpx3Jk7MFVmwme0FeALgg3ZVrb7w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3b948c05-dd85-4e35-ad79-3cb32af960eb",
+                            SecurityStamp = "ee53ff97-6e8e-4ce0-b62a-b203610220cc",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -1166,6 +1166,10 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("ApprovalDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ApprovalStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("GatePassDocument")
                         .HasColumnType("nvarchar(max)");
 
@@ -1175,10 +1179,13 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("GatePassIssuedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsApproved")
+                    b.Property<bool?>("IsApproved")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsRejected")
                         .HasColumnType("bit");
 
                     b.Property<string>("QRCode")
@@ -1206,10 +1213,14 @@ namespace Hometown_Application.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("VehicleImage")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("VehicleImage")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("VehiclePlateNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

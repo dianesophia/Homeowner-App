@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class NGWER : Migration
+    public partial class WERAWERWER : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -475,10 +475,25 @@ namespace Hometown_Application.Migrations
                     VehicleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VehicleBrand = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VehicleColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VehiclePlateNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: true),
+                    IsRejected = table.Column<bool>(type: "bit", nullable: true),
+                    ApprovalDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    VehicleImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ApprovalStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GatePassDocument = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    QRCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GatePassIssuedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    GatePassExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -706,7 +721,7 @@ namespace Hometown_Application.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AdminProfilesAdminId", "Bio", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FacebookProfile", "FirstName", "Gender", "HomeownerProfilesHomeownerId", "IsActiveUser", "IsApproved", "IsBirthdayPublic", "IsGenderPublic", "LastName", "LinkedInProfile", "LockoutEnabled", "LockoutEnd", "MakeFacebookPublic", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "SecurityStamp", "StaffProfilesStaffId", "TwitterProfile", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "100", 0, null, null, "030fffd6-7c15-469d-9042-e3e68d32790c", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAED1sMwuH79dQgfqq34CAmx+rT3WDQ9eVFfbuw0+zhw9BsexxwwgagiNHlmSvYE2enA==", null, false, null, "78336188-eca4-4b3d-923b-ebf2765d9121", null, null, false, "elon.musk@example.com" });
+                values: new object[] { "100", 0, null, null, "64382108-2240-42f8-9809-3893cb0763a7", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEInI6qqPlrNMykRzcxWBvXaxzlUKP1s8rPLuSeDpx3Jk7MFVmwme0FeALgg3ZVrb7w==", null, false, null, "ee53ff97-6e8e-4ce0-b62a-b203610220cc", null, null, false, "elon.musk@example.com" });
 
             migrationBuilder.InsertData(
                 table: "RequestTypes",

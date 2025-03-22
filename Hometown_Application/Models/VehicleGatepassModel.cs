@@ -14,6 +14,8 @@ namespace Hometown_Application.Models
 
         [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
+
+        public string VehicleType { get; set; }
         public string VehicleBrand { get; set; }
 
         public string VehicleColor { get; set; }
@@ -28,8 +30,8 @@ namespace Hometown_Application.Models
 
         public DateTime? ApprovalDate { get; set; }
 
-       
-        public string? VehicleImage { get; set; }
+
+        public byte[]? VehicleImage { get; set; }
 
         public string ApprovalStatus { get; set; } = "Pending";
         public string? RejectionReason { get; set; }

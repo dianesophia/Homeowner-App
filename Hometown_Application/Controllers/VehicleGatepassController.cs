@@ -30,22 +30,54 @@ namespace Hometown_Application.Controllers
             return View();
         }
 
-        // POST: VehicleGatePass/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VehicleGatepassModel model)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return RedirectToAction("Index");
+          // POST: VehicleGatePass/Create
+          [HttpPost]
+          [ValidateAntiForgeryToken]
+          public async Task<IActionResult> Create(VehicleGatepassModel model,IFormFile vehicleImage)
+          {
+              var user = await _userManager.GetUserAsync(User);
+              if (user == null) return RedirectToAction("Index");
 
-            model.UserId = user.Id;
-            model.AddedOn = DateTime.UtcNow;
-            model.AddedBy = user.Id;
-            _context.VehicleGatepasses.Add(model);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+         if (vehicleImage != null && vehicleImage.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await vehicleImage.CopyToAsync(memoryStream);
+                        model.VehicleImage = memoryStream.ToArray();
+                    }
+                }
+              model.UserId = user.Id;
+              model.AddedOn = DateTime.UtcNow;
+              model.AddedBy = user.Id;
+              _context.VehicleGatepasses.Add(model);
+              await _context.SaveChangesAsync();
+              return RedirectToAction(nameof(Index));
+          }
+       
+        /*
+        [HttpPost]
+        public async Task<IActionResult> Create(VehicleGatepassModel model, IFormFile vehicleImage)
+        {
+            if (ModelState.IsValid)
+            {
+                if (vehicleImage != null && vehicleImage.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await vehicleImage.CopyToAsync(memoryStream);
+                        model.VehicleImage = memoryStream.ToArray();
+                    }
+                }
+
+                _context.VehicleGatepasses.Add(model);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index");
+            }
+
+            return View(model);
         }
-      
+        */
 
         // GET: VehicleGatePass/Index
         public async Task<IActionResult> Index()
@@ -187,6 +219,29 @@ namespace Hometown_Application.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+        [HttpPost]
+        public async Task<IActionResult> UploadVehicleImage(IFormFile vehicleImage, int vehicleId)
+        {
+            if (vehicleImage != null && vehicleImage.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await vehicleImage.CopyToAsync(memoryStream);
+                    byte[] imageData = memoryStream.ToArray();
+
+                    var vehicle = _context.VehicleGatepasses.FirstOrDefault(v => v.VehicleId == vehicleId);
+                    if (vehicle != null)
+                    {
+                        vehicle.VehicleImage = imageData;
+                        _context.SaveChanges();
+                    }
+                }
+
+                return RedirectToAction("Index"); // Adjust as needed
+            }
+
+            return View();
         }
 
 

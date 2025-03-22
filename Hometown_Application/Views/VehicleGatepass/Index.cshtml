@@ -13,6 +13,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Image</th>
             <th>Vehicle Brand</th>
             <th>Vehicle Color</th>
             <th>Plate Number</th>
@@ -22,9 +23,13 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Where(v => !v.IsDeleted && v.IsApproved == true))  
+        @foreach (var item in Model.Where(v => !v.IsDeleted && v.IsApproved == true))
         {
             <tr>
+                <td>
+                    <img src="@Url.Content("~/images/" + item.VehicleImage)" alt="Vehicle Image" width="100" height="60" class="img-thumbnail" />
+    
+                </td>
                 <td>@item.VehicleBrand</td>
                 <td>@item.VehicleColor</td>
                 <td>@item.VehiclePlateNumber</td>
@@ -44,6 +49,7 @@
         }
     </tbody>
 </table>
+
 
 
 <!-- Tabs for Approve/Reject -->
