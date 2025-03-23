@@ -8,6 +8,7 @@ using System.Linq;
 using Hometown_Application.Areas.Identity.Data;
 using Hometown_Application.Data;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace Hometown_Application.Controllers
 {
@@ -73,5 +74,25 @@ namespace Hometown_Application.Controllers
 
             return Ok();
         }
+
+        [HttpGet]
+        public IActionResult GetMessages(string recipientId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var messages = _context.Chats
+                .Where(m => (m.SenderId == userId && m.RecipientId == recipientId) ||
+                            (m.SenderId == recipientId && m.RecipientId == userId))
+                .OrderBy(m => m.DateTime)
+                .ToList() // Materialize the query before projection
+                .Select(m => new {
+                    sender = m.SenderId == userId ? "You" : "Them",
+                    message = m.Message,
+                    isSender = m.SenderId == userId
+                });
+
+            return Json(messages);
+        }
+
     }
 }

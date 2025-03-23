@@ -16,15 +16,7 @@
 </select>
 
 <!-- Chatbox container -->
-<div id="chat-container">
-    @foreach (var message in Model)
-    {
-        <div class="message @(message.SenderId == User.FindFirst("sub").Value ? "sent" : "received")">
-            <strong>@(message.SenderId == User.FindFirst("sub").Value ? "You" : "Them"):</strong>
-            @message.Message
-        </div>
-    }
-</div>
+<div id="chat-container"></div>
 
 <!-- Message input -->
 <div id="chat-input">
@@ -44,12 +36,38 @@
             console.log("✅ SignalR Connected!");
         }).catch(err => console.error("❌ SignalR Error:", err));
 
+        let currentRecipientId = "";
+
+        // Function to load chat history for the selected user
+        function loadChatHistory(recipientId) {
+            fetch(`/Chat/GetMessages?recipientId=${recipientId}`)
+                .then(response => response.json())
+                .then(messages => {
+                    const chatBox = document.getElementById("chat-container");
+                    chatBox.innerHTML = ""; // Clear chat box
+                    messages.forEach(msg => {
+                        addMessageToChatbox(msg.sender, msg.message, msg.isSender ? "sent" : "received");
+                    });
+                })
+                .catch(err => console.error("❌ Error loading chat:", err));
+        }
+
+        // Listen for recipient change
+        document.getElementById("recipientSelect").addEventListener("change", function () {
+            currentRecipientId = this.value;
+            if (currentRecipientId) {
+                loadChatHistory(currentRecipientId);
+            } else {
+                document.getElementById("chat-container").innerHTML = ""; // Clear chat if no user selected
+            }
+        });
+
+        // Send message
         document.getElementById("sendButton").addEventListener("click", function () {
             const messageInput = document.getElementById("messageInput");
             const message = messageInput.value.trim();
-            const recipientId = document.getElementById("recipientSelect").value;
 
-            if (!recipientId) {
+            if (!currentRecipientId) {
                 alert("Please select a recipient.");
                 return;
             }
@@ -65,7 +83,7 @@
             fetch("/Chat/SendPrivateMessage", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ recipientId, message })
+                body: JSON.stringify({ recipientId: currentRecipientId, message })
             })
             .then(response => {
                 if (!response.ok) {
@@ -87,8 +105,10 @@
         }
 
         // Handle received messages
-        connection.on("ReceivePrivateMessage", (sender, message) => {
-            addMessageToChatbox(sender, message, "received");
+        connection.on("ReceivePrivateMessage", (sender, message, senderId) => {
+            if (senderId === currentRecipientId) {
+                addMessageToChatbox(sender, message, "received");
+            }
         });
     </script>
 }
