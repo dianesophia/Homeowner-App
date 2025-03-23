@@ -15,11 +15,11 @@
     }
 </select>
 
-<!-- Chatbox container -->
-<div id="chat-container"></div>
+<div id="chatContainer">
+    <div id="chatBox"></div>
+</div>
 
-<!-- Message input -->
-<div id="chat-input">
+<div class="message-input">
     <input type="text" id="messageInput" placeholder="Type a message..." />
     <button id="sendButton">Send</button>
 </div>
@@ -36,38 +36,28 @@
             console.log("✅ SignalR Connected!");
         }).catch(err => console.error("❌ SignalR Error:", err));
 
-        let currentRecipientId = "";
+        function addMessageToChatBox(sender, message, isSender) {
+            const chatBox = document.getElementById("chatBox");
 
-        // Function to load chat history for the selected user
-        function loadChatHistory(recipientId) {
-            fetch(`/Chat/GetMessages?recipientId=${recipientId}`)
-                .then(response => response.json())
-                .then(messages => {
-                    const chatBox = document.getElementById("chat-container");
-                    chatBox.innerHTML = ""; // Clear chat box
-                    messages.forEach(msg => {
-                        addMessageToChatbox(msg.sender, msg.message, msg.isSender ? "sent" : "received");
-                    });
-                })
-                .catch(err => console.error("❌ Error loading chat:", err));
+            if (!chatBox) {
+                console.error("❌ Error: Chat box not found.");
+                return;
+            }
+
+            const newMessage = document.createElement("div");
+            newMessage.classList.add("chat-message", isSender ? "sent" : "received");
+            newMessage.innerHTML = `<p>${message}</p>`;
+
+            chatBox.appendChild(newMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // Listen for recipient change
-        document.getElementById("recipientSelect").addEventListener("change", function () {
-            currentRecipientId = this.value;
-            if (currentRecipientId) {
-                loadChatHistory(currentRecipientId);
-            } else {
-                document.getElementById("chat-container").innerHTML = ""; // Clear chat if no user selected
-            }
-        });
-
-        // Send message
         document.getElementById("sendButton").addEventListener("click", function () {
             const messageInput = document.getElementById("messageInput");
             const message = messageInput.value.trim();
+            const recipientId = document.getElementById("recipientSelect").value;
 
-            if (!currentRecipientId) {
+            if (!recipientId) {
                 alert("Please select a recipient.");
                 return;
             }
@@ -77,85 +67,114 @@
                 return;
             }
 
-            // Append sent message immediately
-            addMessageToChatbox("You", message, "sent");
-
             fetch("/Chat/SendPrivateMessage", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ recipientId: currentRecipientId, message })
+                body: JSON.stringify({ recipientId, message })
             })
             .then(response => {
                 if (!response.ok) {
                     return response.text().then(text => { throw new Error(text); });
                 }
-                messageInput.value = ""; // Clear input after sending
+                addMessageToChatBox("You", message, true);
+                messageInput.value = "";
             })
             .catch(err => console.error("❌ Error sending message:", err));
         });
 
-        // Function to add messages to the chatbox
-        function addMessageToChatbox(sender, message, type) {
-            const chatBox = document.getElementById("chat-container");
-            const newMessage = document.createElement("div");
-            newMessage.classList.add("message", type);
-            newMessage.innerHTML = `<strong>${sender}:</strong> ${message}`;
-            chatBox.appendChild(newMessage);
-            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
-        }
+        document.getElementById("recipientSelect").addEventListener("change", function () {
+            const recipientId = this.value;
+            const chatBox = document.getElementById("chatBox");
 
-        // Handle received messages
-        connection.on("ReceivePrivateMessage", (sender, message, senderId) => {
-            if (senderId === currentRecipientId) {
-                addMessageToChatbox(sender, message, "received");
+            if (!chatBox) {
+                console.error("❌ Error: Chat box not found.");
+                return;
             }
+
+            if (!recipientId) {
+                chatBox.innerHTML = "<p>Select a user to start chatting.</p>";
+                return;
+            }
+
+            fetch(`/Chat/GetMessages?recipientId=${recipientId}`)
+                .then(response => response.json())
+                .then(messages => {
+                    chatBox.innerHTML = "";
+                    messages.forEach(msg => addMessageToChatBox(msg.sender, msg.message, msg.sender === "You"));
+                })
+                .catch(err => console.error("❌ Error loading messages:", err));
+        });
+
+        connection.on("ReceivePrivateMessage", (sender, message) => {
+            console.log(`📩 New message from ${sender}: ${message}`);
+            addMessageToChatBox(sender, message, false);
         });
     </script>
 }
 
 <style>
-    #chat-container {
+    #chatContainer {
         width: 100%;
         max-width: 500px;
-        margin: auto;
-        border: 1px solid #ddd;
-        padding: 10px;
         height: 400px;
         overflow-y: scroll;
+        border: 1px solid #ddd;
+        padding: 10px;
         background-color: #f9f9f9;
         display: flex;
         flex-direction: column;
     }
 
-    .message {
-        padding: 8px;
-        border-radius: 5px;
-        margin: 5px 0;
+    #chatBox {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .chat-message {
         max-width: 75%;
+        padding: 10px;
+        border-radius: 10px;
+        word-wrap: break-word;
+        font-size: 14px;
     }
 
     .sent {
-        background-color: #dcf8c6;
         align-self: flex-end;
+        background-color: #007bff;
+        color: white;
         text-align: right;
     }
 
     .received {
-        background-color: #ebebeb;
+        align-self: flex-start;
+        background-color: #e5e5e5;
+        color: black;
+        text-align: left;
     }
 
-    #chat-input {
+    .message-input {
         display: flex;
-        justify-content: space-between;
         margin-top: 10px;
     }
 
     #messageInput {
-        flex-grow: 1;
+        width: 80%;
         padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
     }
 
     #sendButton {
         padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
     }
+
+        #sendButton:hover {
+            background-color: #0056b3;
+        }
 </style>

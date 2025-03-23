@@ -1,98 +1,76 @@
-﻿using Hometown_Application.Models;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Hometown_Application.Hubs;
-using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using Hometown_Application.Areas.Identity.Data;
-using Hometown_Application.Data;
-using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using Hometown_Application.Data;
+using Hometown_Application.Hubs;
+using Hometown_Application.Models;
+using System;
 
 namespace Hometown_Application.Controllers
 {
+    [Authorize]
     public class ChatController : Controller
     {
         private readonly ApplicationDBContext _context;
         private readonly IHubContext<ChatHub> _hubContext;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ChatController(ApplicationDBContext context, IHubContext<ChatHub> hubContext, UserManager<ApplicationUser> userManager)
+        public ChatController(ApplicationDBContext context, IHubContext<ChatHub> hubContext)
         {
             _context = context;
             _hubContext = hubContext;
-            _userManager = userManager;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            ViewBag.Users = await _context.Users
+                .Where(u => u.Id != userId)
+                .Select(u => new { u.Id, u.UserName })
+                .ToListAsync();
+
+            return View(await _context.Chats
+                .Where(m => m.SenderId == userId || m.RecipientId == userId)
+                .OrderBy(m => m.DateTime)
+                .ToListAsync());
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string recipientId)
+        public async Task<IActionResult> GetMessages(string recipientId)
         {
-            var sender = await _userManager.GetUserAsync(User);
-            if (sender == null)
-            {
-                return Unauthorized();
-            }
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            // Get all users except the logged-in user
-            var users = _userManager.Users.Where(u => u.Id != sender.Id).ToList();
-            ViewBag.Users = users; // Send user list to View
-
-            var messages = _context.Chats
-                .Where(m => (m.SenderId == sender.Id && m.RecipientId == recipientId) ||
-                            (m.SenderId == recipientId && m.RecipientId == sender.Id))
+            var messages = await _context.Chats
+                .Where(m => (m.SenderId == userId && m.RecipientId == recipientId) ||
+                            (m.SenderId == recipientId && m.RecipientId == userId))
                 .OrderBy(m => m.DateTime)
-                .ToList();
+                .Select(m => new { sender = m.SenderId == userId ? "You" : "Them", message = m.Message })
+                .ToListAsync();
 
-            ViewBag.RecipientId = recipientId; // Send selected recipient to View
-            return View(messages);
+            return Json(messages);
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> SendPrivateMessage([FromBody] ChatMessageModel chatData)
+        public async Task<IActionResult> SendPrivateMessage([FromBody] ChatMessageModel model)
         {
-            if (chatData == null || string.IsNullOrWhiteSpace(chatData.Message))
-                return BadRequest("Invalid message data.");
-
-            var sender = await _userManager.GetUserAsync(User);
-            if (sender == null) return Unauthorized();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var chatMessage = new ChatMessageModel
             {
-                SenderId = sender.Id,
-                RecipientId = chatData.RecipientId,
-                Message = chatData.Message,
+                SenderId = userId,
+                RecipientId = model.RecipientId,
+                Message = model.Message,
                 DateTime = DateTime.Now
             };
 
             _context.Chats.Add(chatMessage);
             await _context.SaveChangesAsync();
 
-            await _hubContext.Clients.User(chatMessage.RecipientId)
-                .SendAsync("ReceivePrivateMessage", sender.UserName, chatMessage.Message);
-
+            await _hubContext.Clients.User(model.RecipientId).SendAsync("ReceivePrivateMessage", "Them", model.Message);
             return Ok();
         }
-
-        [HttpGet]
-        public IActionResult GetMessages(string recipientId)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var messages = _context.Chats
-                .Where(m => (m.SenderId == userId && m.RecipientId == recipientId) ||
-                            (m.SenderId == recipientId && m.RecipientId == userId))
-                .OrderBy(m => m.DateTime)
-                .ToList() // Materialize the query before projection
-                .Select(m => new {
-                    sender = m.SenderId == userId ? "You" : "Them",
-                    message = m.Message,
-                    isSender = m.SenderId == userId
-                });
-
-            return Json(messages);
-        }
-
     }
 }
