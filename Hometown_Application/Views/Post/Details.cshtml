@@ -1,0 +1,60 @@
+﻿@model Hometown_Application.Models.PostModel
+
+<div class="container mt-4">
+    <!-- Post Title -->
+    <h2 class="text-primary fw-bold">@Model.Title</h2>
+    <p class="lead">@Model.Content</p>
+    <small class="text-muted d-block mb-3">
+        📝 By <strong>@Model.ApplicationUser.UserName</strong> | 📅 @Model.AddedOn.ToString("MMMM dd, yyyy")
+    </small>
+
+    <hr />
+
+    <!-- Reactions Section -->
+    <h4 class="mt-4">Reactions</h4>
+    <form asp-controller="Reaction" asp-action="Create" method="post" class="d-flex flex-wrap gap-2">
+        <input type="hidden" name="postId" value="@Model.PostId" />
+        <button type="submit" name="type" value="Like" class="btn btn-outline-primary">👍 Like (@Model.Reactions.Count(r => r.Type == "Like"))</button>
+        <button type="submit" name="type" value="Love" class="btn btn-outline-danger">❤️ Love (@Model.Reactions.Count(r => r.Type == "Love"))</button>
+        <button type="submit" name="type" value="Haha" class="btn btn-outline-warning">😂 Haha (@Model.Reactions.Count(r => r.Type == "Haha"))</button>
+        <button type="submit" name="type" value="Wow" class="btn btn-outline-info">😮 Wow (@Model.Reactions.Count(r => r.Type == "Wow"))</button>
+        <button type="submit" name="type" value="Sad" class="btn btn-outline-secondary">😢 Sad (@Model.Reactions.Count(r => r.Type == "Sad"))</button>
+        <button type="submit" name="type" value="Angry" class="btn btn-outline-dark">😡 Angry (@Model.Reactions.Count(r => r.Type == "Angry"))</button>
+    </form>
+
+    <hr />
+
+    <!-- Comments Section -->
+    <h4 class="mt-4">Comments (💬 @Model.Comments.Count())</h4>
+    <div class="mb-3">
+        @if (Model.Comments.Any())
+        {
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="border rounded p-3 mb-2 bg-light d-flex gap-2">
+                    <img src="https://via.placeholder.com/40" class="rounded-circle" alt="User Avatar">
+                    <div>
+                        <p class="mb-1"><strong>@comment.ApplicationUser.UserName</strong>:</p>
+                        <p class="mb-0">@comment.Content</p>
+                        <small class="text-muted">🕒 @comment.AddedOn.ToString("MMMM dd, yyyy HH:mm")</small>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">No comments yet. Be the first to comment!</p>
+        }
+    </div>
+
+    <!-- Comment Form -->
+    <h5 class="mt-3">Leave a Comment</h5>
+    <form asp-controller="Comment" asp-action="Create" method="post" class="mb-4">
+        <input type="hidden" name="postId" value="@Model.PostId" />
+        <textarea name="content" class="form-control mb-2" placeholder="Write your comment here..." rows="3"></textarea>
+        <button type="submit" class="btn btn-primary">💬 Comment</button>
+    </form>
+
+    <!-- Back to Posts Button -->
+    <a asp-action="Index" class="btn btn-outline-secondary">⬅ Back to Posts</a>
+</div>

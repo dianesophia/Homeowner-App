@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class WERAWERWER : Migration
+    public partial class ASDFSF : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -349,43 +349,6 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Gatepass",
-                columns: table => new
-                {
-                    GatepassId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    VisitorName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Purpose = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VisitDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpectedArrivalTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NumberOfVisitors = table.Column<int>(type: "int", nullable: true),
-                    VisitorVehicleDetails = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    ContactNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    PassNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: true),
-                    AdminNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApprovedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PdfPath = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Gatepass", x => x.GatepassId);
-                    table.ForeignKey(
-                        name: "FK_Gatepass_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "House",
                 columns: table => new
                 {
@@ -430,6 +393,29 @@ namespace Hometown_Application.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Posts",
+                columns: table => new
+                {
+                    PostId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Posts", x => x.PostId);
+                    table.ForeignKey(
+                        name: "FK_Posts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -486,7 +472,6 @@ namespace Hometown_Application.Migrations
                     VehicleImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     ApprovalStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GatePassDocument = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     QRCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     GatePassIssuedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     GatePassExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -500,6 +485,47 @@ namespace Hometown_Application.Migrations
                     table.PrimaryKey("PK_VehicleGatepasses", x => x.VehicleId);
                     table.ForeignKey(
                         name: "FK_VehicleGatepasses_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VisitorGatepasses",
+                columns: table => new
+                {
+                    VisitorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VisitorName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Purpose = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VisitDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpectedArrivalTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NumberOfVisitors = table.Column<int>(type: "int", nullable: true),
+                    VehicleType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    VehiclePlateNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    VehicleColor = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    ContactNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    GatePassIssuedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    GatePassExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: true),
+                    IsRejected = table.Column<bool>(type: "bit", nullable: true),
+                    ApprovalStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdminNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApprovedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VisitorGatepasses", x => x.VisitorId);
+                    table.ForeignKey(
+                        name: "FK_VisitorGatepasses_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -604,6 +630,58 @@ namespace Hometown_Application.Migrations
                         principalTable: "Polls",
                         principalColumn: "PollId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comments_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Comments_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "PostId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reactions",
+                columns: table => new
+                {
+                    ReactionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reactions", x => x.ReactionId);
+                    table.ForeignKey(
+                        name: "FK_Reactions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Reactions_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "PostId");
                 });
 
             migrationBuilder.CreateTable(
@@ -721,7 +799,7 @@ namespace Hometown_Application.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AdminProfilesAdminId", "Bio", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FacebookProfile", "FirstName", "Gender", "HomeownerProfilesHomeownerId", "IsActiveUser", "IsApproved", "IsBirthdayPublic", "IsGenderPublic", "LastName", "LinkedInProfile", "LockoutEnabled", "LockoutEnd", "MakeFacebookPublic", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "SecurityStamp", "StaffProfilesStaffId", "TwitterProfile", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "100", 0, null, null, "64382108-2240-42f8-9809-3893cb0763a7", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEInI6qqPlrNMykRzcxWBvXaxzlUKP1s8rPLuSeDpx3Jk7MFVmwme0FeALgg3ZVrb7w==", null, false, null, "ee53ff97-6e8e-4ce0-b62a-b203610220cc", null, null, false, "elon.musk@example.com" });
+                values: new object[] { "100", 0, null, null, "de108a89-34e5-4507-936b-238ed4680b51", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEI3ro/gF07tyKlgeh+Emax++RBiG81vBzrEDUORrdJAX2z52Mjyg+QwkXy/W+xOUNg==", null, false, null, "796ec344-9842-42c8-9e72-8bdddd8aa9f2", null, null, false, "elon.musk@example.com" });
 
             migrationBuilder.InsertData(
                 table: "RequestTypes",
@@ -810,6 +888,16 @@ namespace Hometown_Application.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_PostId",
+                table: "Comments",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_UserId",
+                table: "Comments",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FeedbackComplaints_StatusId",
                 table: "FeedbackComplaints",
                 column: "StatusId");
@@ -817,11 +905,6 @@ namespace Hometown_Application.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_FeedbackComplaints_UserId",
                 table: "FeedbackComplaints",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Gatepass_UserId",
-                table: "Gatepass",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -870,9 +953,24 @@ namespace Hometown_Application.Migrations
                 column: "CreatorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Posts_UserId",
+                table: "Posts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QuestionOptions_QuestionId",
                 table: "QuestionOptions",
                 column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reactions_PostId",
+                table: "Reactions",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reactions_UserId",
+                table: "Reactions",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservation_FacilityId",
@@ -912,6 +1010,11 @@ namespace Hometown_Application.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_VehicleGatepasses_UserId",
                 table: "VehicleGatepasses",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitorGatepasses_UserId",
+                table: "VisitorGatepasses",
                 column: "UserId");
 
             migrationBuilder.AddForeignKey(
@@ -996,6 +1099,9 @@ namespace Hometown_Application.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Comments");
+
+            migrationBuilder.DropTable(
                 name: "Contacts");
 
             migrationBuilder.DropTable(
@@ -1008,10 +1114,10 @@ namespace Hometown_Application.Migrations
                 name: "FeedbackComplaints");
 
             migrationBuilder.DropTable(
-                name: "Gatepass");
+                name: "PollResponses");
 
             migrationBuilder.DropTable(
-                name: "PollResponses");
+                name: "Reactions");
 
             migrationBuilder.DropTable(
                 name: "Reservation");
@@ -1026,10 +1132,16 @@ namespace Hometown_Application.Migrations
                 name: "VehicleGatepasses");
 
             migrationBuilder.DropTable(
+                name: "VisitorGatepasses");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "QuestionOptions");
+
+            migrationBuilder.DropTable(
+                name: "Posts");
 
             migrationBuilder.DropTable(
                 name: "Facility");

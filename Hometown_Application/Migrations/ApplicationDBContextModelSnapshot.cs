@@ -150,7 +150,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f7a7f707-bb40-40a6-9be7-97bdeed5d89e",
+                            ConcurrencyStamp = "de108a89-34e5-4507-936b-238ed4680b51",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -164,9 +164,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHcHp2KxydElBA2iiDURkxnEFHAImLDZyElsibeaWM2S9mlfWi+otI3FG7KRyN4QqQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEI3ro/gF07tyKlgeh+Emax++RBiG81vBzrEDUORrdJAX2z52Mjyg+QwkXy/W+xOUNg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "886a8e88-ace6-4aea-9c24-64fad5d034b4",
+                            SecurityStamp = "796ec344-9842-42c8-9e72-8bdddd8aa9f2",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -199,6 +199,41 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AdminProfiles");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.CommentModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AddedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ContactModel", b =>
@@ -658,6 +693,43 @@ namespace Hometown_Application.Migrations
                     b.ToTable("PollResponses");
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.PostModel", b =>
+                {
+                    b.Property<int>("PostId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PostId"));
+
+                    b.Property<string>("AddedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Posts");
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.QuestionOptionModel", b =>
                 {
                     b.Property<int>("OptionId")
@@ -682,6 +754,34 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("QuestionId");
 
                     b.ToTable("QuestionOptions");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.ReactionModel", b =>
+                {
+                    b.Property<int>("ReactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReactionId"));
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ReactionId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reactions");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.RequestTypeModel", b =>
@@ -1408,6 +1508,25 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.CommentModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Models.PostModel", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.FeedbackComplaintModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.StatusModel", "Status")
@@ -1511,6 +1630,17 @@ namespace Hometown_Application.Migrations
                     b.Navigation("SelectedOption");
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.PostModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.QuestionOptionModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.PollQuestionModel", "Question")
@@ -1520,6 +1650,25 @@ namespace Hometown_Application.Migrations
                         .IsRequired();
 
                     b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.ReactionModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Models.PostModel", "Post")
+                        .WithMany("Reactions")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
@@ -1678,6 +1827,13 @@ namespace Hometown_Application.Migrations
                     b.Navigation("Options");
 
                     b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.PostModel", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Reactions");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.QuestionOptionModel", b =>

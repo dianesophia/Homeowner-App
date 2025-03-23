@@ -1,0 +1,17 @@
+﻿@model Hometown_Application.Models.PostModel
+
+<h2>Create a New Post</h2>
+
+<form asp-action="Create" method="post">
+    <div>
+        <label>Title</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+    <div>
+        <label>Content</label>
+        <textarea asp-for="Content" class="form-control"></textarea>
+    </div>
+    <button type="submit">Submit</button>
+</form>
+
+<a asp-action="Index">Back to Posts</a>

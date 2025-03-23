@@ -28,6 +28,10 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<VisitorGatepassModel> VisitorGatepasses { get; set; }
     public DbSet<VehicleGatepassModel> VehicleGatepasses { get; set; }
 
+    //Community Forum
+    public DbSet<PostModel> Posts { get; set; }
+    public DbSet<CommentModel> Comments { get; set; }
+    public DbSet<ReactionModel> Reactions { get; set; }
 
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
@@ -63,15 +67,53 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .HasForeignKey(fc => fc.UserId)
            .OnDelete(DeleteBehavior.Cascade);
 
+
         builder.Entity<VehicleGatepassModel>()
            .HasOne(fc => fc.ApplicationUser)
            .WithMany()
            .HasForeignKey(fc => fc.UserId)
            .OnDelete(DeleteBehavior.Cascade);
 
-       
+        builder.Entity<VisitorGatepassModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
 
-  
+
+        // Community Forum
+        builder.Entity<PostModel>()
+            .HasOne(p => p.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<ReactionModel>()
+            .HasOne(r => r.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<ReactionModel>()
+            .HasOne(r => r.Post)
+            .WithMany(p => p.Reactions)  // Allow multiple reactions per post
+            .HasForeignKey(r => r.PostId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CommentModel>()
+            .HasOne(c => c.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CommentModel>()
+            .HasOne(c => c.Post)
+            .WithMany(p => p.Comments)  // Allow multiple comments per post
+            .HasForeignKey(c => c.PostId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+
+
         builder.Entity<StatusModel>().HasData(
             new StatusModel { StatusId = 1, StatusName = "Available" },
             new StatusModel { StatusId = 2, StatusName = "Unavailable" },
