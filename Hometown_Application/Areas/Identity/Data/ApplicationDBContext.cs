@@ -33,6 +33,10 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<CommentModel> Comments { get; set; }
     public DbSet<ReactionModel> Reactions { get; set; }
 
+    //Chat
+    public DbSet<ChatMessageModel> Chats { get; set; }
+
+
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
     public DbSet<PollQuestionModel> PollQuestions { get; set; }
@@ -112,6 +116,20 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(c => c.PostId)
             .OnDelete(DeleteBehavior.NoAction);
 
+        //Chat
+
+        builder.Entity<ChatMessageModel>()
+       .HasOne(c => c.Sender)
+       .WithMany()  // No navigation property in ApplicationUser
+       .HasForeignKey(c => c.SenderId)
+       .OnDelete(DeleteBehavior.NoAction); // Prevent cascading delete
+
+        // Relationship for Recipient
+        builder.Entity<ChatMessageModel>()
+            .HasOne(c => c.Recipient)
+            .WithMany()  // No navigation property in ApplicationUser
+            .HasForeignKey(c => c.RecipientId)
+            .OnDelete(DeleteBehavior.NoAction); // Prevent cascading delete
 
 
         builder.Entity<StatusModel>().HasData(

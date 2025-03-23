@@ -7,6 +7,7 @@ using Hometown_Application.Seed;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
 using QuestPDF;
+using Hometown_Application.Hubs;
 
 public class Program
 {
@@ -69,7 +70,14 @@ public class Program
             options.Cookie.SameSite = SameSiteMode.Lax;
         });
 
+        builder.Services.AddSignalR();
+        builder.Services.AddAuthentication();
+        builder.Services.AddAuthorization();
+
+
         var app = builder.Build();
+
+        app.MapHub<ChatHub>("/chatHub");
 
         // Configure the HTTP request pipeline
         if (!app.Environment.IsDevelopment())
