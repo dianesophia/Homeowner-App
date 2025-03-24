@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Hometown_Application.Models.PostModel>
+﻿<!--Backup purpose onlyy-->
+@model IEnumerable<Hometown_Application.Models.PostModel>
 
 <div class="container mt-4">
     <h2 class="text-primary">Community Forum</h2>
@@ -18,6 +19,17 @@
                         @post.Title
                     </a>
                 </h4>
+                <td>
+                    @if (post.Image != null)
+                    {
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(post.Image)" alt="Post Image" width="100" height="100" />
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
+
+                </td>
 
                 <!-- Post Content Preview -->
                 <p class="text-muted">

@@ -8,6 +8,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+
 <style>
     :root {
         --primary-color: #6F754E;
@@ -505,6 +506,73 @@
             </div>
         </div>
     </div>
+
+    <!--Community Forum Section-->
+
+    <div class="container mt-4">
+        <h2 class="text-primary">Community Forum</h2>
+
+        <!-- Create New Post Button -->
+        <div class="text-end mb-3">
+            <a asp-controller="Post" asp-action="Create" class="btn btn-success">➕ Create New Post</a>
+        </div>
+
+        <div class="list-group">
+            @foreach (var post in Model.Posts)
+            {
+                <div class="list-group-item list-group-item-action mb-3 p-4 shadow-sm rounded border">
+                    <!-- Post Title -->
+                    <h4 class="mb-1">
+                        <a asp-controller="Post" asp-action="Details" asp-route-id="@post.PostId" class="text-decoration-none text-dark fw-bold">
+                            @post.Title
+                        </a>
+                    </h4>
+                    <td>
+                        @if (post.Image != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(post.Image)" alt="Post Image" width="100" height="100" />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
+
+                    </td>
+
+                    <!-- Post Content Preview -->
+                    <p class="text-muted">
+                        @if (post.Content.Length > 200)
+                        {
+                            @(post.Content.Length > 200 ? $"{post.Content.Substring(0, 200)}..." : post.Content)
+
+                            <a asp-action="Details" asp-route-id="@post.PostId" class="fw-bold">Read More</a>
+                        }
+                        else
+                        {
+                            @post.Content
+                        }
+                    </p>
+
+                    <!-- Post Metadata -->
+                    <small class="text-secondary">
+                        📝 By <strong>@post.ApplicationUser.UserName</strong> | 📅 @post.AddedOn.ToString("MMMM dd, yyyy")
+                    </small>
+
+                    <!-- Reactions and Comments -->
+                    <div class="mt-2 d-flex align-items-center gap-3">
+                        <span>❤️ @post.Reactions.Count(r => r.Type == "Love")</span>
+                        <span>👍 @post.Reactions.Count(r => r.Type == "Like")</span>
+                        <span>😂 @post.Reactions.Count(r => r.Type == "Haha")</span>
+                        <span>😮 @post.Reactions.Count(r => r.Type == "Wow")</span>
+                        <span>😢 @post.Reactions.Count(r => r.Type == "Sad")</span>
+                        <span>😡 @post.Reactions.Count(r => r.Type == "Angry")</span>
+                        <span>💬 @post.Comments.Count()</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
 
     <!-- Recent Activity Section -->
     <div class="recent-activity">

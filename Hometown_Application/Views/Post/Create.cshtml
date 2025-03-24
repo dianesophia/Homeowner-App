@@ -2,7 +2,7 @@
 
 <h2>Create a New Post</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="Create" method="post" enctype="multipart/form-data">
     <div>
         <label>Title</label>
         <input asp-for="Title" class="form-control" />
@@ -10,8 +10,14 @@
 
     <div class="form-group">
         <label>Upload Image</label>
-        <input type="file" name="imageFile" class="form-control" accept="image/*" />
-    </div>  
+        <input type="file" id="imageUpload" name="imageFile" class="form-control" accept="image/*" onchange="previewImage(event)" />
+    </div>
+
+    <!-- Image preview -->
+    <!-- Image Preview -->
+    <img id="imagePreview" style="display:none; max-width: 200px; margin-top: 10px;" />
+
+
     <div>
         <label>Content</label>
         <textarea asp-for="Content" class="form-control"></textarea>
@@ -20,3 +26,15 @@
 </form>
 
 <a asp-action="Index">Back to Posts</a>
+
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var output = document.getElementById('imagePreview');
+            output.src = reader.result;
+            output.style.display = 'block';
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>

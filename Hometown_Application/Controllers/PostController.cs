@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Hometown_Application.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Hometown_Application.Controllers
 {
@@ -15,11 +17,13 @@ namespace Hometown_Application.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public PostController(ApplicationDBContext context, UserManager<ApplicationUser> userManager)
+        public PostController(ApplicationDBContext context, UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext)
         {
             _context = context;
             _userManager = userManager;
+            _hubContext = hubContext;
         }
 
         // GET: Posts
@@ -56,39 +60,28 @@ namespace Hometown_Application.Controllers
         // POST: Post/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-       /* public async Task<IActionResult> Create(PostModel post)
-        {
-            if (ModelState.IsValid)
-            {
-                post.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                post.AddedOn = DateTime.Now;
-                _context.Posts.Add(post);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(post);
-        }*/
-
-        public async Task<IActionResult> Create(PostModel model)
+        public async Task<IActionResult> Create(PostModel model, IFormFile imageFile)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Index");
 
-           /* if (vehicleImage != null && vehicleImage.Length > 0)
+            if (imageFile != null && imageFile.Length > 0)
             {
                 using (var memoryStream = new MemoryStream())
                 {
-                    await vehicleImage.CopyToAsync(memoryStream);
-                    model.VehicleImage = memoryStream.ToArray();
+                    await imageFile.CopyToAsync(memoryStream);
+                    model.Image = memoryStream.ToArray(); // Convert file to byte array
                 }
-            }*/
+            }
             model.UserId = user.Id;
             model.AddedOn = DateTime.UtcNow;
             model.AddedBy = user.Id;
             _context.Posts.Add(model);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            await _hubContext.Clients.All.SendAsync("ReceiveNotification", "A new post has been added!");
+            return RedirectToAction("Index", "Dashboard");
         }
+
 
         // GET: Post/Edit/5
         public async Task<IActionResult> Edit(int id)
