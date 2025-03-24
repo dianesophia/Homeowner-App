@@ -17,11 +17,14 @@ namespace Hometown_Application.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
 
-        public ChatController(ApplicationDBContext context, IHubContext<ChatHub> hubContext)
+
+        public ChatController(ApplicationDBContext context, IHubContext<ChatHub> hubContext, IHubContext<NotificationHub> notificationHubContext)
         {
             _context = context;
             _hubContext = hubContext;
+            _notificationHubContext = notificationHubContext;
         }
 
         public async Task<IActionResult> Index()
@@ -70,6 +73,9 @@ namespace Hometown_Application.Controllers
             await _context.SaveChangesAsync();
 
             await _hubContext.Clients.User(model.RecipientId).SendAsync("ReceivePrivateMessage", "Them", model.Message);
+
+            await _notificationHubContext.Clients.User(model.RecipientId).SendAsync("ReceiveNotification", "New message received!");
+
             return Ok();
         }
     }
