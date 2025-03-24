@@ -99,7 +99,7 @@
             .catch(err => console.error("❌ Error sending message:", err));
         });
 
-        document.getElementById("recipientSelect").addEventListener("change", function () {
+               document.getElementById("recipientSelect").addEventListener("change", function () {
             const recipientId = this.value;
             const chatBox = document.getElementById("chatBox");
 
@@ -119,12 +119,13 @@
                     chatBox.innerHTML = "";
                     messages.forEach(msg => addMessageToChatBox(msg.sender, msg.message, msg.sender === "You"));
 
-                    // Clear unread notifications when user opens chat
+                    // ✅ Reset unread messages count when user opens chat
                     unreadCount = 0;
                     updateNotificationBadge();
                 })
                 .catch(err => console.error("❌ Error loading messages:", err));
         });
+
 
                 function playNotificationSound() {
             const messageSound = document.getElementById("messageSound");
@@ -149,7 +150,7 @@
         });
 
 
-        function updateNotificationBadge() {
+               function updateNotificationBadge() {
             const badge = document.getElementById("notificationCount");
             if (unreadCount > 0) {
                 badge.innerText = unreadCount;
@@ -158,6 +159,7 @@
                 badge.style.display = "none";
             }
         }
+
     </script>
 }
 

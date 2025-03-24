@@ -117,6 +117,19 @@
                             <h5 class="card-title">@item.VehicleBrand</h5>
                             <span class="badge badge-success mb-2">Approved</span>
                             <br>
+
+                            <td>
+                                @if (item.VehicleImage != null)
+                                {
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.VehicleImage)" alt="Feedback Image" width="100" height="100" />
+                                }
+                                else
+                                {
+                                    <span>No Image</span>
+                                }
+
+                            </td>
+
                             <a asp-controller="VehicleGatePass" asp-action="DownloadPDF" asp-route-id="@item.VehicleId" class="btn btn-primary btn-sm">
                                 Download PDF
                             </a>

@@ -17,6 +17,7 @@ namespace Hometown_Application.Models
 
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
+        public byte[]? Image { get; set; }
         public DateTime AddedOn { get; set; } = DateTime.Now;
         public string AddedBy { get; set; }
         public bool IsDeleted { get; set; }
