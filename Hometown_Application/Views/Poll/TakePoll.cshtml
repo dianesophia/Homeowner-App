@@ -1,5 +1,5 @@
 @model Hometown_Application.ViewModel.PollResponseViewModel
-@using Hometown_Application.Models
+@using Hometown_Application.Data
 
 @{
     ViewData["Title"] = "Take Poll";
@@ -20,13 +20,6 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    @{
-                        ViewData["Title"] = "Take Poll";
-                    }
-
-                    <h2>@Model.PollTitle</h2>
-                    <p>@Model.PollDescription</p>
-
                     <form asp-action="SubmitPoll" method="post">
                         @Html.AntiForgeryToken()
 
@@ -64,14 +57,6 @@
                                     }
                                     @Html.ValidationMessageFor(model => model.Questions[i].SelectedOptionId, "", new { @class = "text-danger" })
                                 }
-                                <!-- Render open-ended questions -->
-                                else if (Model.Questions[i].QuestionType == Hometown_Application.Data.QuestionType.OpenEnded)
-                                {
-                                <div>
-                                    @Html.TextAreaFor(model => model.Questions[i].TextResponse, new { @class = "form-control", rows = "3" })
-                                    @Html.ValidationMessageFor(model => model.Questions[i].TextResponse, "", new { @class = "text-danger" })
-                                </div>
-                                }
                             </div>
                         }
 
@@ -88,15 +73,13 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-                $(document).ready(function () {
+        $(document).ready(function () {
             const QuestionType = {
-                MultipleChoice: @((int)Hometown_Application.Data.QuestionType.MultipleChoice),
-                OpenEnded: @((int)Hometown_Application.Data.QuestionType.OpenEnded)
+                MultipleChoice: @((int)Hometown_Application.Data.QuestionType.MultipleChoice)
             };
 
             $("form").on("submit", function (e) {
@@ -106,20 +89,17 @@
                     const questionType = parseInt($container.find("input[name$='.QuestionType']").val());
                     const questionId = $container.find("input[name$='.QuestionId']").val();
 
-                    // Use dynamic name-based selector
-                    const checked = $container.find(`input[name='Questions[${index}].SelectedOptionId']:checked`).length;
-                    const selectedValue = $container.find(`input[name='Questions[${index}].SelectedOptionId']:checked`).val() || 'none';
-                    console.log(`Question ${index}, Type: ${questionType}, Checked: ${checked}, Selected Value: ${selectedValue}, Name: Questions[${index}].SelectedOptionId`);
+                    if (questionType === QuestionType.MultipleChoice) {
+                        const checked = $container.find(`input[name='Questions[${index}].SelectedOptionId']:checked`).length;
+                        const selectedValue = $container.find(`input[name='Questions[${index}].SelectedOptionId']:checked`).val() || 'none';
+                        console.log(`Question ${index}, Type: ${questionType}, Checked: ${checked}, Selected Value: ${selectedValue}, Name: Questions[${index}].SelectedOptionId`);
 
-                    if (questionType === QuestionType.MultipleChoice && checked === 0) {
-                        hasErrors = true;
-                        $container.append('<span class="text-danger-custom">Please select an option.</span>');
-                        $container.find("input[type='radio']").addClass("is-invalid");
-                        $("#error_" + questionId).text("Please select an option.");
-                    } else if (questionType === QuestionType.OpenEnded && !$container.find("textarea").val().trim()) {
-                        hasErrors = true;
-                        $container.append('<span class="text-danger-custom">Please provide a response.</span>');
-                        $container.find("textarea").addClass("is-invalid");
+                        if (checked === 0) {
+                            hasErrors = true;
+                            $container.append('<span class="text-danger-custom">Please select an option.</span>');
+                            $container.find("input[type='radio']").addClass("is-invalid");
+                            $("#error_" + questionId).text("Please select an option.");
+                        }
                     }
                 });
 
@@ -132,10 +112,10 @@
             });
 
             // Clear error on input change
-            $("textarea, input[type='radio']").on("input change", function () {
+            $("input[type='radio']").on("change", function () {
                 const $container = $(this).closest(".question-container");
                 $container.find(".text-danger-custom").remove();
-                $container.find("textarea, input").removeClass("is-invalid");
+                $container.find("input").removeClass("is-invalid");
                 const questionId = $container.find("input[name$='.QuestionId']").val();
                 $("#error_" + questionId).text("");
             });

@@ -82,21 +82,11 @@ namespace Hometown_Application.ViewModel
         public bool IsRequired { get; set; }
         public int DisplayOrder { get; set; }
 
-        [CustomValidation(typeof(QuestionResponseViewModel), nameof(ValidateTextResponse))]
-        public string TextResponse { get; set; }
+        // Temporarily remove TextResponse to isolate the issue
+        // public string TextResponse { get; set; }
 
         public int? SelectedOptionId { get; set; }
         public List<OptionViewModel> Options { get; set; } = new List<OptionViewModel>();
-
-        public static ValidationResult ValidateTextResponse(string textResponse, ValidationContext context)
-        {
-            var instance = (QuestionResponseViewModel)context.ObjectInstance;
-            if (instance.IsRequired && instance.QuestionType == QuestionType.OpenEnded && string.IsNullOrWhiteSpace(textResponse))
-            {
-                return new ValidationResult("The TextResponse field is required.");
-            }
-            return ValidationResult.Success;
-        }
     }
 
     public class PollResultsViewModel

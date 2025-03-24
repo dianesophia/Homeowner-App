@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250320093938_yeah")]
+    [Migration("20250323040104_yeah")]
     partial class yeah
     {
         /// <inheritdoc />
@@ -153,7 +153,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "82f2c972-3ff4-4ce1-9791-d76b3592d43d",
+                            ConcurrencyStamp = "da5c6be4-733e-4325-9710-b7667b0f118f",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -167,9 +167,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO3a+xBCABoFd4V0wEuKIsV2sXIZQ2k8dkaVxwQd1P0D22XhRLHwgzSZy4paGd0b7A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEACydk2qEUbe8bPXia/Dafnp1aezaFgg3MfJCHt8oJRp9FxWuGLNeBq0L8h4JrCuIw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "beb5cda4-f8fc-4881-bfb7-0931d1d689b4",
+                            SecurityStamp = "808c6ab4-5646-4c0c-a532-54261a2cbfc8",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });

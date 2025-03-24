@@ -288,6 +288,7 @@ namespace Hometown_Application.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> TakePoll(int id)
         {
             _logger.LogInformation($"Loading poll with ID {id}");
@@ -325,7 +326,7 @@ namespace Hometown_Application.Controllers
                 if (hasResponded)
                 {
                     _logger.LogWarning($"User {userId} has already responded to poll with ID {id}.");
-                    return BadRequest("You have already submitted a response to this poll.");
+                    return RedirectToAction("AlreadySubmitted", new { pollTitle = poll.Title });
                 }
             }
 
@@ -371,8 +372,8 @@ namespace Hometown_Application.Controllers
                     model.PollId, model.PollTitle, model.Questions?.Count ?? 0);
                 foreach (var question in model.Questions ?? new List<QuestionResponseViewModel>())
                 {
-                    _logger.LogInformation("Question: QuestionId={QuestionId}, SelectedOptionId={SelectedOptionId}, TextResponse={TextResponse}",
-                        question.QuestionId, question.SelectedOptionId, question.TextResponse);
+                    _logger.LogInformation("Question: QuestionId={QuestionId}, SelectedOptionId={SelectedOptionId}",
+                        question.QuestionId, question.SelectedOptionId);
                 }
 
                 // Fetch the poll to check its status and re-populate the model if needed
@@ -408,7 +409,7 @@ namespace Hometown_Application.Controllers
                     if (hasResponded)
                     {
                         _logger.LogWarning($"User {userId} has already responded to poll with ID {model.PollId}.");
-                        ModelState.AddModelError("", "You have already submitted a response to this poll.");
+                        return RedirectToAction("AlreadySubmitted", new { pollTitle = model.PollTitle });
                     }
                 }
 
@@ -423,24 +424,36 @@ namespace Hometown_Application.Controllers
                         continue;
                     }
 
-                    if (pollQuestion.IsRequired)
+                    if (pollQuestion.IsRequired && pollQuestion.QuestionType == QuestionType.MultipleChoice)
                     {
-                        if (pollQuestion.QuestionType == QuestionType.MultipleChoice && !question.SelectedOptionId.HasValue)
+                        if (!question.SelectedOptionId.HasValue)
                         {
                             _logger.LogWarning($"Required multiple-choice question {question.QuestionId} has no selected option.");
                             ModelState.AddModelError($"Questions[{model.Questions.IndexOf(question)}].SelectedOptionId", "Please select an option for this required question.");
                         }
-                        else if (pollQuestion.QuestionType == QuestionType.OpenEnded && string.IsNullOrWhiteSpace(question.TextResponse))
+                    }
+                }
+
+                // Log all ModelState errors before checking ModelState.IsValid
+                if (ModelState.Any(e => e.Value.Errors.Any()))
+                {
+                    _logger.LogWarning("ModelState contains errors:");
+                    foreach (var state in ModelState)
+                    {
+                        foreach (var error in state.Value.Errors)
                         {
-                            _logger.LogWarning($"Required open-ended question {question.QuestionId} has no text response.");
-                            ModelState.AddModelError($"Questions[{model.Questions.IndexOf(question)}].TextResponse", "Please provide a response for this required question.");
+                            _logger.LogWarning($"Key: {state.Key}, Error: {error.ErrorMessage}");
                         }
                     }
+                }
+                else
+                {
+                    _logger.LogInformation("ModelState is valid, no errors found.");
                 }
 
                 if (!ModelState.IsValid)
                 {
-                    // Log validation errors
+                    // Log validation errors (already logged above, but keeping this for consistency)
                     foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                     {
                         _logger.LogError($"Validation error: {error.ErrorMessage}");
@@ -475,7 +488,6 @@ namespace Hometown_Application.Controllers
                         if (userQuestion != null)
                         {
                             rePopulatedQuestion.SelectedOptionId = userQuestion.SelectedOptionId;
-                            rePopulatedQuestion.TextResponse = userQuestion.TextResponse;
                         }
                     }
 
@@ -495,7 +507,7 @@ namespace Hometown_Application.Controllers
                             PollId = model.PollId,
                             QuestionId = question.QuestionId,
                             SelectedOptionId = question.SelectedOptionId,
-                            TextResponse = question.TextResponse,
+                            TextResponse = null, // Explicitly set to null since we only handle multiple-choice
                             RespondentId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null,
                             IsAnonymous = !User.Identity.IsAuthenticated,
                             SubmissionDate = DateTime.Now
@@ -539,7 +551,6 @@ namespace Hometown_Application.Controllers
                         if (userQuestion != null)
                         {
                             rePopulatedQuestion.SelectedOptionId = userQuestion.SelectedOptionId;
-                            rePopulatedQuestion.TextResponse = userQuestion.TextResponse;
                         }
                     }
 
@@ -589,7 +600,6 @@ namespace Hometown_Application.Controllers
                         if (userQuestion != null)
                         {
                             rePopulatedQuestion.SelectedOptionId = userQuestion.SelectedOptionId;
-                            rePopulatedQuestion.TextResponse = userQuestion.TextResponse;
                         }
                     }
 
@@ -602,6 +612,13 @@ namespace Hometown_Application.Controllers
 
         [AllowAnonymous]
         public IActionResult ThankYou(string pollTitle)
+        {
+            ViewData["PollTitle"] = pollTitle;
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult AlreadySubmitted(string pollTitle)
         {
             ViewData["PollTitle"] = pollTitle;
             return View();
@@ -668,13 +685,6 @@ namespace Hometown_Application.Controllers
                             Percentage = Math.Round(percentage, 1)
                         });
                     }
-                }
-                else if (question.QuestionType == Data.QuestionType.OpenEnded)
-                {
-                    question.TextResponses = responses
-                        .Where(r => r.QuestionId == question.QuestionId && !string.IsNullOrEmpty(r.TextResponse))
-                        .Select(r => r.TextResponse)
-                        .ToList();
                 }
             }
 

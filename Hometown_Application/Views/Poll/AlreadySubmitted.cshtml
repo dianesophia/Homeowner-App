@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Already Submitted";
+    var pollTitle = ViewData["PollTitle"]?.ToString() ?? "the poll";
+}
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm text-center">
+                <div class="card-body py-5" aria-live="polite">
+                    <div class="mb-4">
+                        <style>
+                            .info-icon {
+                                font-size: 5rem;
+                            }
+                        </style>
+                        <i class="fas fa-info-circle text-primary info-icon"></i>
+                    </div>
+                    <h1 class="display-4 mb-4">Already Submitted</h1>
+                    <p class="lead mb-4">You have already submitted a response to "@pollTitle".</p>
+                    <p class="mb-5">Thank you for your participation!</p>
+                    <a asp-action="Index" class="btn btn-primary btn-lg" aria-label="Return to polls list">
+                        <i class="fas fa-home"></i> Back to Polls
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
