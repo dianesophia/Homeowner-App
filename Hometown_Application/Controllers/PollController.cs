@@ -2,10 +2,12 @@ using Hometown_Application.Areas.Identity.Data;
 using Hometown_Application.Data;
 using Hometown_Application.Models;
 using Hometown_Application.ViewModel;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,30 @@ using System.Threading.Tasks;
 
 namespace Hometown_Application.Controllers
 {
+    // Custom anti-forgery token validation filter with logging
+    public class CustomValidateAntiForgeryTokenAttribute : ActionFilterAttribute
+    {
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            // Resolve the logger from the service provider
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<PollController>>();
+
+            try
+            {
+                var antiForgeryService = context.HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
+                await antiForgeryService.ValidateRequestAsync(context.HttpContext);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Anti-forgery token validation failed.");
+                context.Result = new StatusCodeResult(403);
+                return;
+            }
+
+            await next();
+        }
+    }
+
     public class PollController : Controller
     {
         private readonly ApplicationDBContext _context;
@@ -28,6 +54,12 @@ namespace Hometown_Application.Controllers
             _userManager = userManager;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+        }
+
+        [HttpGet]
+        public IActionResult Test()
+        {
+            return Content("PollController is accessible!");
         }
 
         public async Task<IActionResult> Index()
@@ -255,112 +287,340 @@ namespace Hometown_Application.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> TakePoll(int id)
         {
+            _logger.LogInformation($"Loading poll with ID {id}");
+
             var poll = await _context.Polls
                 .Include(p => p.Questions)
-                    .ThenInclude(q => q.Options)
+                .ThenInclude(q => q.Options)
                 .FirstOrDefaultAsync(p => p.PollId == id);
 
-            if (poll == null || !poll.IsActive || (poll.ExpiryDate.HasValue && poll.ExpiryDate < DateTime.Now))
+            if (poll == null)
             {
-                return NotFound();
+                _logger.LogWarning($"Poll with ID {id} not found.");
+                return NotFound("Poll not found.");
+            }
+
+            // Check if the poll is active and not expired
+            if (!poll.IsActive)
+            {
+                _logger.LogWarning($"Poll with ID {id} is not active.");
+                return BadRequest("This poll is no longer active.");
+            }
+
+            if (poll.ExpiryDate.HasValue && poll.ExpiryDate < DateTime.Now)
+            {
+                _logger.LogWarning($"Poll with ID {id} has expired. Expiry date: {poll.ExpiryDate}");
+                return BadRequest("This poll has expired.");
+            }
+
+            // Check if the user has already responded (optional, based on requirements)
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var hasResponded = await _context.PollResponses
+                    .AnyAsync(r => r.PollId == id && r.RespondentId == userId);
+                if (hasResponded)
+                {
+                    _logger.LogWarning($"User {userId} has already responded to poll with ID {id}.");
+                    return RedirectToAction("AlreadySubmitted", new { pollTitle = poll.Title });
+                }
             }
 
             var model = new PollResponseViewModel
             {
-                PollId = id,
+                PollId = poll.PollId,
                 PollTitle = poll.Title,
                 PollDescription = poll.Description,
-                Questions = poll.Questions.Select(q => new QuestionResponseViewModel
-                {
-                    QuestionId = q.QuestionId,
-                    QuestionText = q.QuestionText,
-                    QuestionType = q.QuestionType,
-                    IsRequired = q.IsRequired,
-                    DisplayOrder = q.DisplayOrder,
-                    Options = q.Options.Select(o => new OptionViewModel
+                Questions = poll.Questions
+                    .OrderBy(q => q.DisplayOrder)
+                    .Select(q => new QuestionResponseViewModel
                     {
-                        OptionId = o.OptionId,
-                        OptionText = o.OptionText,
-                        DisplayOrder = o.DisplayOrder,
-                        QuestionId = o.QuestionId
-                    }).OrderBy(o => o.DisplayOrder).ToList()
-                }).OrderBy(q => q.DisplayOrder).ToList()
+                        QuestionId = q.QuestionId,
+                        QuestionText = q.QuestionText,
+                        QuestionType = q.QuestionType,
+                        IsRequired = q.IsRequired,
+                        DisplayOrder = q.DisplayOrder,
+                        Options = q.Options
+                            .OrderBy(o => o.DisplayOrder)
+                            .Select(o => new OptionViewModel
+                            {
+                                OptionId = o.OptionId,
+                                OptionText = o.OptionText,
+                                DisplayOrder = o.DisplayOrder
+                            }).ToList()
+                    }).ToList()
             };
 
             return View(model);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitPoll(PollResponseViewModel model)
         {
-            if (ModelState.IsValid)
+            _logger.LogInformation($"Received SubmitPoll request for PollId {model.PollId}");
+
+            try
             {
-                var userId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
-
-                foreach (var question in model.Questions)
+                // Log the received form data for debugging
+                _logger.LogInformation("Received form data: PollId={PollId}, PollTitle={PollTitle}, QuestionsCount={QuestionsCount}",
+                    model.PollId, model.PollTitle, model.Questions?.Count ?? 0);
+                foreach (var question in model.Questions ?? new List<QuestionResponseViewModel>())
                 {
-                    var response = new PollResponseModel
-                    {
-                        PollId = model.PollId,
-                        QuestionId = question.QuestionId,
-                        RespondentId = userId,
-                        IsAnonymous = userId == null,
-                        SubmissionDate = DateTime.Now
-                    };
+                    _logger.LogInformation("Question: QuestionId={QuestionId}, SelectedOptionId={SelectedOptionId}",
+                        question.QuestionId, question.SelectedOptionId);
+                }
 
-                    if (question.QuestionType == Data.QuestionType.MultipleChoice && question.SelectedOptionId.HasValue)
-                    {
-                        response.SelectedOptionId = question.SelectedOptionId;
-                    }
-                    else if (question.QuestionType == Data.QuestionType.OpenEnded && !string.IsNullOrWhiteSpace(question.TextResponse))
-                    {
-                        response.TextResponse = question.TextResponse;
-                    }
-                    else if (question.IsRequired)
-                    {
-                        ModelState.AddModelError("", $"The question '{question.QuestionText}' requires a selected option.");
-                        var poll = await _context.Polls
-                            .Include(p => p.Questions)
-                                .ThenInclude(q => q.Options)
-                            .FirstOrDefaultAsync(p => p.PollId == model.PollId);
+                // Fetch the poll to check its status and re-populate the model if needed
+                var poll = await _context.Polls
+                    .Include(p => p.Questions)
+                    .ThenInclude(q => q.Options)
+                    .FirstOrDefaultAsync(p => p.PollId == model.PollId);
 
-                        model.Questions = poll.Questions.Select(q => new QuestionResponseViewModel
+                if (poll == null)
+                {
+                    _logger.LogWarning($"Poll with ID {model.PollId} not found.");
+                    return NotFound("Poll not found.");
+                }
+
+                // Check if the poll is active and not expired
+                if (!poll.IsActive)
+                {
+                    _logger.LogWarning($"Poll with ID {model.PollId} is not active.");
+                    ModelState.AddModelError("", "This poll is no longer active.");
+                }
+                else if (poll.ExpiryDate.HasValue && poll.ExpiryDate < DateTime.Now)
+                {
+                    _logger.LogWarning($"Poll with ID {model.PollId} has expired. Expiry date: {poll.ExpiryDate}");
+                    ModelState.AddModelError("", "This poll has expired.");
+                }
+
+                // Check for duplicate submission (optional, based on requirements)
+                if (User.Identity.IsAuthenticated)
+                {
+                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    var hasResponded = await _context.PollResponses
+                        .AnyAsync(r => r.PollId == model.PollId && r.RespondentId == userId);
+                    if (hasResponded)
+                    {
+                        _logger.LogWarning($"User {userId} has already responded to poll with ID {model.PollId}.");
+                        return RedirectToAction("AlreadySubmitted", new { pollTitle = model.PollTitle });
+                    }
+                }
+
+                // Validate that all required questions have a response
+                foreach (var question in model.Questions ?? new List<QuestionResponseViewModel>())
+                {
+                    var pollQuestion = poll.Questions.FirstOrDefault(q => q.QuestionId == question.QuestionId);
+                    if (pollQuestion == null)
+                    {
+                        _logger.LogWarning($"Invalid question ID: {question.QuestionId} for PollId {model.PollId}");
+                        ModelState.AddModelError("", $"Invalid question ID: {question.QuestionId}");
+                        continue;
+                    }
+
+                    if (pollQuestion.IsRequired && pollQuestion.QuestionType == QuestionType.MultipleChoice)
+                    {
+                        if (!question.SelectedOptionId.HasValue)
+                        {
+                            _logger.LogWarning($"Required multiple-choice question {question.QuestionId} has no selected option.");
+                            ModelState.AddModelError($"Questions[{model.Questions.IndexOf(question)}].SelectedOptionId", "Please select an option for this required question.");
+                        }
+                    }
+                }
+
+                // Log all ModelState errors before checking ModelState.IsValid
+                if (ModelState.Any(e => e.Value.Errors.Any()))
+                {
+                    _logger.LogWarning("ModelState contains errors:");
+                    foreach (var state in ModelState)
+                    {
+                        foreach (var error in state.Value.Errors)
+                        {
+                            _logger.LogWarning($"Key: {state.Key}, Error: {error.ErrorMessage}");
+                        }
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("ModelState is valid, no errors found.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    // Log validation errors (already logged above, but keeping this for consistency)
+                    foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        _logger.LogError($"Validation error: {error.ErrorMessage}");
+                    }
+
+                    // Re-populate the model, preserving user selections
+                    model.PollTitle = poll.Title;
+                    model.PollDescription = poll.Description;
+                    var rePopulatedQuestions = poll.Questions
+                        .OrderBy(q => q.DisplayOrder)
+                        .Select(q => new QuestionResponseViewModel
                         {
                             QuestionId = q.QuestionId,
                             QuestionText = q.QuestionText,
                             QuestionType = q.QuestionType,
                             IsRequired = q.IsRequired,
                             DisplayOrder = q.DisplayOrder,
-                            Options = q.Options.Select(o => new OptionViewModel
-                            {
-                                OptionId = o.OptionId,
-                                OptionText = o.OptionText,
-                                DisplayOrder = o.DisplayOrder,
-                                QuestionId = o.QuestionId
-                            }).OrderBy(o => o.DisplayOrder).ToList()
-                        }).OrderBy(q => q.DisplayOrder).ToList();
+                            Options = q.Options
+                                .OrderBy(o => o.DisplayOrder)
+                                .Select(o => new OptionViewModel
+                                {
+                                    OptionId = o.OptionId,
+                                    OptionText = o.OptionText,
+                                    DisplayOrder = o.DisplayOrder
+                                }).ToList()
+                        }).ToList();
 
-                        return View("TakePoll", model);
-                    }
-
-                    if (response.SelectedOptionId.HasValue || !string.IsNullOrWhiteSpace(response.TextResponse))
+                    // Merge user selections into the re-populated questions
+                    foreach (var rePopulatedQuestion in rePopulatedQuestions)
                     {
-                        _context.PollResponses.Add(response);
+                        var userQuestion = model.Questions.FirstOrDefault(q => q.QuestionId == rePopulatedQuestion.QuestionId);
+                        if (userQuestion != null)
+                        {
+                            rePopulatedQuestion.SelectedOptionId = userQuestion.SelectedOptionId;
+                        }
                     }
+
+                    model.Questions = rePopulatedQuestions;
+                    _logger.LogInformation($"Returning to TakePoll view due to validation errors for PollId {model.PollId}");
+                    return View("TakePoll", model);
                 }
 
-                await _context.SaveChangesAsync();
-                return RedirectToAction("ThankYou");
-            }
+                // Process the responses
+                try
+                {
+                    foreach (var question in model.Questions)
+                    {
+                        _logger.LogInformation($"Processing response for QuestionId: {question.QuestionId}, SelectedOptionId: {question.SelectedOptionId}");
+                        var response = new PollResponseModel
+                        {
+                            PollId = model.PollId,
+                            QuestionId = question.QuestionId,
+                            SelectedOptionId = question.SelectedOptionId,
+                            TextResponse = null, // Explicitly set to null since we only handle multiple-choice
+                            RespondentId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null,
+                            IsAnonymous = !User.Identity.IsAuthenticated,
+                            SubmissionDate = DateTime.Now
+                        };
+                        _context.PollResponses.Add(response);
+                    }
 
-            return View("TakePoll", model);
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation($"Successfully saved responses for PollId {model.PollId}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error saving poll responses for PollId {model.PollId}");
+                    ModelState.AddModelError("", "An error occurred while saving your responses. Please try again later.");
+
+                    // Re-populate the model, preserving user selections
+                    model.PollTitle = poll.Title;
+                    model.PollDescription = poll.Description;
+                    var rePopulatedQuestions = poll.Questions
+                        .OrderBy(q => q.DisplayOrder)
+                        .Select(q => new QuestionResponseViewModel
+                        {
+                            QuestionId = q.QuestionId,
+                            QuestionText = q.QuestionText,
+                            QuestionType = q.QuestionType,
+                            IsRequired = q.IsRequired,
+                            DisplayOrder = q.DisplayOrder,
+                            Options = q.Options
+                                .OrderBy(o => o.DisplayOrder)
+                                .Select(o => new OptionViewModel
+                                {
+                                    OptionId = o.OptionId,
+                                    OptionText = o.OptionText,
+                                    DisplayOrder = o.DisplayOrder
+                                }).ToList()
+                        }).ToList();
+
+                    foreach (var rePopulatedQuestion in rePopulatedQuestions)
+                    {
+                        var userQuestion = model.Questions.FirstOrDefault(q => q.QuestionId == rePopulatedQuestion.QuestionId);
+                        if (userQuestion != null)
+                        {
+                            rePopulatedQuestion.SelectedOptionId = userQuestion.SelectedOptionId;
+                        }
+                    }
+
+                    model.Questions = rePopulatedQuestions;
+                    return View("TakePoll", model);
+                }
+
+                return RedirectToAction("ThankYou", new { pollTitle = model.PollTitle });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Unexpected error in SubmitPoll for PollId {model.PollId}");
+                ModelState.AddModelError("", "An unexpected error occurred. Please try again later.");
+
+                // Re-populate the model in case of an error
+                var poll = await _context.Polls
+                    .Include(p => p.Questions)
+                    .ThenInclude(q => q.Options)
+                    .FirstOrDefaultAsync(p => p.PollId == model.PollId);
+
+                if (poll != null)
+                {
+                    model.PollTitle = poll.Title;
+                    model.PollDescription = poll.Description;
+                    var rePopulatedQuestions = poll.Questions
+                        .OrderBy(q => q.DisplayOrder)
+                        .Select(q => new QuestionResponseViewModel
+                        {
+                            QuestionId = q.QuestionId,
+                            QuestionText = q.QuestionText,
+                            QuestionType = q.QuestionType,
+                            IsRequired = q.IsRequired,
+                            DisplayOrder = q.DisplayOrder,
+                            Options = q.Options
+                                .OrderBy(o => o.DisplayOrder)
+                                .Select(o => new OptionViewModel
+                                {
+                                    OptionId = o.OptionId,
+                                    OptionText = o.OptionText,
+                                    DisplayOrder = o.DisplayOrder
+                                }).ToList()
+                        }).ToList();
+
+                    foreach (var rePopulatedQuestion in rePopulatedQuestions)
+                    {
+                        var userQuestion = model.Questions.FirstOrDefault(q => q.QuestionId == rePopulatedQuestion.QuestionId);
+                        if (userQuestion != null)
+                        {
+                            rePopulatedQuestion.SelectedOptionId = userQuestion.SelectedOptionId;
+                        }
+                    }
+
+                    model.Questions = rePopulatedQuestions;
+                }
+
+                return View("TakePoll", model);
+            }
         }
 
-        public IActionResult ThankYou()
+        [AllowAnonymous]
+        public IActionResult ThankYou(string pollTitle)
         {
+            ViewData["PollTitle"] = pollTitle;
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult AlreadySubmitted(string pollTitle)
+        {
+            ViewData["PollTitle"] = pollTitle;
             return View();
         }
 
@@ -425,13 +685,6 @@ namespace Hometown_Application.Controllers
                             Percentage = Math.Round(percentage, 1)
                         });
                     }
-                }
-                else if (question.QuestionType == Data.QuestionType.OpenEnded)
-                {
-                    question.TextResponses = responses
-                        .Where(r => r.QuestionId == question.QuestionId && !string.IsNullOrEmpty(r.TextResponse))
-                        .Select(r => r.TextResponse)
-                        .ToList();
                 }
             }
 
@@ -547,6 +800,21 @@ namespace Hometown_Application.Controllers
                 return NotFound();
             }
             return RedirectToAction(nameof(TakePoll), new { id });
+        }
+
+        [HttpGet]
+        public IActionResult TestForm()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [CustomValidateAntiForgeryToken]
+        public IActionResult TestFormSubmit(string testInput)
+        {
+            _logger.LogInformation($"Received TestFormSubmit with testInput: {testInput}");
+            return Content("Form submitted successfully!");
         }
     }
 }

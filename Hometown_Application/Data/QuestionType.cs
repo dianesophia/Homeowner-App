@@ -5,7 +5,7 @@ namespace Hometown_Application.Data
 {
     public enum QuestionType
     {
-        MultipleChoice,
-        OpenEnded
+        MultipleChoice = 0,
+        OpenEnded = 1
     }
 } 
