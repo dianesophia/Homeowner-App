@@ -65,3 +65,4 @@ namespace Hometown_Application.Models
         public StatusModel? Status { get; set; }
     }
 }
+ 

@@ -2,90 +2,329 @@
 @using Hometown_Application.Areas.Identity.Data
 @inject UserManager<ApplicationUser> UserManager
 @model Hometown_Application.Models.ReservationModel
-
 @{
     var user = await UserManager.GetUserAsync(User);
     ViewData["Title"] = Model.ReservationId == 0 ? "Create Reservation" : "Edit Reservation";
 }
 
-<h2>@(Model.ReservationId == 0 ? "Create a Reservation" : "Edit Reservation")</h2>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<!-- Display Facility Image (if editing) -->
-@if (Model.ReservationId != 0 && Model.Facility?.Image != null && Model.Facility.Image.Length > 0)
-{
-    <div class="mb-3">
-        <label class="form-label">Facility Image</label>
-        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Facility.Image)" alt="@Model.Facility.Name" style="max-width: 200px; max-height: 200px;" />
-    </div>
-}
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
 
-<form id="ReservationForm" asp-action="CreateOrEdit" asp-controller="Reservation" onsubmit="return validateReservationForm()">
-    <input type="hidden" name="ReservationId" value="@Model?.ReservationId" />
-    <input type="hidden" name="UserId" value="@user?.Id" />
-    <input type="hidden" name="AddedBy" value="@user?.Id" />
-    <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(Model?.RowVersion ?? Array.Empty<byte>())" />
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
 
-    <label for="FacilityId">Facility</label>
-    <select class="form-control" id="FacilityId" name="FacilityId" required>
-        <option value="" disabled selected>Select a facility</option>
-        @foreach (var facility in ViewBag.Facilities)
-        {
-            <option value="@facility.Value" selected="@(Model?.FacilityId == Convert.ToInt32(facility.Value) ? "selected" : null)">
-                @facility.Text
-            </option>
+        .navbar-brand:hover {
+            transform: scale(1.05);
         }
-    </select>
 
-    <label for="ReservationDate">Date</label>
-    <input class="form-control" id="ReservationDate" type="date" name="ReservationDate" value="@Model?.ReservationDate.ToString("yyyy-MM-dd")" required />
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
 
-    <label for="StartTime">Start Time</label>
-    <input class="form-control" id="StartTime" type="time" name="StartTime" value="@Model?.StartTime.ToString("HH:mm")" required />
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
 
-    <label for="EndTime">End Time</label>
-    <input class="form-control" id="EndTime" type="time" name="EndTime" value="@Model?.EndTime.ToString("HH:mm")" required />
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
 
-    <button class="btn btn-primary mt-3" type="submit">Submit</button>
-</form>
+        .user-info i {
+            font-size: 1.2rem;
+        }
 
-<a asp-action="ReservationStatusReport" class="btn btn-secondary mt-3">Back to My Reservations</a>
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
 
-@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
-{
-    <div class="alert alert-danger mt-3">
-        <strong>Validation Errors:</strong>
-        <ul>
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <li>@error.ErrorMessage</li>
-            }
-        </ul>
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .reservation-form-container {
+        width: 100%;
+        max-width: 800px;
+        margin: 2rem auto;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+        font-weight: 500;
+    }
+
+    .facility-image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        border: 3px solid var(--primary-light);
+        object-fit: cover;
+        display: block;
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: var(--transition);
+        margin-bottom: 1rem;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        }
+
+    .form-select {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 2.25rem 0.75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: var(--transition);
+        margin-bottom: 1rem;
+    }
+
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        }
+
+    .btn {
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 10px 20px;
+        transition: var(--transition);
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.2);
+        color: var(--danger-color);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1.5rem;
+    }
+
+    .buttons-container {
+        display: flex;
+        margin-top: 1.5rem;
+    }
+
+        .reservation-form-container
+
+    {
+        padding: 15px;
+    }
+
+    .buttons-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+</style>
+
+<div class="content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">@(Model.ReservationId == 0 ? "Create Reservation" : "Edit Reservation")</h1>
+        </div>
     </div>
-}
+
+    <div class="reservation-form-container">
+        <!-- Display Facility Image (if editing) -->
+        @if (Model.ReservationId != 0 && Model.Facility?.Image != null && Model.Facility.Image.Length > 0)
+        {
+            <div class="form-group">
+                <label class="form-label">Facility Image</label>
+                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Facility.Image)" alt="@Model.Facility.Name" class="facility-image" />
+            </div>
+        }
+
+        <form id="ReservationForm" asp-action="CreateOrEdit" asp-controller="Reservation" onsubmit="return validateReservationForm()">
+            <input type="hidden" name="ReservationId" value="@Model?.ReservationId" />
+            <input type="hidden" name="UserId" value="@user?.Id" />
+            <input type="hidden" name="AddedBy" value="@user?.Id" />
+            <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(Model?.RowVersion ?? Array.Empty<byte>())" />
+
+            <div class="form-group">
+                <label class="form-label" for="FacilityId">Facility</label>
+                <select class="form-select" id="FacilityId" name="FacilityId" required>
+                    <option value="" disabled selected>Select a facility</option>
+                    @foreach (var facility in ViewBag.Facilities)
+                    {
+                        <option value="@facility.Value" selected="@(Model?.FacilityId == Convert.ToInt32(facility.Value) ? "selected" : null)">
+                            @facility.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="ReservationDate">Date</label>
+                <input class="form-control" id="ReservationDate" type="date" name="ReservationDate" value="@Model?.ReservationDate.ToString("yyyy-MM-dd")" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="StartTime">Start Time</label>
+                <input class="form-control" id="StartTime" type="time" name="StartTime" value="@Model?.StartTime.ToString("HH:mm")" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="EndTime">End Time</label>
+                <input class="form-control" id="EndTime" type="time" name="EndTime" value="@Model?.EndTime.ToString("HH:mm")" required />
+            </div>
+
+            <div class="buttons-container">
+                <button class="btn btn-primary" type="submit">Submit</button>
+                <a asp-action="ReservationStatusReport" class="btn btn-secondary">Back to My Reservations</a>
+            </div>
+        </form>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+        {
+            <div class="alert alert-danger">
+                <strong>Validation Errors:</strong>
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        function validateReservationForm() {
+            var facility = document.querySelector('select[name="FacilityId"]').value;
+            var date = document.querySelector('input[name="ReservationDate"]').value;
+            var startTime = document.querySelector('input[name="StartTime"]').value;
+            var endTime = document.querySelector('input[name="EndTime"]').value;
+
+            if (!facility || facility === "" || !date || !startTime || !endTime) {
+                alert("Please fill in all required fields, including selecting a valid facility.");
+                return false;
+            }
+
+            if (startTime >= endTime) {
+                alert("End time must be later than start time.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 }
-
-<script>
-    function validateReservationForm() {
-        var facility = document.querySelector('select[name="FacilityId"]').value;
-        var date = document.querySelector('input[name="ReservationDate"]').value;
-        var startTime = document.querySelector('input[name="StartTime"]').value;
-        var endTime = document.querySelector('input[name="EndTime"]').value;
-
-        if (!facility || facility === "" || !date || !startTime || !endTime) {
-            alert("Please fill in all required fields, including selecting a valid facility.");
-            return false;
-        }
-
-        if (startTime >= endTime) {
-            alert("End time must be later than start time.");
-            return false;
-        }
-
-        return true;
-    }
-</script>

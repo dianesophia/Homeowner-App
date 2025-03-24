@@ -5,223 +5,661 @@
 }
 
 <style>
-    .profile-picture-upload .profile-picture-preview-container {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
     }
 
-    .profile-picture-upload .profile-picture-overlay {
-        position: absolute;
+    .navbar {
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: var(--transition);
+        margin-bottom: 150px;
+        width:100%;
+        margin-right: 100px;
+    }
+
+        .card:hover {
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
+
+    .card-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        background-color: var(--primary-color) !important;
+    }
+
+    .card-body {
+        margin-bottom: 5rem;
+        padding: 2rem;
+    }
+    .content {
+        width: 100%;
+    }
+    .form-label {
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 16px;
+        border: 1px solid #ced4da;
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        }
+
+    .form-select {
+        border-radius: 10px;
+        padding: 12px 16px;
+        border: 1px solid #ced4da;
+        transition: var(--transition);
+        font-size: 1rem;
+        background-position: right 16px center;
+    }
+
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .btn {
+        white-space: normal !important;
+        word-break: break-word; 
+        text-align: center; 
+        padding: 10px; 
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+    .btn-light {
+        background-color: white;
+        color: var(--primary-color);
+        border: 1px solid transparent;
+    }
+
+        .btn-light:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        color: var(--primary-color);
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+        }
+
+    .form-check {
+        padding-left: 2rem;
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.25rem;
+        margin-left: -2rem;
+        cursor: pointer;
+    }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+    .form-check-label {
+        cursor: pointer;
+    }
+
+    .profile-picture-upload {
+        margin-bottom: 2.5rem;
+    }
+
+        .profile-picture-upload .profile-picture-preview-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px white, 0 0 0 8px var(--primary-light);
+            transition: var(--transition);
+        }
+
+        .profile-picture-upload .profile-picture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 50%;
+        }
+
+        .profile-picture-upload .profile-picture-preview-container:hover .profile-picture-overlay {
+            opacity: 1;
+        }
+
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .form-section-title {
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--primary-color);
+        font-family: 'Marcellus', serif;
+        font-size: 1.25rem;
+    }
+
+    .required-field::after {
+        content: "*";
+        color: var(--danger-color);
+        margin-left: 4px;
+    }
+
+    .animated {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Homeowner Fields Animation */
+    #homeOwnerFields {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+        opacity: 0;
+    }
+
+        #homeOwnerFields.show {
+            max-height: 1000px;
+            opacity: 1;
+            padding-top: 20px;
+        }
+
+    /* Progress Bar Styling */
+    .progress-container {
+        margin-bottom: 30px;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        background-color: var(--primary-color);
+        transition: width 0.6s ease;
+    }
+
+    .progress-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-top: -14px;
+    }
+
+    .progress-step {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        border-radius: 50%;
+        border: 2px solid white;
+        transition: all 0.3s ease;
+        position: relative;
     }
 
-    .profile-picture-upload .profile-picture-preview-container:hover .profile-picture-overlay {
+        .progress-step.active {
+            background-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+
+    .tooltip-custom {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+
+    .progress-step:hover .tooltip-custom {
         opacity: 1;
     }
-</style>
+    .row{
+        width:100%;
+    }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">@ViewData["Title"]</h2>
-                    <a asp-controller="CreateStaff" asp-action="StaffList" class="btn btn-light">
-                        Staff List
-                    </a>
-                </div>
-                <div class="card-body">
-                    <form asp-action="CreateStaff" method="post" enctype="multipart/form-data">
-                        <div class="row">
-                            <div class="col-12 mb-4">
-                                <div class="profile-picture-upload text-center">
-                                    <label class="control-label d-block mb-3">Profile Picture</label>
-                                    <div class="position-relative d-inline-block">
-                                        <input type="hidden" asp-for="ProfilePicture" id="profilePictureData" />
-                                        <input type="file" id="profilePictureInput" class="form-control-file position-absolute" accept="image/*" style="opacity: 0; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2;" />
-                                        <div class="profile-picture-preview-container">
-                                            <img id="profilePicturePreview"
-                                                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='%23e9ecef'%3E%3Cpath d='M100 0a100 100 0 1 0 0 200 100 100 0 1 0 0-200zm0 160a60 60 0 1 1 0-120 60 60 0 1 1 0 120z'/%3E%3Cpath d='M100 80a20 20 0 1 0 0 40 20 20 0 1 0 0-40z'/%3E%3C/svg%3E"
-                                                 class="rounded-circle img-thumbnail"
-                                                 style="width: 200px; height: 200px; object-fit: cover; display: block;"
-                                                 alt="Profile Picture" />
-                                            <div class="profile-picture-overlay">
-                                                <span class="text-white">Upload Photo</span>
+    .card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: var(--transition);
+        margin-bottom: 150px;
+        width: 100%;
+        margin-right: 0; 
+    }
+    .container-fluid .row .col-md-8.offset-md-2 {
+        width: 100%;
+        margin-left: 0;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+    .content {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+    }
+    .container-fluid {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+    }
+    .row {
+        width: 100%;
+        margin: 0;
+    }
+</style>
+<div class="content">
+    <div class="page-header">
+        <h1 class="page-title">Create Staff Profile</h1>
+        <!--<a asp-controller="ManageUsers" asp-action="Index" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </a>-->
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <a asp-controller="CreateStaff" asp-action="StaffList" class="btn btn-light">
+                            Staff List
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="CreateStaff" method="post" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-12 mb-4">
+                                    <div class="profile-picture-upload text-center">
+                                        <label class="control-label d-block mb-3">Profile Picture</label>
+                                        <div class="position-relative d-inline-block">
+                                            <input type="hidden" asp-for="ProfilePicture" id="profilePictureData" />
+                                            <input type="file" id="profilePictureInput" class="form-control-file position-absolute" accept="image/*" style="opacity: 0; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2;" />
+                                            <div class="profile-picture-preview-container">
+                                                <img id="profilePicturePreview"
+                                                     src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='%23e9ecef'%3E%3Cpath d='M100 0a100 100 0 1 0 0 200 100 100 0 1 0 0-200zm0 160a60 60 0 1 1 0-120 60 60 0 1 1 0 120z'/%3E%3Cpath d='M100 80a20 20 0 1 0 0 40 20 20 0 1 0 0-40z'/%3E%3C/svg%3E"
+                                                     class="rounded-circle img-thumbnail"
+                                                     style="width: 200px; height: 200px; object-fit: cover; display: block;"
+                                                     alt="Profile Picture" />
+                                                <div class="profile-picture-overlay">
+                                                    <span class="text-white">Upload Photo</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <canvas id="croppedCanvas" class="d-none"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Basic Information Section -->
+                                <div class="form-section animated" style="animation-delay: 0.3s">
+                                    <h3 class="form-section-title"><i class="fas fa-user me-2"></i>Personal Information</h3>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label asp-for="FirstName" class="control-label">First Name</label>
+                                            <input asp-for="FirstName" class="form-control" required placeholder="Enter first name" />
+                                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="LastName" class="control-label">Last Name</label>
+                                            <input asp-for="LastName" class="form-control" required placeholder="Enter last name" />
+                                            <span asp-validation-for="LastName" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="Email" class="control-label">Email Address</label>
+                                            <div class="input-group">
+                                                <div class="input-group-text">
+                                                    <i class="fas fa-envelope"></i>
+                                                </div>
+                                                <input asp-for="Email" class="form-control" required placeholder="Enter email address" />
+                                            </div>
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="PhoneNumber" class="control-label">Phone Number</label>
+                                            <div class="input-group">
+                                                <div class="input-group-text">
+                                                    <i class="fas fa-phone"></i>
+                                                </div>
+                                                <input asp-for="PhoneNumber" class="form-control" required placeholder="Enter phone number" />
+                                            </div>
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="Password" class="control-label">Password</label>
+                                            <div class="input-group">
+                                                <div class="input-group-text">
+                                                    <i class="fas fa-key"></i>
+                                                </div>
+                                                <input asp-for="Password" class="form-control" required placeholder="Enter password" />
+                                            </div>
+                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Employment Details Section -->
+                                <div class="form-section animated" style="animation-delay: 0.4s">
+                                    <h3 class="form-section-title"><i class="fas fa-briefcase me-2"></i>Employment Details</h3>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label asp-for="Position" class="control-label">Position</label>
+                                            <input asp-for="Position" class="form-control" required placeholder="Enter position" />
+                                            <span asp-validation-for="Position" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="Department" class="control-label">Department</label>
+                                            <select asp-for="Department" class="form-control" asp-items="Html.GetEnumSelectList<Hometown_Application.Models.StaffDepartment>()">
+                                                <option value="">-- Select Department --</option>
+                                            </select>
+                                            <span asp-validation-for="Department" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="HireDate" class="control-label">Hire Date</label>
+                                            <input asp-for="HireDate" type="date" class="form-control" required />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="Salary" class="control-label">Salary</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input asp-for="Salary" type="number" class="form-control" required placeholder="Enter annual salary" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <canvas id="croppedCanvas" class="d-none"></canvas>
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-4 form-group">
-                                <label asp-for="FirstName" class="control-label">First Name</label>
-                                <input asp-for="FirstName" class="form-control" required />
-                                <span asp-validation-for="FirstName" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <label asp-for="LastName" class="control-label">Last Name</label>
-                                <input asp-for="LastName" class="form-control" required />
-                                <span asp-validation-for="LastName" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <label asp-for="Email" class="control-label">Email</label>
-                                <input asp-for="Email" class="form-control" required />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="PhoneNumber"></label>
-                            <input asp-for="PhoneNumber" class="form-control" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 form-group">
-                                <label asp-for="Password" class="control-label">Password</label>
-                                <input asp-for="Password" type="text" class="form-control" required />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 form-group">
-                                <label asp-for="Position" class="control-label">Position</label>
-                                <input asp-for="Position" class="form-control" required />
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <label asp-for="Department" class="control-label">Department</label>
-                                <select asp-for="Department" class="form-control" asp-items="Html.GetEnumSelectList<Hometown_Application.Models.StaffDepartment>()">
-                                    <option value="">-- Select Department --</option>
-                                </select>
-                                <span asp-validation-for="Department" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <label asp-for="HireDate" class="control-label">Hire Date</label>
-                                <input asp-for="HireDate" type="date" class="form-control" required />
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 form-group">
-                                <label asp-for="Salary" class="control-label">Salary</label>
-                                <input asp-for="Salary" type="number" class="form-control" required />
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <label asp-for="EmergencyContactName" class="control-label">Emergency Contact Name</label>
-                                <input asp-for="EmergencyContactName" class="form-control" />
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <label asp-for="EmergencyContactNumber" class="control-label">Emergency Contact Number</label>
-                                <input asp-for="EmergencyContactNumber" class="form-control" />
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 form-group">
-                                <label asp-for="EmergencyContactRelation" class="control-label">Relationship</label>
-                                <input asp-for="EmergencyContactRelation" class="form-control" />
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <div class="form-check mt-4">
-                                    <input asp-for="IsActiveEmployee" class="form-check-input" type="checkbox" />
-                                    <label asp-for="IsActiveEmployee" class="form-check-label">Active Employee</label>
-                                </div>
-                                <div class="form-check">
-                                    <input asp-for="IsAlsoHomeOwner" class="form-check-input" type="checkbox" id="isHomeOwnerCheckbox" />
-                                    <label asp-for="IsAlsoHomeOwner" class="form-check-label">Also a Homeowner</label>
-                                </div>
-
-                                <!-- Homeowner Fields (Initially Hidden) -->
-                                <!-- Homeowner Fields (Initially Hidden) -->
-                                <div id="homeOwnerFields" style="display: none;">
-                                    <!-- Block Number -->
-                                    <div class="mb-3">
-                                        <label asp-for="BlockNumber" class="form-label">Block Number</label>
-                                        <select asp-for="BlockNumber" class="form-control">
-                                            <option value="">Select Block</option>
-                                            <option value="aspen">Aspen Heights Block</option>
-                                            <option value="birch">Birch Haven Block</option>
-                                            <option value="cedar">Cedar Crest Block</option>
-                                            <option value="chestnut">Chestnut Grove Block</option>
-                                            <option value="crystal">Crystal Lake Block</option>
-                                            <option value="elm">Elmwood Block</option>
-                                            <option value="evergreen">Evergreen Haven Block</option>
-                                            <option value="golden">Golden Oaks Block</option>
-                                            <option value="harmony">Harmony Hills Block</option>
-                                            <option value="hawthorn">Hawthorn Valley Block</option>
-                                            <option value="laurel">Laurel Ridge Block</option>
-                                            <option value="magnolia">Magnolia Park Block</option>
-                                            <option value="maple">Maple Grove Block</option>
-                                            <option value="oak">Oakwood Block</option>
-                                            <option value="pine">Pinehurst Block</option>
-                                            <option value="rosewood">Rosewood Block</option>
-                                            <option value="serenity">Serenity Pines Block</option>
-                                            <option value="silver">Silver Springs Block</option>
-                                            <option value="spruce">Spruce Meadows Block</option>
-                                            <option value="willow">Willow Heights Block</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Lot Number -->
-                                    <div class="mb-3">
-                                        <label asp-for="LotNumber" class="form-label">Lot Number</label>
-                                        <select asp-for="LotNumber" class="form-control">
-                                            <option value="">Select Lot</option>
-                                            @for (int i = 1; i <= 5; i++)
-                                            {
-                                                <option value="@i">Lot @i</option>
-                                            }
-                                        </select>
-                                    </div>
-
-                                    <!-- Street -->
-                                    <div class="mb-3">
-                                        <label asp-for="StreetName" class="form-label">Street</label>
-                                        <select asp-for="StreetName" class="form-control">
-                                            <option value="">Select Street</option>
-                                            <option value="main">Main Street</option>
-                                            <option value="elm">Elm Street</option>
-                                            <option value="maple">Maple Avenue</option>
-                                            <option value="oak">Oak Lane</option>
-                                            <option value="pine">Pine Road</option>
-                                            <option value="cedar">Cedar Drive</option>
-                                            <option value="willow">Willow Street</option>
-                                            <option value="birch">Birch Lane</option>
-                                            <option value="chestnut">Chestnut Avenue</option>
-                                            <option value="rosewood">Rosewood Court</option>
-                                            <option value="hawthorn">Hawthorn Drive</option>
-                                            <option value="silver">Silver Way</option>
-                                            <option value="serenity">Serenity Lane</option>
-                                        </select>
+                                <!-- Emergency Contact Section -->
+                                <div class="form-section animated" style="animation-delay: 0.5s">
+                                    <h3 class="form-section-title"><i class="fas fa-first-aid me-2"></i>Emergency Contact</h3>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label asp-for="EmergencyContactName" class="control-label">Emergency Contact Name</label>
+                                            <input asp-for="EmergencyContactName" class="form-control" placeholder="Enter contact name" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="EmergencyContactNumber" class="control-label">Emergency Contact Number</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                                <input asp-for="EmergencyContactNumber" class="form-control" placeholder="Enter contact number" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="EmergencyContactRelation" class="control-label">Relationship</label>
+                                            <input asp-for="EmergencyContactRelation" class="form-control" placeholder="Enter relationship" />
+                                            <!--<select class="form-select" id="EmergencyContactRelation" name="EmergencyContactRelation">
+                                                <option value="">-- Select Relationship --</option>
+                                                <option value="Spouse">Spouse</option>
+                                                <option value="Parent">Parent</option>
+                                                <option value="Sibling">Sibling</option>
+                                                <option value="Child">Child</option>
+                                                <option value="Friend">Friend</option>
+                                                <option value="Other">Other</option>
+                                            </select>-->
+                                        </div>
                                     </div>
                                 </div>
 
-                            </div>
+                                <!-- Additional Information Section -->
+                                <div class="form-section animated" style="animation-delay: 0.6s">
+                                    <h3 class="form-section-title"><i class="fas fa-info-circle me-2"></i>Additional Information</h3>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input asp-for="IsActiveEmployee" class="form-check-input" type="checkbox" checked />
+                                                <label asp-for="IsActiveEmployee" class="form-check-label">Active Employee</label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input asp-for="IsAlsoHomeOwner" class="form-check-input" type="checkbox" id="isHomeOwnerCheckbox" />
+                                                <label asp-for="IsAlsoHomeOwner" class="form-check-label">Also a Homeowner</label>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                            <div class="row mt-4">
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary btn-block">Create Staff</button>
+                                    <!-- Homeowner Fields (Initially Hidden) -->
+                                    <div id="homeOwnerFields" style="display: none;">
+                                        <!-- Block Number -->
+                                        <div class="mb-3">
+                                            <label asp-for="BlockNumber" class="form-label">Block Number</label>
+                                            <select asp-for="BlockNumber" class="form-control">
+                                                <option value="">Select Block</option>
+                                                <option value="aspen">Aspen Heights Block</option>
+                                                <option value="birch">Birch Haven Block</option>
+                                                <option value="cedar">Cedar Crest Block</option>
+                                                <option value="chestnut">Chestnut Grove Block</option>
+                                                <option value="crystal">Crystal Lake Block</option>
+                                                <option value="elm">Elmwood Block</option>
+                                                <option value="evergreen">Evergreen Haven Block</option>
+                                                <option value="golden">Golden Oaks Block</option>
+                                                <option value="harmony">Harmony Hills Block</option>
+                                                <option value="hawthorn">Hawthorn Valley Block</option>
+                                                <option value="laurel">Laurel Ridge Block</option>
+                                                <option value="magnolia">Magnolia Park Block</option>
+                                                <option value="maple">Maple Grove Block</option>
+                                                <option value="oak">Oakwood Block</option>
+                                                <option value="pine">Pinehurst Block</option>
+                                                <option value="rosewood">Rosewood Block</option>
+                                                <option value="serenity">Serenity Pines Block</option>
+                                                <option value="silver">Silver Springs Block</option>
+                                                <option value="spruce">Spruce Meadows Block</option>
+                                                <option value="willow">Willow Heights Block</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Lot Number -->
+                                        <div class="mb-3">
+                                            <label asp-for="LotNumber" class="form-label">Lot Number</label>
+                                            <select asp-for="LotNumber" class="form-control">
+                                                <option value="">Select Lot</option>
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <option value="@i">Lot @i</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <!-- Street -->
+                                        <div class="mb-3">
+                                            <label asp-for="StreetName" class="form-label">Street</label>
+                                            <select asp-for="StreetName" class="form-control">
+                                                <option value="">Select Street</option>
+                                                <option value="main">Main Street</option>
+                                                <option value="elm">Elm Street</option>
+                                                <option value="maple">Maple Avenue</option>
+                                                <option value="oak">Oak Lane</option>
+                                                <option value="pine">Pine Road</option>
+                                                <option value="cedar">Cedar Drive</option>
+                                                <option value="willow">Willow Street</option>
+                                                <option value="birch">Birch Lane</option>
+                                                <option value="chestnut">Chestnut Avenue</option>
+                                                <option value="rosewood">Rosewood Court</option>
+                                                <option value="hawthorn">Hawthorn Drive</option>
+                                                <option value="silver">Silver Way</option>
+                                                <option value="serenity">Serenity Lane</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                    </form>
+                                <div class="back-button">
+                                    <button type="submit" class="btn btn-primary text-wrap w-100">
+                                        Create Staff Profile
+                                    </button>
+                                </div>
+                        </form>
+                    </div>
                 </div>
             </div>
+
+                              
         </div>
     </div>
 </div>
-
 @section Scripts {
     <script>
         let cropper;

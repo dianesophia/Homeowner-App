@@ -11,166 +11,418 @@
 
 <style>
     :root {
-        --olive-green: #6d7349;
-        --sand-beige: #e8dcca;
-        --gold-accent: #b19b6d;
-        --text-dark: #4a4a4a;
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
     }
 
-    .profile-card {
-        background-color: #ffffff;
-        border: none;
-        border-radius: 6px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
     }
 
-    .profile-title {
-        color: var(--olive-green);
-        font-family: serif;
+    .navbar-brand {
+        font-size: 1.2rem;
         font-weight: normal;
+        color: white;
     }
 
-    .profile-subtitle {
-        color: var(--gold-accent);
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .content {
+        margin-bottom: 5rem;
+        width: 100%; /* Make content full width */
+        max-width: 100%; /* Ensure content doesn't exceed viewport */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+
+    .data-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(0,0,0,0.05);
+        width: 100%; /* Make container full width */
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .action-button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        text-decoration: none;
+        min-width: 150px;
+    }
+
+        .action-button:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+
+    .danger-button {
+        background-color: var(--danger-color);
+    }
+
+        .danger-button:hover {
+            background-color: #e34c59;
+        }
+
+    .data-description {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        color: var(--text-color);
+    }
+
+    .warning-text {
+        background-color: #fff8e1;
+        border-left: 4px solid var(--warning-color);
+        padding: 15px;
+        margin-bottom: 25px;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
         font-weight: 500;
     }
 
+    /* Profile Picture */
     .profile-picture {
-        width: 180px;
-        height: 180px;
+        width: 150px;
+        height: 150px;
         object-fit: cover;
-        border: 4px solid white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 4px solid var(--primary-light);
+        transition: var(--transition);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .custom-form-control {
-        border-color: #e2e2e2;
-        padding: 0.6rem 0.75rem;
-    }
-
-        .custom-form-control:focus {
-            border-color: var(--gold-accent);
-            box-shadow: 0 0 0 0.2rem rgba(177, 155, 109, 0.15);
+        .profile-picture:hover {
+            transform: scale(1.05);
         }
 
-    .custom-select {
-        border-color: #e2e2e2;
-        padding: 0.6rem 0.75rem;
+    /* Form Controls */
+    .custom-form-control, .custom-select {
+        border: 1px solid #ced4da;
+        border-radius: var(--border-radius);
+        padding: 0.75rem 1rem;
+        transition: var(--transition);
+        background-color: #f8f9fa;
+        margin-bottom: 1.25rem;
+        width: 100%; /* Make form controls full width */
     }
 
-        .custom-select:focus {
-            border-color: var(--gold-accent);
-            box-shadow: 0 0 0 0.2rem rgba(177, 155, 109, 0.15);
+        .custom-form-control:focus, .custom-select:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 0.2rem rgba(111, 117, 78, 0.25);
+            background-color: white;
         }
 
-    .custom-btn {
-        background-color: var(--olive-green);
-        border-color: var(--olive-green);
-        padding: 0.6rem 1.5rem;
+        .custom-form-control:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+    textarea.custom-form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    /* Form Check (Checkbox) */
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.2em;
+    }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+    .form-check-label {
+        margin-left: 0.25rem;
+    }
+
+    /* Labels */
+    .form-label {
         font-weight: 500;
-        transition: all 0.2s;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
     }
 
-        .custom-btn:hover {
-            background-color: #5c6240;
-            border-color: #5c6240;
+    /* Status Message Styling */
+    .alert {
+        border-radius: var(--border-radius);
+        border: none;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        width: 100%; /* Make alerts full width */
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: var(--success-color);
+        border-left: 4px solid var(--success-color);
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--danger-color);
+        border-left: 4px solid var(--danger-color);
+    }
+
+    /* File Input Customization */
+    input[type="file"].custom-form-control {
+        padding: 0.5rem;
+    }
+
+        input[type="file"].custom-form-control::file-selector-button {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            margin-right: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
         }
 
-    .form-check-input:checked {
-        background-color: var(--olive-green);
-        border-color: var(--olive-green);
+            input[type="file"].custom-form-control::file-selector-button:hover {
+                background: var(--primary-dark);
+            }
+
+    /* Cropper Modal Styling */
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--secondary-color);
+        color: white;
+    }
+
+    .modal-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .img-container {
+        max-height: 600px;
+        overflow: hidden;
+    }
+
+    .container1 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        flex-direction: column;
+    }
+
+    /* New full-width styles */
+    #profile-form {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .col-md-8 {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    form {
+        width: 100%;
     }
 </style>
 
-<h3 class="profile-title text-center mb-4">@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
+<div class="content">
+    <!-- Page Header -->
+    <h1 class="page-title">@ViewData["Title"]</h1>
+    <partial name="_StatusMessage" for="StatusMessage" />
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="profile-card p-4">
-            <div class="card-body">
-                <h5 class="profile-subtitle text-center mb-4">Edit Profile</h5>
+    <div class="data-container">
+        <p class="data-description">
+            Update your account information and manage your profile settings.
+        </p>
 
-                <form id="profile-form" method="post" enctype="multipart/form-data">
-                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <div class="container1">
+            <div class="col-md-8">
+                <div id="profile-form" class="mb-4">
+                    <form method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
-                    <!-- Profile Picture Section -->
-                    <div class="text-center mb-4">
-                        <img id="profilePicture" class="profile-picture rounded-circle"
-                             src="@((Model.Input.ProfilePicture != null) ?
+                        <!-- Profile Picture Section -->
+                        <div class="text-center mb-4">
+                            <img id="profilePicture" class="profile-picture rounded-circle"
+                                 src="@((Model.Input.ProfilePicture != null) ?
                                     $"data:image/*;base64,{Convert.ToBase64String(Model.Input.ProfilePicture)}" :
                                     "https://via.placeholder.com/200")">
-                    </div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Input.ProfilePictureFile" class="form-label">Profile Picture</label>
-                        <input type="file" id="ProfilePictureFile" asp-for="Input.ProfilePictureFile" class="form-control custom-form-control" />
-                        <span asp-validation-for="Input.ProfilePictureFile" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="Input.ProfilePictureFile" class="form-label">Profile Picture</label>
+                            <input type="file" id="ProfilePictureFile" asp-for="Input.ProfilePictureFile" class="form-control custom-form-control" />
+                            <span asp-validation-for="Input.ProfilePictureFile" class="text-danger"></span>
+                        </div>
 
-                    <!-- Username (Read-Only) -->
-                    <div class="mb-3">
-                        <label asp-for="Username" class="form-label">Username</label>
-                        <input asp-for="Username" class="form-control custom-form-control" placeholder="Your username" disabled />
-                    </div>
+                        <!-- Username (Read-Only) -->
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label">Username</label>
+                            <input asp-for="Username" class="form-control custom-form-control" placeholder="Your username" disabled />
+                        </div>
 
-                    <!-- Gender Dropdown -->
-                    <div class="mb-3">
-                        <label asp-for="Input.Gender" class="form-label">Gender</label>
-                        <select asp-for="Input.Gender" class="form-select custom-select">
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
+                        <!-- Gender Dropdown -->
+                        <div class="mb-3">
+                            <label asp-for="Input.Gender" class="form-label">Gender</label>
+                            <select asp-for="Input.Gender" class="form-select custom-select">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
 
-                    <!-- Gender Privacy -->
-                    <div class="form-check mb-3">
-                        <input asp-for="Input.IsGenderPublic" class="form-check-input" type="checkbox" />
-                        <label asp-for="Input.IsGenderPublic" class="form-check-label">Make Gender Public</label>
-                    </div>
+                        <!-- Gender Privacy -->
+                        <div class="form-check mb-3">
+                            <input asp-for="Input.IsGenderPublic" class="form-check-input" type="checkbox" />
+                            <label asp-for="Input.IsGenderPublic" class="form-check-label">Make Gender Public</label>
+                        </div>
 
-                    <!-- Phone Number -->
-                    <div class="mb-3">
-                        <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
-                        <input asp-for="Input.PhoneNumber" class="form-control custom-form-control" placeholder="Your phone number" />
-                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-                    </div>
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
+                            <input asp-for="Input.PhoneNumber" class="form-control custom-form-control" placeholder="Your phone number" />
+                            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                        </div>
 
-                    <!-- Personalization Information -->
-                    <div class="mb-3">
-                        <label asp-for="Input.Bio" class="form-label">Short Bio</label>
-                        <textarea asp-for="Input.Bio" class="form-control custom-form-control" rows="3" placeholder="Short bio about yourself"></textarea>
-                    </div>
+                        <!-- Personalization Information -->
+                        <div class="mb-3">
+                            <label asp-for="Input.Bio" class="form-label">Short Bio</label>
+                            <textarea asp-for="Input.Bio" class="form-control custom-form-control" rows="3" placeholder="Short bio about yourself"></textarea>
+                        </div>
 
-                    <button id="update-profile-button" type="submit" class="btn custom-btn text-white w-100 mt-3">Save Changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Cropper Modal -->
-<div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="img-container">
-                    <img id="cropperImage" src="" style="max-width: 100%;">
+                        <div class="action-buttons">
+                            <button id="update-profile-button" type="submit" class="action-button">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn custom-btn text-white" id="cropButton">Crop & Save</button>
+        </div>
+    </div>
+
+    <!-- Cropper Modal -->
+    <div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="img-container">
+                        <img id="cropperImage" src="" style="max-width: 100%;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="action-button" id="cropButton">Crop & Save</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

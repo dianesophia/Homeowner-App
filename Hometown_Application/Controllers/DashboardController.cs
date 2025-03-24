@@ -29,13 +29,16 @@ namespace Hometown_Application.Controllers
         {
             var totalUsers = await _userManager.Users.CountAsync();
             //var activeIssues = await _context.FeedbackComplaints.Where(f => f.Status == "Open").CountAsync();
+            var posts = _context.Posts.Include(p => p.ApplicationUser).Include(p => p.Reactions).Include(p => p.Comments).ToList();
+
             var totalDocuments = await _context.Documents.CountAsync();
 
             var model = new DashboardViewModel
             {
                 TotalUsers = totalUsers,
                 //ActiveIssues = activeIssues,
-                TotalDocuments = totalDocuments
+                TotalDocuments = totalDocuments,
+                Posts = posts
             };
 
             return View(model);

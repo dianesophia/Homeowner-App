@@ -7,11 +7,15 @@ using Hometown_Application.Seed;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
 using Hometown_Application.Controllers;
+using QuestPDF;
+using Hometown_Application.Hubs;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
+        QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
         var builder = WebApplication.CreateBuilder(args);
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -19,10 +23,14 @@ public class Program
         builder.Services.AddScoped<CustomValidateAntiForgeryTokenAttribute>();
 
         // Add DbContext
-        builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(connectionString));
+        builder.Services.AddDbContext<ApplicationDBContext>(options =>
+            options.UseSqlServer(connectionString));
 
         // Add Identity
-        builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+        builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = false;
+        })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDBContext>();
 
@@ -42,9 +50,9 @@ public class Program
         // Add CORS policy with dynamic origin
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("AllowLocalhost", builder =>
+            options.AddPolicy("AllowLocalhost", policyBuilder =>
             {
-                builder
+                policyBuilder
                     .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost") // Allow any localhost origin
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -68,14 +76,12 @@ public class Program
             options.Cookie.SameSite = SameSiteMode.Lax;
         });
 
-        var app = builder.Build();
+        // Add SignalR
+        builder.Services.AddSignalR();
+        builder.Services.AddAuthentication();
+        builder.Services.AddAuthorization();
 
-        // Configure the HTTP request pipeline
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Home/Error");
-            app.UseHsts(); // Enforce HTTPS with HSTS in production
-        }
+        var app = builder.Build();
 
         // Forward headers to handle reverse proxy or load balancer scenarios
         app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -94,12 +100,12 @@ public class Program
             await next();
         });
 
-        app.UseHttpsRedirection(); // Redirect all HTTP requests to HTTPS
+        app.UseHttpsRedirection();
         app.UseStaticFiles();
 
         app.UseRouting();
 
-        // Enable CORS before authentication and authorization
+        // Enable CORS BEFORE Authentication and Authorization
         app.UseCors("AllowLocalhost");
 
         app.UseAuthentication();
@@ -108,58 +114,43 @@ public class Program
         // Apply cookie policy
         app.UseCookiePolicy();
 
+        // Map endpoints AFTER authentication and authorization middleware are in place.
+        app.MapHub<ChatHub>("/chatHub");
+        app.MapHub<NotificationHub>("/notificationHub");
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
         app.MapRazorPages();
 
-         using (var scope = app.Services.CreateScope())
-         {
-             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-             var roles = new[] { "Admin", "HomeOwner", "Staff" };
-
-
-             foreach (var role in roles)
-             {
-                 if (!await roleManager.RoleExistsAsync(role))
-                     await roleManager.CreateAsync(new IdentityRole(role));
-             }
-         }
-
-       /* using (var scope = app.Services.CreateScope())
+        // Seed roles
+        using (var scope = app.Services.CreateScope())
         {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var roles = new[] { "Admin", "HomeOwner", "Staff" };
 
-            // Define roles with fixed IDs
-            var roles = new List<IdentityRole>
-            {
-                new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
-                new IdentityRole { Id = "2", Name = "HomeOwner", NormalizedName = "HOMEOWNER" },
-                new IdentityRole { Id = "3", Name = "Staff", NormalizedName = "STAFF" }
-            };
-                 
-            // Ensure roles exist in the database
             foreach (var role in roles)
             {
-                if (!await roleManager.RoleExistsAsync(role.Name))
-                    await roleManager.CreateAsync(role);
+                if (!await roleManager.RoleExistsAsync(role))
+                    await roleManager.CreateAsync(new IdentityRole(role));
             }
+        }
 
-            // Admin user credentials
+        // Seed an admin user
+        using (var scope = app.Services.CreateScope())
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
             string email = "admin@admin.com";
             string password = "Admin1234*";
 
-            var existingUser = await userManager.FindByEmailAsync(email);
-            if (existingUser == null)
+            if (await userManager.FindByEmailAsync(email) == null)
             {
                 var user = new ApplicationUser
                 {
                     UserName = email,
                     Email = email,
                     FirstName = "Admin",
-                    LastName = "User",
-                    EmailConfirmed = true
+                    LastName = "User"
                 };
 
                 var result = await userManager.CreateAsync(user, password);
@@ -170,37 +161,7 @@ public class Program
                 }
             }
         }
-       */
-
-
-           using (var scope = app.Services.CreateScope())
-           {
-               var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>(); // FIXED
-
-               string email = "admin@admin.com";
-               string password = "Admin1234*";
-
-               if (await userManager.FindByEmailAsync(email) == null)
-               {
-                   var user = new ApplicationUser
-                   {
-                       UserName = email,
-                       Email = email,
-                       FirstName = "Admin",
-                       LastName = "User"
-                   };
-
-                   var result = await userManager.CreateAsync(user, password);
-
-                   if (result.Succeeded)
-                   {
-                       await userManager.AddToRoleAsync(user, "Admin");
-                   }
-               }
-           }
-
-
 
         app.Run();
-    } 
+    }
 }

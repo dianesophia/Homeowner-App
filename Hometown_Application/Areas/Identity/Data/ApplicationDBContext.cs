@@ -25,7 +25,18 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<StatusModel> Status { get; set; }
     public DbSet<ReservationModel> Reservation { get; set; }
     public DbSet<FacilityModel> Facility { get; set; }
-    
+    public DbSet<VisitorGatepassModel> VisitorGatepasses { get; set; }
+    public DbSet<VehicleGatepassModel> VehicleGatepasses { get; set; }
+
+    //Community Forum
+    public DbSet<PostModel> Posts { get; set; }
+    public DbSet<CommentModel> Comments { get; set; }
+    public DbSet<ReactionModel> Reactions { get; set; }
+
+    //Chat
+    public DbSet<ChatMessageModel> Chats { get; set; }
+
+
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
     public DbSet<PollQuestionModel> PollQuestions { get; set; }
@@ -60,10 +71,67 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .HasForeignKey(fc => fc.UserId)
            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<IdentityRole>().ToTable("AspNetRoles").HasKey(r => r.Id);
-        builder.Entity<ApplicationUser>().ToTable("AspNetUsers").HasKey(u => u.Id);
 
-  
+        builder.Entity<VehicleGatepassModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<VisitorGatepassModel>()
+           .HasOne(fc => fc.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(fc => fc.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
+
+
+        // Community Forum
+        builder.Entity<PostModel>()
+            .HasOne(p => p.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<ReactionModel>()
+            .HasOne(r => r.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<ReactionModel>()
+            .HasOne(r => r.Post)
+            .WithMany(p => p.Reactions)  // Allow multiple reactions per post
+            .HasForeignKey(r => r.PostId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CommentModel>()
+            .HasOne(c => c.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CommentModel>()
+            .HasOne(c => c.Post)
+            .WithMany(p => p.Comments)  // Allow multiple comments per post
+            .HasForeignKey(c => c.PostId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        //Chat
+
+        builder.Entity<ChatMessageModel>()
+       .HasOne(c => c.Sender)
+       .WithMany()  // No navigation property in ApplicationUser
+       .HasForeignKey(c => c.SenderId)
+       .OnDelete(DeleteBehavior.NoAction); // Prevent cascading delete
+
+        // Relationship for Recipient
+        builder.Entity<ChatMessageModel>()
+            .HasOne(c => c.Recipient)
+            .WithMany()  // No navigation property in ApplicationUser
+            .HasForeignKey(c => c.RecipientId)
+            .OnDelete(DeleteBehavior.NoAction); // Prevent cascading delete
+
+
         builder.Entity<StatusModel>().HasData(
             new StatusModel { StatusId = 1, StatusName = "Available" },
             new StatusModel { StatusId = 2, StatusName = "Unavailable" },
@@ -126,15 +194,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         };
         builder.Entity<ApplicationUser>().HasData(users);
 
-        // ✅ Seeding User Roles
-        var userRoles = new List<IdentityUserRole<string>>
-        {
-          //  new IdentityUserRole<string> { UserId = "100", RoleId = "2" },  // Elon Musk → Staff
-          //  new IdentityUserRole<string> { UserId = "101", RoleId = "1" }   // Admin → Admin
-        };
-
-
-        builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
+      
         builder.Entity<HomeownerProfileModel>()
           .HasOne(fc => fc.ApplicationUser)
           .WithMany()
@@ -207,7 +267,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
              .OnDelete(DeleteBehavior.Restrict);
         */
    
-        base.OnModelCreating(builder);
+     
 
         // 🔹 ServiceRequest ↔ Status (FK)
         builder.Entity<ServiceRequestModel>()
@@ -272,5 +332,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             .WithMany(o => o.Responses)
             .HasForeignKey(r => r.SelectedOptionId)
             .OnDelete(DeleteBehavior.Restrict);
+
+       
     }
 }

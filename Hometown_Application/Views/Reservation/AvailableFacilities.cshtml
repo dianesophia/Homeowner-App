@@ -1,61 +1,274 @@
 ﻿@model IEnumerable<Hometown_Application.Models.FacilityModel>
-
 @{
     ViewData["Title"] = "Available Facilities";
 }
 
-<h2>Available Facilities</h2>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<div class="mb-3">
-    <label for="searchInput" class="form-label"><strong>Search Facilities:</strong></label>
-    <input type="text" id="searchInput" class="form-control" placeholder="Enter facility name..." onkeyup="filterFacilities()">
-</div>
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
 
-<table class="table" id="facilityTable">
-    <thead>
-        <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Capacity</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var facility in Model)
-        {
-            var hasPendingReservation = facility.Reservations?.Any(r => r.Status == "Pending" && !r.IsDeleted) ?? false;
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
 
-            <tr>
-                <td>
-                    @if (facility.Image != null && facility.Image.Length > 0)
-                    {
-                        var base64Image = Convert.ToBase64String(facility.Image);
-                        var imgSrc = $"data:image/jpeg;base64,{base64Image}";
-                        <img src="@imgSrc" alt="Facility Image" style="max-width: 100px;" />
-                    }
-                    else
-                    {
-                        <span>No Image</span>
-                    }
-                </td>
-                <td class="facility-name">@facility.Name</td>
-                <td>@facility.Type</td>
-                <td>@facility.Capacity</td>
-                <td>
-                    @if (hasPendingReservation)
-                    {
-                        <span class="badge bg-warning text-dark">Pending Reservation</span>
-                    }
-                    else
-                    {
-                        <a asp-action="CreateOrEdit" asp-controller="Reservation" asp-route-facilityId="@facility.FacilityId" class="btn btn-primary">Reserve</a>
-                    }
-                </td>
-            </tr>
+        .navbar-brand:hover {
+            transform: scale(1.05);
         }
-    </tbody>
-</table>
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+
+    .facilities-container {
+        width: 100%;
+        margin: 2rem auto;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(111, 117, 78, 0.05);
+    }
+
+    .table thead th {
+        vertical-align: middle;
+        padding: 0.75rem;
+        border-bottom: 2px solid var(--primary-light);
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .table tbody td {
+        padding: 0.75rem;
+        vertical-align: middle;
+        border-top: 1px solid #dee2e6;
+        text-align: center;
+    }
+
+    .btn {
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+        color: var(--text-color);
+    }
+
+    .search-box {
+        background-color: rgba(111, 117, 78, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(111, 117, 78, 0.1);
+    }
+
+    .badge {
+        padding: 0.5em 0.8em;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+
+    .bg-warning {
+        background-color: var(--warning-color) !important;
+    }
+
+    .text-dark {
+        color: #212529 !important;
+    }
+
+    .facility-image {
+        max-width: 100px;
+        max-height: 100px;
+        border-radius: 8px;
+        border: 3px solid var(--primary-light);
+        object-fit: cover;
+    }
+</style>
+
+<div class="content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Available Facilities</h1>
+        </div>
+    </div>
+
+    <div class="facilities-container">
+        <div class="search-box">
+            <label for="searchInput" class="form-label"><strong>Search Facilities:</strong></label>
+            <input type="text" id="searchInput" class="form-control" placeholder="Enter facility name..." onkeyup="filterFacilities()">
+        </div>
+
+        <table class="table table-striped" id="facilityTable">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Capacity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var facility in Model)
+                {
+                    var hasPendingReservation = facility.Reservations?.Any(r => r.Status == "Pending" && !r.IsDeleted) ?? false;
+                    <tr>
+                        <td>
+                            @if (facility.Image != null && facility.Image.Length > 0)
+                            {
+                                var base64Image = Convert.ToBase64String(facility.Image);
+                                var imgSrc = $"data:image/jpeg;base64,{base64Image}";
+                                <img src="@imgSrc" alt="Facility Image" class="facility-image" />
+                            }
+                            else
+                            {
+                                <span>No Image</span>
+                            }
+                        </td>
+                        <td class="facility-name">@facility.Name</td>
+                        <td>@facility.Type</td>
+                        <td>@facility.Capacity</td>
+                        <td>
+                            @if (hasPendingReservation)
+                            {
+                                <span class="badge bg-warning text-dark">Pending Reservation</span>
+                            }
+                            else
+                            {
+                                <a asp-action="CreateOrEdit" asp-controller="Reservation" asp-route-facilityId="@facility.FacilityId" class="btn btn-primary">Reserve</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script>
     function filterFacilities() {
@@ -63,7 +276,6 @@
         var filter = input.value.toLowerCase();
         var table = document.getElementById("facilityTable");
         var tr = table.getElementsByTagName("tr");
-
         for (var i = 1; i < tr.length; i++) { // Skip table header
             var td = tr[i].getElementsByClassName("facility-name")[0];
             if (td) {

@@ -55,5 +55,8 @@ public class ApplicationUser : IdentityUser
     public HomeownerProfileModel? HomeownerProfiles { get; set; }
     public StaffProfileModel? StaffProfiles { get; set; }
 
+    public virtual ICollection<ChatMessageModel> SentMessages { get; set; }
+    public virtual ICollection<ChatMessageModel> ReceivedMessages { get; set; }
+
 }
 
