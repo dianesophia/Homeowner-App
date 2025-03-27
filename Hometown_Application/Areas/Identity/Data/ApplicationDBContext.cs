@@ -37,6 +37,9 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<ChatMessageModel> Chats { get; set; }
 
 
+    //Billing
+    public DbSet<BillModel> Bills { get; set; }
+
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
     public DbSet<PollQuestionModel> PollQuestions { get; set; }
@@ -123,6 +126,15 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
        .WithMany()  // No navigation property in ApplicationUser
        .HasForeignKey(c => c.SenderId)
        .OnDelete(DeleteBehavior.NoAction); // Prevent cascading delete
+
+
+        //Billing
+        builder.Entity<BillModel>()
+           .HasOne(p => p.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(p => p.UserId)
+           .OnDelete(DeleteBehavior.NoAction);
+
 
         // Relationship for Recipient
         builder.Entity<ChatMessageModel>()

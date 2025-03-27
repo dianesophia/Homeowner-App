@@ -45,7 +45,7 @@ namespace Hometown_Application.Controllers
             return View();
         }
 
-        // POST: Save Request Type
+       /* // POST: Save Request Type
         [HttpPost]
         [ValidateAntiForgeryToken]
         [HttpPost]
@@ -77,10 +77,10 @@ namespace Hometown_Application.Controllers
 
 
 
+*/
 
 
-
-
+/*
         [HttpGet]
         public IActionResult RequestConfirmation()
         {
@@ -98,7 +98,7 @@ namespace Hometown_Application.Controllers
         }
 
 
-       
+ */      
 
 
 
