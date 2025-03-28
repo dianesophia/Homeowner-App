@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
 using QuestPDF;
 using Hometown_Application.Hubs;
-
+using Stripe;
+using Hometown_Application;
 public class Program
 {
     public static async Task Main(string[] args)
@@ -72,6 +73,9 @@ public class Program
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Cookies only sent over HTTPS
             options.Cookie.SameSite = SameSiteMode.Lax;
         });
+
+        var stripeSettings = builder.Configuration.GetSection("StripeSettings").Get<StripeSettings>();
+        builder.Services.AddSingleton(stripeSettings);
 
         // Add SignalR
         builder.Services.AddSignalR();
@@ -158,6 +162,7 @@ public class Program
                 }
             }
         }
+
 
         app.Run();
     }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Hometown_Application.Areas.Identity.Data;
 
 namespace Hometown_Application.Models
 {
@@ -7,11 +8,13 @@ namespace Hometown_Application.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int BillId { get; set; }
 
         [Required]
-        [StringLength(450)]
-        public string HomeownerId { get; set; }  // Foreign key to Homeowner
+        public string UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public ApplicationUser ApplicationUser { get; set; }
 
         [Required]
         public DateTime BillingDate { get; set; }
