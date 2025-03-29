@@ -92,6 +92,9 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; }
 
+            [Required]
+            public string PhoneNumber { get; set; }
+
 
             [PersonalData]
             [Column(TypeName = "nvarchar(50)")]
@@ -202,6 +205,7 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
                 user.Email = Input.Email;
+                user.PhoneNumber = Input.PhoneNumber;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

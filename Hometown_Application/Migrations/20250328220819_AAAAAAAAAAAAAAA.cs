@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class DFW : Migration
+    public partial class AAAAAAAAAAAAAAA : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -309,6 +309,40 @@ namespace Hometown_Application.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bills",
+                columns: table => new
+                {
+                    BillId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    BillingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BalanceAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BillingPeriod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsPenaltyApplied = table.Column<bool>(type: "bit", nullable: false),
+                    PenaltyAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentReference = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bills", x => x.BillId);
+                    table.ForeignKey(
+                        name: "FK_Bills_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -838,7 +872,7 @@ namespace Hometown_Application.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AdminProfilesAdminId", "Bio", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FacebookProfile", "FirstName", "Gender", "HomeownerProfilesHomeownerId", "IsActiveUser", "IsApproved", "IsBirthdayPublic", "IsGenderPublic", "LastName", "LinkedInProfile", "LockoutEnabled", "LockoutEnd", "MakeFacebookPublic", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "SecurityStamp", "StaffProfilesStaffId", "TwitterProfile", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "100", 0, null, null, "416ccdf0-dbee-4c26-8819-54522d0e5d65", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEF25vm/yFzg5RS4r5gNTY/WvcmzOxWsT+0FtJlsYGcmeVabm+hICtPXTh/iM6Pzung==", null, false, null, "9aa32387-caa7-4859-9e2c-a59246a85233", null, null, false, "elon.musk@example.com" });
+                values: new object[] { "100", 0, null, null, "6e647800-fda8-4f5e-8b27-f051d2f49b43", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEB+L0Esae5IhMP9fCLqP7oGGSgtQ6l9mji2pxI6S4V7r2+inXrwlbuvvQtDLRO0bwA==", null, false, null, "ce1cbe13-ac15-4a91-a3c4-e0b844e4b802", null, null, false, "elon.musk@example.com" });
 
             migrationBuilder.InsertData(
                 table: "RequestTypes",
@@ -925,6 +959,11 @@ namespace Hometown_Application.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bills_UserId",
+                table: "Bills",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Chats_ApplicationUserId",
@@ -1156,6 +1195,9 @@ namespace Hometown_Application.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Bills");
 
             migrationBuilder.DropTable(
                 name: "Chats");

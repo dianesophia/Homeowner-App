@@ -165,6 +165,12 @@
             <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
 
+        <div class="mb-3">
+            <label asp-for="Input.PhoneNumber" class="form-label"></label>
+            <input asp-for="Input.PhoneNumber" class="form-control custom-form-control" placeholder="Your phone number" />
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+        </div>
+
         <!-- Password Field -->
         <div class="form-floating mb-3">
             <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="password" />

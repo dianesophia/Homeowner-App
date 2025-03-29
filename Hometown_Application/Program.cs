@@ -74,8 +74,8 @@ public class Program
             options.Cookie.SameSite = SameSiteMode.Lax;
         });
 
-        var stripeSettings = builder.Configuration.GetSection("StripeSettings").Get<StripeSettings>();
-        builder.Services.AddSingleton(stripeSettings);
+       // var stripeSettings = builder.Configuration.GetSection("StripeSettings").Get<StripeSettings>();
+        //builder.Services.AddSingleton(stripeSettings);
 
         // Add SignalR
         builder.Services.AddSignalR();

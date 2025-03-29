@@ -19,7 +19,7 @@
     <!-- Post Content -->
     <p class="lead">@Model.Content</p>
     <small class="text-muted d-block mb-4">
-        📝 By <strong>@Model.ApplicationUser.UserName</strong> | 📅 @Model.AddedOn.ToString("MMMM dd, yyyy")
+        📝 By <strong>@Model.ApplicationUser.FirstName @Model.ApplicationUser.LastName</strong> | 📅 @Model.AddedOn.ToString("MMMM dd, yyyy")
     </small>
 
     <hr />

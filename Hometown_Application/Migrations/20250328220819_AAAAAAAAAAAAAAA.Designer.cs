@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250324061704_DFW")]
-    partial class DFW
+    [Migration("20250328220819_AAAAAAAAAAAAAAA")]
+    partial class AAAAAAAAAAAAAAA
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -153,7 +153,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "416ccdf0-dbee-4c26-8819-54522d0e5d65",
+                            ConcurrencyStamp = "6e647800-fda8-4f5e-8b27-f051d2f49b43",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -167,9 +167,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEF25vm/yFzg5RS4r5gNTY/WvcmzOxWsT+0FtJlsYGcmeVabm+hICtPXTh/iM6Pzung==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB+L0Esae5IhMP9fCLqP7oGGSgtQ6l9mji2pxI6S4V7r2+inXrwlbuvvQtDLRO0bwA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9aa32387-caa7-4859-9e2c-a59246a85233",
+                            SecurityStamp = "ce1cbe13-ac15-4a91-a3c4-e0b844e4b802",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -202,6 +202,78 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AdminProfiles");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillModel", b =>
+                {
+                    b.Property<int>("BillId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillId"));
+
+                    b.Property<decimal>("BalanceAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("BillingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("BillingPeriod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPenaltyApplied")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PaidAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentReference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PenaltyAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BillId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Bills");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ChatMessageModel", b =>
@@ -1551,6 +1623,17 @@ namespace Hometown_Application.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
