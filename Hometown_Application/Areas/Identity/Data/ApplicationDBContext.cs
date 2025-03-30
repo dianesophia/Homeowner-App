@@ -13,7 +13,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
-    public DbSet<HouseModel> House { get; set; }
+    public DbSet<HouseModel> Houses { get; set; }
     public DbSet<HomeownerProfileModel> HomeownerProfiles { get; set; }
     public DbSet<StaffProfileModel> StaffProfiles { get; set; }
     public DbSet<AdminProfileModel> AdminProfiles { get; set; }
@@ -39,6 +39,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
 
     //Billing
     public DbSet<BillModel> Bills { get; set; }
+    public DbSet<BillItemsModel> BillItems { get; set; }
 
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
@@ -54,7 +55,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder builder)
     {
             base.OnModelCreating(builder);
-           builder.Entity<FacilityModel>()
+
+        builder.Entity<HouseModel>()
+            .HasIndex(h => new { h.BlockNumber, h.LotNumber, h.StreetName })
+            .IsUnique(); 
+
+        builder.Entity<FacilityModel>()
                 .HasMany(f => f.Reservations)
                 .WithOne(r => r.Facility)
                 .HasForeignKey(r => r.FacilityId)
@@ -163,50 +169,103 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
                 new RequestTypeModel { RequestTypeId = 7, Name = "Suspicious Activity", AssignedDepartment = StaffDepartment.Security, Description = "Report security concerns or suspicious activity." }
             );
 
+        builder.Entity<BillItemsModel>().HasData(
+       new BillItemsModel { BillItemsID = 1, PaymentName = "Homeowners Association (HOA) Fees", Amount = 2000.00m, Description = "Monthly HOA dues covering maintenance, security, and amenities.", PaymentDuration = "Monthly" },
+       new BillItemsModel { BillItemsID = 2, PaymentName = "Water Bill", Amount = 50.00m, Description = "Monthly water consumption charges.", PaymentDuration = "Monthly" },
+       new BillItemsModel { BillItemsID = 3, PaymentName = "Electricity Bill", Amount = 2500.00m, Description = "Monthly payment for electricity consumption.", PaymentDuration = "Monthly" },
+       new BillItemsModel { BillItemsID = 4, PaymentName = "Garbage Collection Fee", Amount = 300.00m, Description = "Monthly fee for waste disposal services.", PaymentDuration = "Monthly" },
+       new BillItemsModel { BillItemsID = 5, PaymentName = "Security Fee", Amount = 1500.00m, Description = "Monthly fee for subdivision security services.", PaymentDuration = "Monthly" },
+       new BillItemsModel { BillItemsID = 6, PaymentName = "Street Lighting Fee", Amount = 500.00m, Description = "Monthly fee for streetlight maintenance.", PaymentDuration = "Monthly" },
+       new BillItemsModel { BillItemsID = 7, PaymentName = "Clubhouse Maintenance Fee", Amount = 800.00m, Description = "Annual fee for maintaining the clubhouse and shared spaces.", PaymentDuration = "Yearly" },
+       new BillItemsModel { BillItemsID = 8, PaymentName = "Property Tax Contribution", Amount = 5000.00m, Description = "Annual contribution for property tax remittance.", PaymentDuration = "Yearly" },
+       new BillItemsModel { BillItemsID = 9, PaymentName = "Sinking Fund Contribution", Amount = 1200.00m, Description = "Quarterly contribution for major subdivision repairs.", PaymentDuration = "Quarterly" },
+       new BillItemsModel { BillItemsID = 10, PaymentName = "Pest Control Fee", Amount = 600.00m, Description = "Quarterly fee for pest control services in the subdivision.", PaymentDuration = "Quarterly" },
+       new BillItemsModel { BillItemsID = 11, PaymentName = "Road Maintenance Fee", Amount = 1000.00m, Description = "Annual fee for road maintenance and repairs.", PaymentDuration = "Yearly" }
+   );
 
 
         // ✅ Seeding Roles
-       /* var roles = new List<IdentityRole>
-        {
-            new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
-            new IdentityRole { Id = "2", Name = "HomeOwner", NormalizedName = "HOMEOWNER" },
-            new IdentityRole { Id = "3", Name = "Staff", NormalizedName = "STAFF" }
-        };
-        builder.Entity<IdentityRole>().HasData(roles);*/
+         var roles = new List<IdentityRole>
+         {
+             new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
+             new IdentityRole { Id = "2", Name = "HomeOwner", NormalizedName = "HOMEOWNER" },
+             new IdentityRole { Id = "3", Name = "Staff", NormalizedName = "STAFF" }
+         };
+         builder.Entity<IdentityRole>().HasData(roles);
 
         // ✅ Seeding Users
+
+       /* var adminRole = new IdentityRole("Admin") { Id = "1", NormalizedName = "ADMIN" };
+        var homeOwnerRole = new IdentityRole("HomeOwner") { Id = "2", NormalizedName = "HOMEOWNER" };
+        var staffRole = new IdentityRole("Staff") { Id = "3", NormalizedName = "STAFF" };
+       */
         var hasher = new PasswordHasher<ApplicationUser>();
 
-        var users = new List<ApplicationUser>
+      /*  var adminUser = new ApplicationUser
         {
-            new ApplicationUser
-            {
-                Id = "100",  // Unique GUID
-                UserName = "elon.musk@example.com",
-                NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                Email = "elon.musk@example.com",
-                NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
-                EmailConfirmed = true,
-                FirstName = "Elon",
-                LastName = "Musk",
-                PasswordHash = hasher.HashPassword(null, "ElonMusk123*")
-            },
-            /*new ApplicationUser
-            {
-                Id = "101",
-                UserName = "admin@admin.com",
-                NormalizedUserName = "ADMIN@ADMIN.COM",
-                Email = "admin@admin.com",
-                NormalizedEmail = "ADMIN@ADMIN.COM",
-                EmailConfirmed = true,
-                FirstName = "Admin",
-                LastName = "User",
-                PasswordHash = hasher.HashPassword(null, "Admin123*")
-            }*/
+            Id = "999", // Unique ID for Admin
+            UserName = "admin@admin.com",
+            NormalizedUserName = "ADMIN@ADMIN.COM",
+            Email = "admin@admin.com",
+            NormalizedEmail = "ADMIN@ADMIN.COM",
+            EmailConfirmed = true,
+            FirstName = "System",
+            LastName = "Admin",
+            PasswordHash = hasher.HashPassword(null, "Admin1234*") // Secure password
         };
-        builder.Entity<ApplicationUser>().HasData(users);
 
-      
+        // ✅ Add Admin User
+        builder.Entity<ApplicationUser>().HasData(adminUser);
+
+        builder.Entity<IdentityUserRole<string>>().HasData(
+   new IdentityUserRole<string> { UserId = "999", RoleId = "1" } // Assigning Admin Role
+);*/
+
+        builder.Entity<ApplicationUser>().HasData(
+    new ApplicationUser { Id = "100", UserName = "elon.musk@example.com", NormalizedUserName = "ELON.MUSK@EXAMPLE.COM", Email = "elon.musk@example.com", NormalizedEmail = "ELON.MUSK@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Elon", LastName = "Musk", PasswordHash = hasher.HashPassword(null, "ElonMusk123*") },
+    new ApplicationUser { Id = "102", UserName = "bill.gates@example.com", NormalizedUserName = "BILL.GATES@EXAMPLE.COM", Email = "bill.gates@example.com", NormalizedEmail = "BILL.GATES@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Bill", LastName = "Gates", PasswordHash = hasher.HashPassword(null, "BillGates123*") },
+    new ApplicationUser { Id = "103", UserName = "mark.zuckerberg@example.com", NormalizedUserName = "MARK.ZUCKERBERG@EXAMPLE.COM", Email = "mark.zuckerberg@example.com", NormalizedEmail = "MARK.ZUCKERBERG@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Mark", LastName = "Zuckerberg", PasswordHash = hasher.HashPassword(null, "MarkZuck123*") },
+    new ApplicationUser { Id = "104", UserName = "sundar.pichai@example.com", NormalizedUserName = "SUNDAR.PICHAI@EXAMPLE.COM", Email = "sundar.pichai@example.com", NormalizedEmail = "SUNDAR.PICHAI@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Sundar", LastName = "Pichai", PasswordHash = hasher.HashPassword(null, "SundarPichai123*") },
+    new ApplicationUser { Id = "105", UserName = "tim.cook@example.com", NormalizedUserName = "TIM.COOK@EXAMPLE.COM", Email = "tim.cook@example.com", NormalizedEmail = "TIM.COOK@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Tim", LastName = "Cook", PasswordHash = hasher.HashPassword(null, "TimCook123*") },
+    new ApplicationUser { Id = "106", UserName = "satya.nadella@example.com", NormalizedUserName = "SATYA.NADELLA@EXAMPLE.COM", Email = "satya.nadella@example.com", NormalizedEmail = "SATYA.NADELLA@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Satya", LastName = "Nadella", PasswordHash = hasher.HashPassword(null, "SatyaNadella123*") },
+    new ApplicationUser { Id = "107", UserName = "jack.dorsey@example.com", NormalizedUserName = "JACK.DORSEY@EXAMPLE.COM", Email = "jack.dorsey@example.com", NormalizedEmail = "JACK.DORSEY@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Jack", LastName = "Dorsey", PasswordHash = hasher.HashPassword(null, "JackDorsey123*") },
+    new ApplicationUser { Id = "108", UserName = "larry.page@example.com", NormalizedUserName = "LARRY.PAGE@EXAMPLE.COM", Email = "larry.page@example.com", NormalizedEmail = "LARRY.PAGE@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Larry", LastName = "Page", PasswordHash = hasher.HashPassword(null, "LarryPage123*") },
+    new ApplicationUser { Id = "109", UserName = "sergey.brin@example.com", NormalizedUserName = "SERGEY.BRIN@EXAMPLE.COM", Email = "sergey.brin@example.com", NormalizedEmail = "SERGEY.BRIN@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Sergey", LastName = "Brin", PasswordHash = hasher.HashPassword(null, "SergeyBrin123*") },
+    new ApplicationUser { Id = "110", UserName = "steve.jobs@example.com", NormalizedUserName = "STEVE.JOBS@EXAMPLE.COM", Email = "steve.jobs@example.com", NormalizedEmail = "STEVE.JOBS@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Steve", LastName = "Jobs", PasswordHash = hasher.HashPassword(null, "SteveJobs123*") });
+
+
+
+        builder.Entity<HouseModel>().HasData(
+        new HouseModel { HouseId = 1, UserId = "100", BlockNumber = "A1", LotNumber = 101, StreetName = "Main St", IsOccupied = true },
+        new HouseModel { HouseId = 2, UserId = "102", BlockNumber = "B2", LotNumber = 202, StreetName = "Oak St", IsOccupied = true },
+        new HouseModel { HouseId = 3, UserId = "103", BlockNumber = "C3", LotNumber = 303, StreetName = "Pine St", IsOccupied = true },
+        new HouseModel { HouseId = 4, UserId = "104", BlockNumber = "D4", LotNumber = 404, StreetName = "Cedar St", IsOccupied = true },
+        new HouseModel { HouseId = 5, UserId = "105", BlockNumber = "E5", LotNumber = 505, StreetName = "Birch St", IsOccupied = true },
+        new HouseModel { HouseId = 6, UserId = "106", BlockNumber = "F6", LotNumber = 606, StreetName = "Maple St", IsOccupied = true },
+        new HouseModel { HouseId = 7, UserId = "107", BlockNumber = "G7", LotNumber = 707, StreetName = "Elm St", IsOccupied = true }
+    );
+        
+        builder.Entity<StaffProfileModel>().HasData(
+    new StaffProfileModel { StaffId = 1, UserId = "100", Department = StaffDepartment.Security, Position = "Security Officer", HireDate = DateTime.Parse("2022-01-10"), Salary = 25000.00m, IsActiveEmployee = true, IsAlsoHomeOwner = true, Address = "123 Main St", EmergencyContactName = "Jane Doe", EmergencyContactNumber = "1234567890", EmergencyContactRelation = "Spouse", AccountCreatedBy = "admin", AccountCreatedOn = DateTime.UtcNow },
+    new StaffProfileModel { StaffId = 2, UserId = "102", Department = StaffDepartment.Maintenance, Position = "Maintenance Supervisor", HireDate = DateTime.Parse("2021-06-15"), Salary = 30000.00m, IsActiveEmployee = true, IsAlsoHomeOwner = true,  Address = "456 Oak St", EmergencyContactName = "John Smith", EmergencyContactNumber = "0987654321", EmergencyContactRelation = "Brother", AccountCreatedBy = "admin", AccountCreatedOn = DateTime.UtcNow },
+    new StaffProfileModel { StaffId = 3, UserId = "103", Department = StaffDepartment.IT, Position = "System Administrator", HireDate = DateTime.Parse("2020-09-20"), Salary = 35000.00m, IsActiveEmployee = true, IsAlsoHomeOwner = true, Address = "789 Pine St", EmergencyContactName = "Alice Brown", EmergencyContactNumber = "5678901234", EmergencyContactRelation = "Sister", AccountCreatedBy = "admin", AccountCreatedOn = DateTime.UtcNow },
+    new StaffProfileModel { StaffId = 4, UserId = "104", Department = StaffDepartment.Finance, Position = "Finance Manager", HireDate = DateTime.Parse("2019-04-05"), Salary = 40000.00m, IsActiveEmployee = true, IsAlsoHomeOwner = true,  Address = "987 Cedar St", EmergencyContactName = "Bob White", EmergencyContactNumber = "2345678901", EmergencyContactRelation = "Father", AccountCreatedBy = "admin", AccountCreatedOn = DateTime.UtcNow },
+    new StaffProfileModel { StaffId = 5, UserId = "105", Department = StaffDepartment.Amenities, Position = "Amenities Coordinator", HireDate = DateTime.Parse("2021-11-12"), Salary = 28000.00m, IsActiveEmployee = true, IsAlsoHomeOwner = true, Address = "654 Birch St", EmergencyContactName = "Chris Green", EmergencyContactNumber = "3456789012", EmergencyContactRelation = "Friend", AccountCreatedBy = "admin", AccountCreatedOn = DateTime.UtcNow },
+    new StaffProfileModel { StaffId = 6, UserId = "106", Department = StaffDepartment.CustomerSupport, Position = "Customer Service Representative", HireDate = DateTime.Parse("2023-02-20"), Salary = 26000.00m, IsActiveEmployee = true, IsAlsoHomeOwner = true, Address = "321 Maple St", EmergencyContactName = "Diana Blue", EmergencyContactNumber = "4567890123", EmergencyContactRelation = "Cousin", AccountCreatedBy = "admin", AccountCreatedOn = DateTime.UtcNow },
+    new StaffProfileModel { StaffId = 7, UserId = "107", Department = StaffDepartment.Landscaping, Position = "Head Gardener", HireDate = DateTime.Parse("2020-06-30"), Salary = 27000.00m, IsActiveEmployee = true, IsAlsoHomeOwner = true, Address = "159 Elm St", EmergencyContactName = "Evan Red", EmergencyContactNumber = "5678901234", EmergencyContactRelation = "Uncle", AccountCreatedBy = "admin", AccountCreatedOn = DateTime.UtcNow }
+);
+
+
+        builder.Entity<IdentityUserRole<string>>().HasData(
+    new IdentityUserRole<string> { UserId = "100", RoleId = "3" }, // Elon Musk -> Staff
+    new IdentityUserRole<string> { UserId = "102", RoleId = "3" }, // Bill Gates -> Staff
+    new IdentityUserRole<string> { UserId = "103", RoleId = "3" }, // Mark Zuckerberg -> Staff
+    new IdentityUserRole<string> { UserId = "104", RoleId = "3" }, // Sundar Pichai -> Staff
+    new IdentityUserRole<string> { UserId = "105", RoleId = "3" }, // Tim Cook -> Staff
+    new IdentityUserRole<string> { UserId = "106", RoleId = "3" }, // Satya Nadella -> Staff
+    new IdentityUserRole<string> { UserId = "107", RoleId = "3" }  // Jack Dorsey -> Staff
+);
+
         builder.Entity<HomeownerProfileModel>()
           .HasOne(fc => fc.ApplicationUser)
           .WithMany()
@@ -225,12 +284,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .HasForeignKey(fc => fc.UserId)
         .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<StaffProfileModel>()
+       /* builder.Entity<StaffProfileModel>()
      .HasOne(s => s.House)
      .WithMany()
      .HasForeignKey(s => s.HouseId)
      .OnDelete(DeleteBehavior.Restrict);
-
+*/
         builder.Entity<AdminProfileModel>()
         .HasOne(fc => fc.ApplicationUser)
         .WithMany()

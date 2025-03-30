@@ -127,7 +127,7 @@ public class Program
         app.MapRazorPages();
 
         // Seed roles
-        using (var scope = app.Services.CreateScope())
+       /* using (var scope = app.Services.CreateScope())
         {
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var roles = new[] { "Admin", "HomeOwner", "Staff" };
@@ -137,7 +137,7 @@ public class Program
                 if (!await roleManager.RoleExistsAsync(role))
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
-        }
+        }*/
 
         // Seed an admin user
         using (var scope = app.Services.CreateScope())
@@ -165,7 +165,7 @@ public class Program
                 }
             }
         }
-
+    
 
         app.Run();
     }

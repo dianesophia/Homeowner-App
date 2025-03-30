@@ -1,15 +1,15 @@
-﻿@model List<Hometown_Application.Models.BillModel>
+﻿@model IEnumerable<BillModel>
 
-<h2>My Bills</h2>
+<h2>Your Bills</h2>
+
 <table class="table">
     <thead>
         <tr>
             <th>Billing Period</th>
-            <th>Due Date</th>
             <th>Total Amount</th>
-            <th>Balance</th>
+            <th>Due Date</th>
             <th>Status</th>
-            <th>Action</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -17,20 +17,14 @@
         {
             <tr>
                 <td>@bill.BillingPeriod</td>
-                <td>@bill.DueDate.ToShortDateString()</td>
                 <td>@bill.TotalAmount.ToString("C")</td>
-                <td>@bill.BalanceAmount.ToString("C")</td>
+                <td>@bill.DueDate.ToShortDateString()</td>
+                <td>@bill.Status</td>
                 <td>
-                    <span class="badge @(bill.Status == "Paid" ? "bg-success" : "bg-warning")">@bill.Status</span>
-                </td>
-                <td>
-                    @if (bill.Status != "Paid")
+                    <a asp-action="Details" asp-route-id="@bill.BillId">View</a> |
+                    @if (bill.Status == "Pending")
                     {
-                        <a href="@Url.Action("Pay", "Billing", new { id = bill.BillId })" class="btn btn-primary">Pay Now</a>
-                    }
-                    else
-                    {
-                        <span class="text-success">Paid</span>
+                        <a asp-action="Pay" asp-route-id="@bill.BillId">Pay</a>
                     }
                 </td>
             </tr>

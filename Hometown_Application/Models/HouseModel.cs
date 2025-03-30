@@ -7,22 +7,20 @@ namespace Hometown_Application.Models
     public class HouseModel
     {
         [Key]
-        public int? HouseId { get; set; } // Unique identifier for each house
+        public int? HouseId { get; set; }
 
-        [Required]
+        [Required, ForeignKey("ApplicationUser")]
         public string UserId { get; set; }
-
-        [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
-        public string? BlockNumber { get; set; }
+        [Column(TypeName = "nvarchar(50)"), Required]
+        public string BlockNumber { get; set; }
 
-        public int? LotNumber { get; set; }
+        [Required]
+        public int LotNumber { get; set; }
 
-        [Column(TypeName = "nvarchar(150)")]
-        public string? StreetName { get; set; }
-
+        [Column(TypeName = "nvarchar(150)"), Required]
+        public string StreetName { get; set; }
 
         public bool? IsOccupied { get; set; } = false;
 

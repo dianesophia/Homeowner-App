@@ -1,100 +1,115 @@
 ﻿using Hometown_Application.Data;
 using Hometown_Application.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using Hometown_Application.Areas.Identity.Data;
-using Stripe;
-using Stripe.Checkout;
-using Hometown_Application;
 
-
-
-[Authorize] // Ensure only logged-in users can access
-public class BillingController : Controller
+public class BillingManagementController : Controller
 {
     private readonly ApplicationDBContext _context;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly StripeSettings _stripeSettings;
 
-    public BillingController(ApplicationDBContext context, UserManager<ApplicationUser> userManager, StripeSettings stripeSettings)
+    public BillingManagementController(ApplicationDBContext context)
     {
         _context = context;
-        _userManager = userManager;
-        _stripeSettings = stripeSettings;  // Injected directly
     }
 
-    // Show Bills for the Logged-in User
+    // Display all bills
     public async Task<IActionResult> Index()
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
-
-        var bills = _context.Bills.Where(b => b.UserId == user.Id && b.IsActive).ToList();
+        var bills = await _context.Bills.Include(b => b.ApplicationUser).ToListAsync();
         return View(bills);
     }
 
-    // Pay Now - Redirect to Payment Gateway
-    public async Task<IActionResult> Pay(int id)
+    // Display an empty view
+    public IActionResult EmptyIndex()
+    {
+        return View();
+    }
+
+    // Display form to create a new bill
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    // Handle the creation of a new bill
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("UserId,BillingDate,DueDate,TotalAmount,BillingPeriod,Status")] BillModel bill)
+    {
+        if (ModelState.IsValid)
+        {
+            _context.Add(bill);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        return View(bill);
+    }
+
+    // Display form to edit an existing bill
+    public async Task<IActionResult> Edit(int id)
     {
         var bill = await _context.Bills.FindAsync(id);
-        if (bill == null) return NotFound();
-
-        return RedirectToAction("Checkout", new { billId = bill.BillId });
-    }
-
-    // Confirm Payment
-    public async Task<IActionResult> ConfirmPayment(int billId)
-    {
-        var bill = await _context.Bills.FindAsync(billId);
-        if (bill != null)
+        if (bill == null)
         {
-            bill.Status = "Paid";
-            bill.PaidAmount = bill.TotalAmount;
-            bill.BalanceAmount = 0;
-            bill.PaidDate = DateTime.UtcNow;
-            bill.UpdatedAt = DateTime.UtcNow;
-            bill.PaymentReference = Guid.NewGuid().ToString(); 
-            await _context.SaveChangesAsync();
+            return NotFound();
         }
-        return RedirectToAction("Index");
+        return View(bill);
     }
 
-    public async Task<IActionResult> Checkout(int billId)
+    // Handle the update of an existing bill
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, [Bind("BillId,UserId,BillingDate,DueDate,TotalAmount,BillingPeriod,Status")] BillModel bill)
     {
-        var bill = await _context.Bills.FindAsync(billId);
-        if (bill == null) return NotFound();
-
-        var domain = "https://yourwebsite.com";
-        var options = new SessionCreateOptions
+        if (id != bill.BillId)
         {
-            PaymentMethodTypes = new List<string> { "card" },
-            LineItems = new List<SessionLineItemOptions>
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
         {
-            new SessionLineItemOptions
-            {
-                PriceData = new SessionLineItemPriceDataOptions
-                {
-                    Currency = "usd",
-                    UnitAmount = (long)(bill.TotalAmount * 100), // Convert to cents
-                    ProductData = new SessionLineItemPriceDataProductDataOptions
-                    {
-                        Name = "Homeowner Dues"
-                    }
-                },
-                Quantity = 1
-            }
-        },
-            Mode = "payment",
-            SuccessUrl = $"{domain}/Billing/ConfirmPayment?billId={bill.BillId}",
-            CancelUrl = $"{domain}/Billing"
-        };
+            _context.Update(bill);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        return View(bill);
+    }
 
-        var service = new SessionService();
-        var session = await service.CreateAsync(options);
+    // Display details of a specific bill
+    public async Task<IActionResult> Details(int id)
+    {
+        var bill = await _context.Bills
+            .Include(b => b.ApplicationUser)
+            .FirstOrDefaultAsync(m => m.BillId == id);
+        if (bill == null)
+        {
+            return NotFound();
+        }
+        return View(bill);
+    }
 
-        return Redirect(session.Url);
+    // Confirm deletion of a bill
+    public async Task<IActionResult> Delete(int id)
+    {
+        var bill = await _context.Bills
+            .Include(b => b.ApplicationUser)
+            .FirstOrDefaultAsync(m => m.BillId == id);
+        if (bill == null)
+        {
+            return NotFound();
+        }
+        return View(bill);
+    }
+
+    // Handle the deletion of a bill
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var bill = await _context.Bills.FindAsync(id);
+        _context.Bills.Remove(bill);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
     }
 }

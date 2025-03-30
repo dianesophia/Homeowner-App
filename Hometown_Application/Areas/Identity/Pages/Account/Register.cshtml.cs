@@ -22,6 +22,7 @@ using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations.Schema;
 using Hometown_Application.Data;
 using Hometown_Application.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hometown_Application.Areas.Identity.Pages.Account
 {
@@ -200,78 +201,84 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-
-                user.FirstName = Input.FirstName;
-                user.LastName = Input.LastName;
-                user.Email = Input.Email;
-                user.PhoneNumber = Input.PhoneNumber;
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded)
+                using (var scope = HttpContext.RequestServices.CreateScope())
                 {
-                    _logger.LogInformation("User created a new account with password.");
-                    await _userManager.AddToRoleAsync(user, "HomeOwner");
+                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
 
-                    // Create a new HomeownerProfileModel instance and associate it with the user
-                    var homeownerProfile = new HomeownerProfileModel
+                    // Check if the house already exists
+                    var existingHouse = await dbContext.Houses.FirstOrDefaultAsync(h =>
+                        h.BlockNumber == Input.BlockNumber &&
+                        h.LotNumber == Input.LotNumber &&
+                        h.StreetName == Input.StreetName);
+
+                    if (existingHouse != null)
                     {
-                        UserId = user.Id,
-                        /*BlockNumber = Input.BlockNumber,
-                        LotNumber = Input.LotNumber,
-                        StreetName = Input.StreetName,*/
-                        RegisteredOn = DateTime.UtcNow
-                    };
-
-                    var houses = new HouseModel
-                    {
-
-                        BlockNumber = Input.BlockNumber,
-                        LotNumber = Input.LotNumber,
-                        StreetName = Input.StreetName,
-                        UserId = user.Id,
-
-                    };
-
-                    using (var scope = HttpContext.RequestServices.CreateScope())
-                    {
-                        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-                     dbContext.HomeownerProfiles.Add(homeownerProfile);
-                    dbContext.House.Add(houses);
-                    await dbContext.SaveChangesAsync();
+                        ModelState.AddModelError(string.Empty, "This house is already registered.");
+                        return Page();
                     }
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var user = CreateUser();
+                    user.FirstName = Input.FirstName;
+                    user.LastName = Input.LastName;
+                    user.Email = Input.Email;
+                    user.PhoneNumber = Input.PhoneNumber;
 
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    var result = await _userManager.CreateAsync(user, Input.Password);
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    if (result.Succeeded)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
+                        _logger.LogInformation("User created a new account with password.");
+                        await _userManager.AddToRoleAsync(user, "HomeOwner");
 
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                        var homeownerProfile = new HomeownerProfileModel
+                        {
+                            UserId = user.Id,
+                            RegisteredOn = DateTime.UtcNow
+                        };
+
+                        var house = new HouseModel
+                        {
+                            BlockNumber = Input.BlockNumber,
+                            LotNumber = Input.LotNumber,
+                            StreetName = Input.StreetName,
+                            UserId = user.Id
+                        };
+
+                        dbContext.HomeownerProfiles.Add(homeownerProfile);
+                        dbContext.Houses.Add(house);
+                        await dbContext.SaveChangesAsync();
+
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                        else
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
+                    }
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
             }
 

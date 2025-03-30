@@ -13,13 +13,18 @@
 
 <!-- Select recipient -->
 <label for="recipientSelect">Select User:</label>
-<select id="recipientSelect">
-    <option value="">-- Choose a user --</option>
-    @foreach (var user in ViewBag.Users)
-    {
-        <option value="@user.Id">@user.FirstName @user.LastName</option>
-    }
-</select>
+<div class="user-selection">
+    <img id="selectedProfilePic" src="" alt="Profile" class="profile-pic hidden">
+    <select id="recipientSelect">
+        <option value="" data-image="">-- Choose a user --</option>
+        @foreach (var user in ViewBag.Users)
+        {
+            <option value="@user.Id" data-image="@user.ProfilePicture">
+                @user.FirstName @user.LastName
+            </option>
+        }
+    </select>
+</div>
 
 <div id="chatContainer">
     <div id="chatBox"></div>
@@ -36,7 +41,6 @@
     <source src="/audio/messenger.wav" type="audio/wav">
     Your browser does not support the audio element.
 </audio>
-
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
@@ -55,7 +59,6 @@
 
         function addMessageToChatBox(sender, message, isSender) {
             const chatBox = document.getElementById("chatBox");
-
             if (!chatBox) {
                 console.error("❌ Error: Chat box not found.");
                 return;
@@ -99,7 +102,7 @@
             .catch(err => console.error("❌ Error sending message:", err));
         });
 
-               document.getElementById("recipientSelect").addEventListener("change", function () {
+        document.getElementById("recipientSelect").addEventListener("change", function () {
             const recipientId = this.value;
             const chatBox = document.getElementById("chatBox");
 
@@ -126,9 +129,7 @@
                 .catch(err => console.error("❌ Error loading messages:", err));
         });
 
-
-                function playNotificationSound() {
-            const messageSound = document.getElementById("messageSound");
+        function playNotificationSound() {
             if (messageSound) {
                 messageSound.play().catch(err => {
                     console.warn("🔇 Sound play error (possible autoplay restriction):", err);
@@ -136,8 +137,7 @@
             }
         }
 
-
-             connection.on("ReceivePrivateMessage", (sender, message) => {
+        connection.on("ReceivePrivateMessage", (sender, message) => {
             console.log(`📩 New message from ${sender}: ${message}`);
             addMessageToChatBox(sender, message, false);
 
@@ -149,8 +149,7 @@
             updateNotificationBadge();
         });
 
-
-               function updateNotificationBadge() {
+        function updateNotificationBadge() {
             const badge = document.getElementById("notificationCount");
             if (unreadCount > 0) {
                 badge.innerText = unreadCount;
@@ -159,6 +158,20 @@
                 badge.style.display = "none";
             }
         }
+
+        // ✅ Display selected user's profile picture
+        document.getElementById("recipientSelect").addEventListener("change", function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const profilePic = document.getElementById("selectedProfilePic");
+            const imageUrl = selectedOption.getAttribute("data-image");
+
+            if (imageUrl) {
+                profilePic.src = imageUrl;
+                profilePic.classList.remove("hidden");
+            } else {
+                profilePic.classList.add("hidden");
+            }
+        });
 
     </script>
 }
@@ -229,6 +242,25 @@
         #sendButton:hover {
             background-color: #0056b3;
         }
+
+    /* User Selection */
+    .user-selection {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .hidden {
+        display: none;
+    }
 
     /* Notification Bell */
     .notification-container {

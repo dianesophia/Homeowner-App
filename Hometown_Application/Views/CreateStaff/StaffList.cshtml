@@ -370,7 +370,8 @@
                                 var modalId = $"staffModal{staff.UserId}"; // Unique Modal ID
 
                                 <tr>
-                                    <td class="text-center">@staff.FirstName @staff.LastName</td>
+                                        <td class="text-center">@staff.ApplicationUser.FirstName @staff.ApplicationUser.LastName</td>
+
                                     <td class="text-center">@staff.Position</td>
                                     <td class="text-center">@(staff.HireDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
                                     <td class="text-center">$@staff.Salary</td>
@@ -386,14 +387,15 @@
                                     <div class="modal-dialog modal-lg">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="modalLabel@modalId">Staff Details - @staff.FirstName @staff.LastName</h5>
+                                                <h5 class="modal-title" id="modalLabel@modalId">Staff Details - @staff.ApplicationUser.FirstName @staff.ApplicationUser.LastName</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body staff-modal-body">
                                                 <img id="staffProfilePic" src="" alt="Profile Picture" class="profile-image">
 
                                                 <div class="staff-info">
-                                                    <h4>@staff.FirstName @staff.LastName</h4>
+                                <td class="text-center">@staff.ApplicationUser.FirstName @staff.ApplicationUser.LastName</td>
+
                                                     <div class="staff-details">
                                                         <p><strong>Position:</strong> @staff.Position</p>
                                                         <p><strong>Hire Date:</strong> @(staff.HireDate?.ToString("yyyy-MM-dd") ?? "N/A")</p>

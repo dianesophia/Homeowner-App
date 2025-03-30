@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250328220819_AAAAAAAAAAAAAAA")]
-    partial class AAAAAAAAAAAAAAA
+    [Migration("20250330172518_AWERWAERWER")]
+    partial class AWERWAERWER
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,9 +151,33 @@ namespace Hometown_Application.Migrations
                     b.HasData(
                         new
                         {
+                            Id = "999",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "9a318035-5f7b-4075-8b3e-b9d7727eb579",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "System",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Admin",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "ADMIN@EXAMPLE.COM",
+                            NormalizedUserName = "ADMIN@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEM95WSqolXaAXANY6tPO8SVrtBt+xQqLqSgC4DwlWzyxnosTESm3oul1Syq4t85t7w==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "5e6f8bf1-3c91-4e84-b2e6-2f2080406c18",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@example.com"
+                        },
+                        new
+                        {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "6e647800-fda8-4f5e-8b27-f051d2f49b43",
+                            ConcurrencyStamp = "8dae3e8e-f032-49b1-aba3-ec15c4b6deaa",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -167,11 +191,227 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEB+L0Esae5IhMP9fCLqP7oGGSgtQ6l9mji2pxI6S4V7r2+inXrwlbuvvQtDLRO0bwA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEC6bM0UsVLeNjpRS3MiIhwD1gDpV9U/M2me9nd73IDVZowRYgshMw2LiPrhtgxdaRw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ce1cbe13-ac15-4a91-a3c4-e0b844e4b802",
+                            SecurityStamp = "e14c7059-e4c8-46e9-bcf1-3194d13a4984",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
+                        },
+                        new
+                        {
+                            Id = "102",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "5e1bff29-94de-4e12-ba84-386d11d6a82b",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "bill.gates@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Bill",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Gates",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "BILL.GATES@EXAMPLE.COM",
+                            NormalizedUserName = "BILL.GATES@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEf7xDagiblNDI2iaDz9GF1rQcVALy5S/SsCmsC2HqTlRPIATvqxO+6yWGGoF/rAkg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "14834ee1-f5bf-42d7-a717-83db15ba14c3",
+                            TwoFactorEnabled = false,
+                            UserName = "bill.gates@example.com"
+                        },
+                        new
+                        {
+                            Id = "103",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "434d2735-e32c-4350-8d01-ae8c4740ef07",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "mark.zuckerberg@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Mark",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Zuckerberg",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "MARK.ZUCKERBERG@EXAMPLE.COM",
+                            NormalizedUserName = "MARK.ZUCKERBERG@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGABfjy/PEQEnuz8kLJ4JRhLOtMjVhNqAMN1w1JrL+6UFF719vRwuJqtIwlBMZPcpg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "3ab12dcc-f080-4268-b33b-c3dfede07ae1",
+                            TwoFactorEnabled = false,
+                            UserName = "mark.zuckerberg@example.com"
+                        },
+                        new
+                        {
+                            Id = "104",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "2c8b234e-446b-43e9-a228-a487f88edfa3",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "sundar.pichai@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Sundar",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Pichai",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "SUNDAR.PICHAI@EXAMPLE.COM",
+                            NormalizedUserName = "SUNDAR.PICHAI@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPolQZGVKdulcTUYfY5ko47IaEvieeKV08zdKoqDW3pkfvQbmSBb3PQ78tTSuqSTHw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "5c50e357-0fc5-4202-818a-cb22267e247e",
+                            TwoFactorEnabled = false,
+                            UserName = "sundar.pichai@example.com"
+                        },
+                        new
+                        {
+                            Id = "105",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b80c9852-f20e-423e-874c-e99d80cdc601",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "tim.cook@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Tim",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Cook",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "TIM.COOK@EXAMPLE.COM",
+                            NormalizedUserName = "TIM.COOK@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGhsI6OnJiipTGHzhRTWjMPI4Loa6TgaOS1L7Se1HfnKTrIVYut4jh2IA2TBC8vDbQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "0f8f6280-e9e6-4c7e-9ff3-cb7ceef83793",
+                            TwoFactorEnabled = false,
+                            UserName = "tim.cook@example.com"
+                        },
+                        new
+                        {
+                            Id = "106",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "a9fa362c-57c1-421b-bfef-cafb12945692",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "satya.nadella@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Satya",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Nadella",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "SATYA.NADELLA@EXAMPLE.COM",
+                            NormalizedUserName = "SATYA.NADELLA@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBO0Wuu6EtnXQU1D+ChcrBzTAMxofFrbCWjSj4csRTzlcSGNK7Aphtjj2SOy4DB5Sg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "74133f6f-9f19-44b8-9af0-ca7db1348dde",
+                            TwoFactorEnabled = false,
+                            UserName = "satya.nadella@example.com"
+                        },
+                        new
+                        {
+                            Id = "107",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "ee708f43-e3a0-49a4-9e0c-7e1fafc0079a",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "jack.dorsey@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Jack",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Dorsey",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "JACK.DORSEY@EXAMPLE.COM",
+                            NormalizedUserName = "JACK.DORSEY@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEK27heW+6pvChQ7Qe7cvVRUpSx1SaDSmRk8LjEBIejXNYl3UlDtYfEH0kwyPWyMtSA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "df613cb7-fa09-49c1-b532-c9c5af6c260a",
+                            TwoFactorEnabled = false,
+                            UserName = "jack.dorsey@example.com"
+                        },
+                        new
+                        {
+                            Id = "108",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "ac8395a8-3a8a-411a-b7b4-153fd70fe708",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "larry.page@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Larry",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Page",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "LARRY.PAGE@EXAMPLE.COM",
+                            NormalizedUserName = "LARRY.PAGE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPUlgRRwl7m5rrp5GGpIAC/46jRWqdzrqqh0njeAxg2IPo3Fubzb4OlYX2HcevUWQw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "b9361fa4-941c-4639-ad6c-5d4d4759c1ba",
+                            TwoFactorEnabled = false,
+                            UserName = "larry.page@example.com"
+                        },
+                        new
+                        {
+                            Id = "109",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "cc8d95d1-6956-4c48-98cb-cb3083520814",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "sergey.brin@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Sergey",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Brin",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "SERGEY.BRIN@EXAMPLE.COM",
+                            NormalizedUserName = "SERGEY.BRIN@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAECODDEh76LC1ktgmEsIQ+PH2h3Hx3/lVdCNKTIU+0noZjcfnCu0VXU4zMo+8XA3dgg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "2396b356-0bcc-4f14-977b-7d6068754851",
+                            TwoFactorEnabled = false,
+                            UserName = "sergey.brin@example.com"
+                        },
+                        new
+                        {
+                            Id = "110",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "01aa9df1-ecaa-49ab-b2a5-36ca10924433",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "steve.jobs@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Steve",
+                            IsActiveUser = true,
+                            IsApproved = false,
+                            IsBirthdayPublic = false,
+                            IsGenderPublic = false,
+                            LastName = "Jobs",
+                            LockoutEnabled = false,
+                            MakeFacebookPublic = false,
+                            NormalizedEmail = "STEVE.JOBS@EXAMPLE.COM",
+                            NormalizedUserName = "STEVE.JOBS@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKmqW95nXx1KOGiSoJMxhGQjXjSZExjgcU5TD/FbLVvTZAlxcvGOmhvVS+8aar/4vQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "9f00bc24-43a9-4d3c-8e15-387fb7af3684",
+                            TwoFactorEnabled = false,
+                            UserName = "steve.jobs@example.com"
                         });
                 });
 
@@ -202,6 +442,171 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AdminProfiles");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillItemsModel", b =>
+                {
+                    b.Property<int>("BillItemsID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillItemsID"));
+
+                    b.Property<string>("AddedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentDuration")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("BillItemsID");
+
+                    b.ToTable("BillItems");
+
+                    b.HasData(
+                        new
+                        {
+                            BillItemsID = 1,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6157),
+                            Amount = 2000.00m,
+                            Description = "Monthly HOA dues covering maintenance, security, and amenities.",
+                            IsDeleted = false,
+                            PaymentDuration = "Monthly",
+                            PaymentName = "Homeowners Association (HOA) Fees",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 2,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6165),
+                            Amount = 50.00m,
+                            Description = "Monthly water consumption charges.",
+                            IsDeleted = false,
+                            PaymentDuration = "Monthly",
+                            PaymentName = "Water Bill",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 3,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6167),
+                            Amount = 2500.00m,
+                            Description = "Monthly payment for electricity consumption.",
+                            IsDeleted = false,
+                            PaymentDuration = "Monthly",
+                            PaymentName = "Electricity Bill",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 4,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6168),
+                            Amount = 300.00m,
+                            Description = "Monthly fee for waste disposal services.",
+                            IsDeleted = false,
+                            PaymentDuration = "Monthly",
+                            PaymentName = "Garbage Collection Fee",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 5,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6170),
+                            Amount = 1500.00m,
+                            Description = "Monthly fee for subdivision security services.",
+                            IsDeleted = false,
+                            PaymentDuration = "Monthly",
+                            PaymentName = "Security Fee",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 6,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6171),
+                            Amount = 500.00m,
+                            Description = "Monthly fee for streetlight maintenance.",
+                            IsDeleted = false,
+                            PaymentDuration = "Monthly",
+                            PaymentName = "Street Lighting Fee",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 7,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6172),
+                            Amount = 800.00m,
+                            Description = "Annual fee for maintaining the clubhouse and shared spaces.",
+                            IsDeleted = false,
+                            PaymentDuration = "Yearly",
+                            PaymentName = "Clubhouse Maintenance Fee",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 8,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6173),
+                            Amount = 5000.00m,
+                            Description = "Annual contribution for property tax remittance.",
+                            IsDeleted = false,
+                            PaymentDuration = "Yearly",
+                            PaymentName = "Property Tax Contribution",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 9,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6175),
+                            Amount = 1200.00m,
+                            Description = "Quarterly contribution for major subdivision repairs.",
+                            IsDeleted = false,
+                            PaymentDuration = "Quarterly",
+                            PaymentName = "Sinking Fund Contribution",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 10,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6176),
+                            Amount = 600.00m,
+                            Description = "Quarterly fee for pest control services in the subdivision.",
+                            IsDeleted = false,
+                            PaymentDuration = "Quarterly",
+                            PaymentName = "Pest Control Fee",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            BillItemsID = 11,
+                            AddedOn = new DateTime(2025, 3, 30, 17, 25, 15, 694, DateTimeKind.Utc).AddTicks(6177),
+                            Amount = 1000.00m,
+                            Description = "Annual fee for road maintenance and repairs.",
+                            IsDeleted = false,
+                            PaymentDuration = "Yearly",
+                            PaymentName = "Road Maintenance Fee",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.BillModel", b =>
@@ -675,15 +1080,17 @@ namespace Hometown_Application.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("HouseId"));
 
                     b.Property<string>("BlockNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<bool?>("IsOccupied")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LotNumber")
+                    b.Property<int>("LotNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("StreetName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("UserId")
@@ -694,7 +1101,75 @@ namespace Hometown_Application.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("House");
+                    b.HasIndex("BlockNumber", "LotNumber", "StreetName")
+                        .IsUnique();
+
+                    b.ToTable("Houses");
+
+                    b.HasData(
+                        new
+                        {
+                            HouseId = 1,
+                            BlockNumber = "A1",
+                            IsOccupied = true,
+                            LotNumber = 101,
+                            StreetName = "Main St",
+                            UserId = "100"
+                        },
+                        new
+                        {
+                            HouseId = 2,
+                            BlockNumber = "B2",
+                            IsOccupied = true,
+                            LotNumber = 202,
+                            StreetName = "Oak St",
+                            UserId = "102"
+                        },
+                        new
+                        {
+                            HouseId = 3,
+                            BlockNumber = "C3",
+                            IsOccupied = true,
+                            LotNumber = 303,
+                            StreetName = "Pine St",
+                            UserId = "103"
+                        },
+                        new
+                        {
+                            HouseId = 4,
+                            BlockNumber = "D4",
+                            IsOccupied = true,
+                            LotNumber = 404,
+                            StreetName = "Cedar St",
+                            UserId = "104"
+                        },
+                        new
+                        {
+                            HouseId = 5,
+                            BlockNumber = "E5",
+                            IsOccupied = true,
+                            LotNumber = 505,
+                            StreetName = "Birch St",
+                            UserId = "105"
+                        },
+                        new
+                        {
+                            HouseId = 6,
+                            BlockNumber = "F6",
+                            IsOccupied = true,
+                            LotNumber = 606,
+                            StreetName = "Maple St",
+                            UserId = "106"
+                        },
+                        new
+                        {
+                            HouseId = 7,
+                            BlockNumber = "G7",
+                            IsOccupied = true,
+                            LotNumber = 707,
+                            StreetName = "Elm St",
+                            UserId = "107"
+                        });
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.PollModel", b =>
@@ -1194,9 +1669,6 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("HireDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("HouseId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActiveEmployee")
                         .HasColumnType("bit");
 
@@ -1230,11 +1702,144 @@ namespace Hometown_Application.Migrations
 
                     b.HasKey("StaffId");
 
-                    b.HasIndex("HouseId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("StaffProfiles");
+
+                    b.HasData(
+                        new
+                        {
+                            StaffId = 1,
+                            AccountCreatedBy = "admin",
+                            AccountCreatedOn = new DateTime(2025, 3, 30, 17, 25, 16, 359, DateTimeKind.Utc).AddTicks(9531),
+                            Address = "123 Main St",
+                            Department = 6,
+                            EmergencyContactName = "Jane Doe",
+                            EmergencyContactNumber = "1234567890",
+                            EmergencyContactRelation = "Spouse",
+                            HireDate = new DateTime(2022, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActiveEmployee = true,
+                            IsAlsoHomeOwner = true,
+                            IsDeleted = false,
+                            IsFired = false,
+                            Position = "Security Officer",
+                            Salary = 25000.00m,
+                            UserId = "100"
+                        },
+                        new
+                        {
+                            StaffId = 2,
+                            AccountCreatedBy = "admin",
+                            AccountCreatedOn = new DateTime(2025, 3, 30, 17, 25, 16, 359, DateTimeKind.Utc).AddTicks(9543),
+                            Address = "456 Oak St",
+                            Department = 5,
+                            EmergencyContactName = "John Smith",
+                            EmergencyContactNumber = "0987654321",
+                            EmergencyContactRelation = "Brother",
+                            HireDate = new DateTime(2021, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActiveEmployee = true,
+                            IsAlsoHomeOwner = true,
+                            IsDeleted = false,
+                            IsFired = false,
+                            Position = "Maintenance Supervisor",
+                            Salary = 30000.00m,
+                            UserId = "102"
+                        },
+                        new
+                        {
+                            StaffId = 3,
+                            AccountCreatedBy = "admin",
+                            AccountCreatedOn = new DateTime(2025, 3, 30, 17, 25, 16, 359, DateTimeKind.Utc).AddTicks(9556),
+                            Address = "789 Pine St",
+                            Department = 3,
+                            EmergencyContactName = "Alice Brown",
+                            EmergencyContactNumber = "5678901234",
+                            EmergencyContactRelation = "Sister",
+                            HireDate = new DateTime(2020, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActiveEmployee = true,
+                            IsAlsoHomeOwner = true,
+                            IsDeleted = false,
+                            IsFired = false,
+                            Position = "System Administrator",
+                            Salary = 35000.00m,
+                            UserId = "103"
+                        },
+                        new
+                        {
+                            StaffId = 4,
+                            AccountCreatedBy = "admin",
+                            AccountCreatedOn = new DateTime(2025, 3, 30, 17, 25, 16, 359, DateTimeKind.Utc).AddTicks(9563),
+                            Address = "987 Cedar St",
+                            Department = 2,
+                            EmergencyContactName = "Bob White",
+                            EmergencyContactNumber = "2345678901",
+                            EmergencyContactRelation = "Father",
+                            HireDate = new DateTime(2019, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActiveEmployee = true,
+                            IsAlsoHomeOwner = true,
+                            IsDeleted = false,
+                            IsFired = false,
+                            Position = "Finance Manager",
+                            Salary = 40000.00m,
+                            UserId = "104"
+                        },
+                        new
+                        {
+                            StaffId = 5,
+                            AccountCreatedBy = "admin",
+                            AccountCreatedOn = new DateTime(2025, 3, 30, 17, 25, 16, 359, DateTimeKind.Utc).AddTicks(9569),
+                            Address = "654 Birch St",
+                            Department = 0,
+                            EmergencyContactName = "Chris Green",
+                            EmergencyContactNumber = "3456789012",
+                            EmergencyContactRelation = "Friend",
+                            HireDate = new DateTime(2021, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActiveEmployee = true,
+                            IsAlsoHomeOwner = true,
+                            IsDeleted = false,
+                            IsFired = false,
+                            Position = "Amenities Coordinator",
+                            Salary = 28000.00m,
+                            UserId = "105"
+                        },
+                        new
+                        {
+                            StaffId = 6,
+                            AccountCreatedBy = "admin",
+                            AccountCreatedOn = new DateTime(2025, 3, 30, 17, 25, 16, 359, DateTimeKind.Utc).AddTicks(9575),
+                            Address = "321 Maple St",
+                            Department = 1,
+                            EmergencyContactName = "Diana Blue",
+                            EmergencyContactNumber = "4567890123",
+                            EmergencyContactRelation = "Cousin",
+                            HireDate = new DateTime(2023, 2, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActiveEmployee = true,
+                            IsAlsoHomeOwner = true,
+                            IsDeleted = false,
+                            IsFired = false,
+                            Position = "Customer Service Representative",
+                            Salary = 26000.00m,
+                            UserId = "106"
+                        },
+                        new
+                        {
+                            StaffId = 7,
+                            AccountCreatedBy = "admin",
+                            AccountCreatedOn = new DateTime(2025, 3, 30, 17, 25, 16, 359, DateTimeKind.Utc).AddTicks(9582),
+                            Address = "159 Elm St",
+                            Department = 4,
+                            EmergencyContactName = "Evan Red",
+                            EmergencyContactNumber = "5678901234",
+                            EmergencyContactRelation = "Uncle",
+                            HireDate = new DateTime(2020, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActiveEmployee = true,
+                            IsAlsoHomeOwner = true,
+                            IsDeleted = false,
+                            IsFired = false,
+                            Position = "Head Gardener",
+                            Salary = 27000.00m,
+                            UserId = "107"
+                        });
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StatusModel", b =>
@@ -1484,6 +2089,26 @@ namespace Hometown_Application.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "HomeOwner",
+                            NormalizedName = "HOMEOWNER"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            Name = "Staff",
+                            NormalizedName = "STAFF"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1573,6 +2198,48 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "999",
+                            RoleId = "1"
+                        },
+                        new
+                        {
+                            UserId = "100",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "102",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "103",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "104",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "105",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "106",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "107",
+                            RoleId = "3"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -1876,11 +2543,6 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
                 {
-                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
-                        .WithMany()
-                        .HasForeignKey("HouseId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -1888,8 +2550,6 @@ namespace Hometown_Application.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-
-                    b.Navigation("House");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.VehicleGatepassModel", b =>

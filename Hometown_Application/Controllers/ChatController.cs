@@ -32,7 +32,7 @@ namespace Hometown_Application.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             ViewBag.Users = await _context.Users
                 .Where(u => u.Id != userId)
-                .Select(u => new { u.Id, u.UserName, u.FirstName, u.LastName })
+                .Select(u => new { u.Id, u.UserName, u.FirstName, u.LastName, u.ProfilePicture })
                 .ToListAsync();
 
             return View(await _context.Chats
