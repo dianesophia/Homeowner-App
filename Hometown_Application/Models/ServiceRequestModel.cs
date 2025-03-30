@@ -5,36 +5,49 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hometown_Application.Models
 {
+    public enum UrgencyLevel
+    {
+        Low,
+        Medium,
+        High
+    }
+
     public class ServiceRequestModel
     {
         [Key]
         public int ServiceRequestId { get; set; }
 
         [Required]
-        public string? Details { get; set; }
+        [StringLength(500)]
+        public string Details { get; set; }
 
         [Required]
-        public string? Location { get; set; }
+        [StringLength(100)]
+        public string Location { get; set; }
 
         [Required]
-        public string? Urgency { get; set; }
+        public UrgencyLevel Urgency { get; set; }
 
         [Required]
         [EmailAddress]
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         [Required]
-        public DateTime? Schedule { get; set; }
+        public DateTime Schedule { get; set; }
 
+        [StringLength(500)]
         public string? RejectedReason { get; set; }
+
         public DateTime? RejectedOn { get; set; }
 
+        [StringLength(500)]
         public string? CancelReason { get; set; }
+
         public DateTime? CancelledOn { get; set; }
 
         public DateTime? CompletedOn { get; set; }
 
-        public DateTime? AddedOn { get; set; } = DateTime.Now;
+        public DateTime AddedOn { get; set; } = DateTime.UtcNow;
 
         [StringLength(50)]
         public string? AddedBy { get; set; }
@@ -44,10 +57,10 @@ namespace Hometown_Application.Models
         [StringLength(50)]
         public string? UpdatedBy { get; set; }
 
-        public bool? IsDeleted { get; set; } = false;
+        public bool IsDeleted { get; set; } = false;
 
         [Required]
-        public int? RequestTypeId { get; set; }
+        public int RequestTypeId { get; set; }
 
         [ForeignKey("RequestTypeId")]
         public RequestTypeModel? RequestType { get; set; }
@@ -57,12 +70,15 @@ namespace Hometown_Application.Models
         [ForeignKey("HomeownerId")]
         public HomeownerProfileModel? Homeowner { get; set; }
 
-        // 🔹 Reference to Status Table
         [Required]
-        public int? StatusId { get; set; }
+        public int StatusId { get; set; }
 
         [ForeignKey("StatusId")]
         public StatusModel? Status { get; set; }
+
+        public string? UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public ApplicationUser? User { get; set; }
     }
 }
- 

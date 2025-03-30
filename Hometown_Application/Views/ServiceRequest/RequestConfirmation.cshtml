@@ -10,6 +10,11 @@
             <h3>Your Submitted Service Requests</h3>
         </div>
         <div class="card-body">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+
             @if (Model != null && Model.Any())
             {
                 <p class="lead">Below are all the service requests you have submitted:</p>
@@ -19,13 +24,24 @@
                     <div class="card mb-4 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title"><strong>Service Name:</strong> @request.RequestType?.Name</h5>
-
                             <p><strong>Request Details:</strong> @request.Details</p>
                             <p><strong>Location:</strong> @request.Location</p>
                             <p><strong>Urgency Level:</strong> @request.Urgency</p>
                             <p><strong>Email:</strong> @request.Email</p>
-                            <p><strong>Requested On:</strong> @request.AddedOn?.ToString("MMMM dd, yyyy hh:mm tt")</p>
-                            <p><strong>Status:</strong> <span class="badge bg-warning text-dark">Pending</span></p>
+                            <p><strong>Requested On:</strong> @request.AddedOn.ToString("MMMM dd, yyyy hh:mm tt")</p>
+                            <p>
+                                <strong>Status:</strong>
+                                <span class="badge @(request.Status?.StatusName == "Completed" ? "bg-success" : "bg-warning")">
+                                    @request.Status?.StatusName
+                                </span>
+                            </p>
+                        </div>
+                        <div class="card-footer text-end">
+                            <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning btn-sm">Edit</a>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                    onclick="setDeleteId(@request.ServiceRequestId, '@request.RequestType?.Name')">
+                                Delete
+                            </button>
                         </div>
                     </div>
                 }
@@ -41,3 +57,33 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the request for "<span id="deleteRequestName"></span>"?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteRequestId" />
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setDeleteId(id, name) {
+        document.getElementById("deleteRequestId").value = id;
+        document.getElementById("deleteRequestName").innerText = name;
+    }
+</script>

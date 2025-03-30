@@ -1,207 +1,469 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Hometown_Application.Data;
 using Hometown_Application.Models;
+using Hometown_Application.ViewModels;
 
 namespace Hometown_Application.Controllers
 {
+    [Authorize]
     public class ServiceRequestController : Controller
     {
         private readonly ApplicationDBContext _context;
+        private readonly ILogger<ServiceRequestController> _logger;
 
-        public ServiceRequestController(ApplicationDBContext context)
+        public ServiceRequestController(ApplicationDBContext context, ILogger<ServiceRequestController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        // Display all service requests (Only non-deleted)
-        public IActionResult Index()
+        // GET: Display all service requests with pagination and sorting
+        public async Task<IActionResult> Index(int page = 1, string sortBy = "AddedOn", bool ascending = false)
         {
-            var requests = _context.ServiceRequests
-                .Include(r => r.Status) // Load related Status
-                .Include(r => r.RequestType) // Load related RequestType
-                .Include(r => r.Homeowner) // Load related Homeowner
-              .Where(r => r.IsDeleted == false || r.IsDeleted == null)
-                .ToList();
+            try
+            {
+                int pageSize = 10;
+                var query = _context.ServiceRequests
+                    .Include(r => r.Status)
+                    .Include(r => r.RequestType)
+                    .Include(r => r.Homeowner)
+                    .Where(r => r.IsDeleted == false);
 
-            return View(requests);
+                // Sorting
+                query = sortBy switch
+                {
+                    "Urgency" => ascending ? query.OrderBy(r => r.Urgency) : query.OrderByDescending(r => r.Urgency),
+                    "Status" => ascending ? query.OrderBy(r => r.Status.StatusName) : query.OrderByDescending(r => r.Status.StatusName),
+                    _ => ascending ? query.OrderBy(r => r.AddedOn) : query.OrderByDescending(r => r.AddedOn),
+                };
+
+                // Pagination
+                var totalItems = await query.CountAsync();
+                var requests = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var viewModel = new ServiceRequestListViewModel
+                {
+                    Requests = requests,
+                    CurrentPage = page,
+                    TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
+                    SortBy = sortBy,
+                    Ascending = ascending
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching service requests");
+                TempData["Error"] = "An error occurred while fetching service requests.";
+                return View(new ServiceRequestListViewModel { Requests = new List<ServiceRequestModel>() });
+            }
         }
 
-        // Display form to create a new request
-        public IActionResult Create(string searchQuery)
+        // GET: Display form to create a new request
+        public async Task<IActionResult> Create(string searchQuery)
         {
-            var requestTypes = _context.RequestTypes.Where(rt => rt.IsActive);
+            var requestTypesQuery = _context.RequestTypes.Where(rt => rt.IsActive);
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
-                requestTypes = requestTypes.Where(rt => rt.Name.Contains(searchQuery));
+                requestTypesQuery = requestTypesQuery.Where(rt => rt.Name.Contains(searchQuery));
             }
 
-            ViewBag.RequestTypes = requestTypes.OrderBy(rt => rt.Name).ToList();
-            ViewBag.Statuses = _context.Status.OrderBy(s => s.StatusName).ToList(); // Load status options
-            return View();
+            var viewModel = new CreateServiceRequestViewModel
+            {
+                ServiceRequest = new ServiceRequestModel(),
+                RequestTypes = await requestTypesQuery.OrderBy(rt => rt.Name).ToListAsync(),
+                Statuses = await _context.Status
+                    .OrderBy(s => s.StatusName)
+                    .Select(s => new SelectListItem { Value = s.StatusId.ToString(), Text = s.StatusName })
+                    .ToListAsync(),
+                SearchQuery = searchQuery
+
+            };
+
+            return View(viewModel);
         }
 
-        // POST: Save Request Type
+        // POST: Save a new request
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [HttpPost]
-        public IActionResult CreateRequest(ServiceRequestModel model)
+        public async Task<IActionResult> CreateRequest(ServiceRequestModel model)
         {
             if (!ModelState.IsValid)
             {
-                // Reload dropdowns in case of validation failure
-                ViewBag.RequestTypes = _context.RequestTypes.Where(rt => rt.IsActive).OrderBy(rt => rt.Name).ToList();
-                ViewBag.Statuses = _context.Status.OrderBy(s => s.StatusName).ToList();
-                return View("Create", model);
+                var viewModel = new CreateServiceRequestViewModel
+                {
+                    ServiceRequest = model,
+                    RequestTypes = await _context.RequestTypes
+                        .Where(rt => rt.IsActive)
+                        .OrderBy(rt => rt.Name)
+                        .ToListAsync(),
+                    Statuses = await _context.Status
+                        .OrderBy(s => s.StatusName)
+                        .Select(s => new SelectListItem { Value = s.StatusId.ToString(), Text = s.StatusName })
+                        .ToListAsync()
+                };
+                return View("Create", viewModel);
             }
 
-            // Ensure that the model has necessary fields before adding
             var newRequest = new ServiceRequestModel
             {
                 RequestTypeId = model.RequestTypeId,
                 StatusId = model.StatusId,
                 Details = model.Details,
+                Location = model.Location,
+                Urgency = model.Urgency,
+                Email = model.Email,
+                Schedule = model.Schedule,
                 AddedOn = DateTime.UtcNow,
+                AddedBy = User.Identity?.Name,
+                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
                 IsDeleted = false
             };
 
-            _context.ServiceRequests.Add(newRequest);
-            _context.SaveChangesAsync();
-
-            return RedirectToAction("Index"); // Redirect to service request list
-        }
-
-
-
-
-
-
-
-        [HttpGet]
-        public IActionResult RequestConfirmation()
-        {
-            // Get the currently logged-in user
-            string loggedInUser = User.Identity?.Name ?? "Anonymous";
-
-            // Fetch all service requests made by this user
-            var userRequests = _context.ServiceRequests
-                .Include(sr => sr.RequestType) // Include related data if needed
-                .Where(sr => sr.Email == loggedInUser) // Filter requests by user email
-                .OrderByDescending(sr => sr.AddedOn) // Show newest requests first
-                .ToList();
-
-            return View(userRequests);
-        }
-
-
-       
-
-
-
-
-        // Display all requests for Admin
-        /*  public IActionResult AdminView()
-          {
-              var serviceRequests = _context.ServiceRequests
-                  .Include(r => r.Status)
-                  .Include(r => r.RequestType)
-                  .Include(r => r.Homeowner)
-                 .Where(r => r.IsDeleted == false || r.IsDeleted == null)
-                  .ToList();
-
-              var staffProfiles = _context.StaffProfiles.ToList();
-              ViewBag.StaffProfiles = new SelectList(staffProfiles, "StaffId", "FullName");
-
-              return View(serviceRequests);
-          }
-        */
-        // Display only the logged-in homeowner's requests
-        /* public IActionResult HomeownerView()
-         {
-             var homeownerRequests = _context.ServiceRequests
-                 .Include(r => r.Status)
-                 .Include(r => r.RequestType)
-                 .Where(r => r.Homeowner.HomeownerId == User.Identity.Name) // Filter by logged-in user
-                 .ToList();
-
-             return View(homeownerRequests);
-         }
-        */
-        // Display form to edit a request
-        public IActionResult Edit(int id)
-        {
-            var request = _context.ServiceRequests.Find(id);
-            if (request == null) return NotFound();
-
-            ViewBag.RequestTypes = _context.RequestTypes.ToList();
-            ViewBag.Statuses = _context.Status.ToList();
-            return View(request);
-        }
-
-        // Handle edit request
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(ServiceRequestModel model)
-        {
-            if (ModelState.IsValid)
+            try
             {
-                _context.ServiceRequests.Update(model);
-                _context.SaveChanges();
+                _context.ServiceRequests.Add(newRequest);
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            return View(model);
-        }
-
-        // Display delete confirmation
-        [HttpGet]
-        public IActionResult Delete(int id)
-        {
-            var request = _context.ServiceRequests.Find(id);
-            if (request == null || request.IsDeleted == true) return NotFound();
-            return View(request);
-        }
-
-
-        // Handle soft delete
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            var request = _context.ServiceRequests.Find(id);
-            if (request != null)
+            catch (DbUpdateException ex)
             {
-                request.IsDeleted = true;
-                _context.SaveChanges();
+                _logger.LogError(ex, "Error saving service request");
+                ModelState.AddModelError("", "An error occurred while saving the request.");
+                var viewModel = new CreateServiceRequestViewModel
+                {
+                    ServiceRequest = model,
+                    RequestTypes = await _context.RequestTypes
+                        .Where(rt => rt.IsActive)
+                        .OrderBy(rt => rt.Name)
+                        .ToListAsync(),
+                    Statuses = await _context.Status
+                        .OrderBy(s => s.StatusName)
+                        .Select(s => new SelectListItem { Value = s.StatusId.ToString(), Text = s.StatusName })
+                        .ToListAsync()
+                };
+                return View("Create", viewModel);
             }
-            return RedirectToAction("Index");
         }
 
-        /*// Display staff assignment form
-        [HttpGet]
-        public IActionResult AssignStaff(int id)
+        // GET: Display user's submitted requests
+        public async Task<IActionResult> RequestConfirmation()
         {
-            var request = _context.ServiceRequests.Include(r => r.RequestType).FirstOrDefault(r => r.Id == id);
-            if (request == null) return NotFound();
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
 
-            var staff = _context.StaffProfiles
-                .Where(s => s.DepartmentId == request.RequestTypeId) // Match request type with department
-                .ToList();
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userRequests = await _context.ServiceRequests
+                    .Include(sr => sr.RequestType)
+                    .Include(sr => sr.Status)
+                    .Where(sr => sr.UserId == userId)
+                    .OrderByDescending(sr => sr.AddedOn)
+                    .ToListAsync();
 
-            ViewBag.StaffList = new SelectList(staff, "StaffId", "FullName");
-            return View(request);
+                return View(userRequests);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching user service requests");
+                TempData["Error"] = "An error occurred while fetching your requests.";
+                return View(new List<ServiceRequestModel>());
+            }
         }
 
-        // Handle staff assignment
+        // GET: Display all requests for Admin
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminView(int page = 1, string sortBy = "AddedOn", bool ascending = false)
+        {
+            try
+            {
+                int pageSize = 10;
+                var query = _context.ServiceRequests
+                    .Include(r => r.Status)
+                    .Include(r => r.RequestType)
+                    .Include(r => r.Homeowner)
+                    .Where(r => r.IsDeleted == false);
+
+                // Sorting
+                query = sortBy switch
+                {
+                    "Urgency" => ascending ? query.OrderBy(r => r.Urgency) : query.OrderByDescending(r => r.Urgency),
+                    "Status" => ascending ? query.OrderBy(r => r.Status.StatusName) : query.OrderByDescending(r => r.Status.StatusName),
+                    _ => ascending ? query.OrderBy(r => r.AddedOn) : query.OrderByDescending(r => r.AddedOn),
+                };
+
+                // Pagination
+                var totalItems = await query.CountAsync();
+                var requests = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var viewModel = new ServiceRequestListViewModel
+                {
+                    Requests = requests,
+                    CurrentPage = page,
+                    TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
+                    SortBy = sortBy,
+                    Ascending = ascending
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching service requests for admin view");
+                TempData["Error"] = "An error occurred while fetching service requests.";
+                return View(new ServiceRequestListViewModel { Requests = new List<ServiceRequestModel>() });
+            }
+        }
+
+        // GET: Display only the logged-in homeowner's requests
+        public async Task<IActionResult> HomeownerView(int page = 1, string sortBy = "AddedOn", bool ascending = false)
+        {
+            try
+            {
+                int pageSize = 10;
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var query = _context.ServiceRequests
+                    .Include(r => r.Status)
+                    .Include(r => r.RequestType)
+                    .Where(r => r.UserId == userId && r.IsDeleted == false);
+
+                // Sorting
+                query = sortBy switch
+                {
+                    "Urgency" => ascending ? query.OrderBy(r => r.Urgency) : query.OrderByDescending(r => r.Urgency),
+                    "Status" => ascending ? query.OrderBy(r => r.Status.StatusName) : query.OrderByDescending(r => r.Status.StatusName),
+                    _ => ascending ? query.OrderBy(r => r.AddedOn) : query.OrderByDescending(r => r.AddedOn),
+                };
+
+                // Pagination
+                var totalItems = await query.CountAsync();
+                var requests = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var viewModel = new ServiceRequestListViewModel
+                {
+                    Requests = requests,
+                    CurrentPage = page,
+                    TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
+                    SortBy = sortBy,
+                    Ascending = ascending
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching homeowner service requests");
+                TempData["Error"] = "An error occurred while fetching your requests.";
+                return View(new ServiceRequestListViewModel { Requests = new List<ServiceRequestModel>() });
+            }
+        }
+
+        // GET: Display form to edit a request
+        public async Task<IActionResult> Edit(int id)
+        {
+            var request = await _context.ServiceRequests
+                .Include(r => r.RequestType)
+                .Include(r => r.Status)
+                .FirstOrDefaultAsync(r => r.ServiceRequestId == id);
+
+            if (request == null || request.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            // Check ownership
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (request.UserId != userId && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
+            var viewModel = new EditServiceRequestViewModel
+            {
+                ServiceRequest = request,
+                RequestTypes = await _context.RequestTypes
+                    .Select(rt => new SelectListItem { Value = rt.RequestTypeId.ToString(), Text = rt.Name })
+                    .ToListAsync(),
+                Statuses = await _context.Status
+                    .Select(s => new SelectListItem { Value = s.StatusId.ToString(), Text = s.StatusName })
+                    .ToListAsync()
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Handle edit request
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AssignStaff(int id, int staffId)
+        public async Task<IActionResult> Edit(EditServiceRequestViewModel viewModel)
         {
-            var request = _context.ServiceRequests.Find(id);
-            if (request == null) return NotFound();
+            if (!ModelState.IsValid)
+            {
+                viewModel.RequestTypes = await _context.RequestTypes
+                    .Select(rt => new SelectListItem { Value = rt.RequestTypeId.ToString(), Text = rt.Name })
+                    .ToListAsync();
+                viewModel.Statuses = await _context.Status
+                    .Select(s => new SelectListItem { Value = s.StatusId.ToString(), Text = s.StatusName })
+                    .ToListAsync();
+                return View(viewModel);
+            }
+
+            var request = await _context.ServiceRequests.FindAsync(viewModel.ServiceRequest.ServiceRequestId);
+            if (request == null || request.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            // Check ownership
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (request.UserId != userId && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
+            // Update fields
+            request.RequestTypeId = viewModel.ServiceRequest.RequestTypeId;
+            request.StatusId = viewModel.ServiceRequest.StatusId;
+            request.Details = viewModel.ServiceRequest.Details;
+            request.Location = viewModel.ServiceRequest.Location;
+            request.Urgency = viewModel.ServiceRequest.Urgency;
+            request.Email = viewModel.ServiceRequest.Email;
+            request.Schedule = viewModel.ServiceRequest.Schedule;
+            request.UpdatedOn = DateTime.UtcNow;
+            request.UpdatedBy = User.Identity?.Name;
+
+            try
+            {
+                _context.ServiceRequests.Update(request);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error updating service request");
+                ModelState.AddModelError("", "An error occurred while updating the request.");
+                viewModel.RequestTypes = await _context.RequestTypes
+                    .Select(rt => new SelectListItem { Value = rt.RequestTypeId.ToString(), Text = rt.Name })
+                    .ToListAsync();
+                viewModel.Statuses = await _context.Status
+                    .Select(s => new SelectListItem { Value = s.StatusId.ToString(), Text = s.StatusName })
+                    .ToListAsync();
+                return View(viewModel);
+            }
+        }
+
+        // GET: Display delete confirmation
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var request = await _context.ServiceRequests
+                .Include(r => r.RequestType)
+                .FirstOrDefaultAsync(r => r.ServiceRequestId == id);
+
+            if (request == null || request.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            // Check ownership
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (request.UserId != userId && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
+            return View(request);
+        }
+
+        // POST: Handle soft delete
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var request = await _context.ServiceRequests.FindAsync(id);
+            if (request == null || request.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            // Check ownership
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (request.UserId != userId && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
+            try
+            {
+                request.IsDeleted = true;
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error deleting service request");
+                TempData["Error"] = "An error occurred while deleting the request.";
+                return RedirectToAction("Index");
+            }
+        }
+
+        /* Commented out staff assignment functionality
+        // GET: Display staff assignment form
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> AssignStaff(int id)
+        {
+            var request = await _context.ServiceRequests
+                .Include(r => r.RequestType)
+                .FirstOrDefaultAsync(r => r.ServiceRequestId == id);
+
+            if (request == null || request.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            var staff = await _context.StaffProfiles
+                .Where(s => s.DepartmentId == request.RequestTypeId)
+                .Select(s => new SelectListItem { Value = s.StaffId.ToString(), Text = s.FullName })
+                .ToListAsync();
+
+            ViewBag.StaffList = staff;
+            return View(request);
+        }
+
+        // POST: Handle staff assignment
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignStaff(int id, int staffId)
+        {
+            var request = await _context.ServiceRequests.FindAsync(id);
+            if (request == null || request.IsDeleted)
+            {
+                return NotFound();
+            }
 
             var assignment = new ServiceStaffAssignmentModel
             {
@@ -212,26 +474,47 @@ namespace Hometown_Application.Controllers
                 IsUnavailable = false
             };
 
-            _context.ServiceStaffAssignments.Add(assignment);
+            try
+            {
+                _context.ServiceStaffAssignments.Add(assignment);
 
-            // Update request status
-            request.StatusId = _context.Status.FirstOrDefault(s => s.Name == "Assigned")?.Id ?? request.StatusId;
-            _context.SaveChanges();
+                // Update request status to "Assigned"
+                var assignedStatus = await _context.Status
+                    .FirstOrDefaultAsync(s => s.StatusName == "Assigned");
+                if (assignedStatus != null)
+                {
+                    request.StatusId = assignedStatus.StatusId;
+                }
 
-            return RedirectToAction("Index");
+                await _context.SaveChangesAsync();
+                return RedirectToAction("AdminView");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error assigning staff to service request");
+                TempData["Error"] = "An error occurred while assigning staff.";
+                return RedirectToAction("AdminView");
+            }
         }
 
-        // Automatically assign available staff
-        public IActionResult AutoAssignStaff(int requestId)
+        // POST: Automatically assign available staff
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AutoAssignStaff(int requestId)
         {
-            var request = _context.ServiceRequests.Include(r => r.RequestType).FirstOrDefault(r => r.Id == requestId);
-            if (request == null) return NotFound();
+            var request = await _context.ServiceRequests
+                .Include(r => r.RequestType)
+                .FirstOrDefaultAsync(r => r.ServiceRequestId == requestId);
 
-            var availableStaff = _context.StaffProfiles
+            if (request == null || request.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            var availableStaff = await _context.StaffProfiles
                 .Where(s => s.DepartmentId == request.RequestTypeId &&
                             !_context.ServiceStaffAssignments
-                            .Any(a => a.StaffId == s.StaffId && !a.IsUnavailable))
-                .FirstOrDefault();
+                                .Any(a => a.StaffId == s.StaffId && !a.IsUnavailable))
+                .FirstOrDefaultAsync();
 
             if (availableStaff != null)
             {
@@ -244,16 +527,31 @@ namespace Hometown_Application.Controllers
                     IsUnavailable = false
                 };
 
-                _context.ServiceStaffAssignments.Add(assignment);
+                try
+                {
+                    _context.ServiceStaffAssignments.Add(assignment);
 
-                // Update request status
-                request.StatusId = _context.Status.FirstOrDefault(s => s.Name == "Assigned")?.Id ?? request.StatusId;
-                _context.SaveChanges();
+                    // Update request status to "Assigned"
+                    var assignedStatus = await _context.Status
+                        .FirstOrDefaultAsync(s => s.StatusName == "Assigned");
+                    if (assignedStatus != null)
+                    {
+                        request.StatusId = assignedStatus.StatusId;
+                    }
 
-                return RedirectToAction("Index");
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("AdminView");
+                }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogError(ex, "Error auto-assigning staff to service request");
+                    TempData["Error"] = "An error occurred while auto-assigning staff.";
+                    return RedirectToAction("AdminView");
+                }
             }
 
             return View("NoAvailableStaff");
-        }*/
+        }
+        */
     }
 }

@@ -1,38 +1,67 @@
-﻿    @model Hometown_Application.Models.ServiceRequestModel
+﻿@model Hometown_Application.ViewModels.EditServiceRequestViewModel
 
+@{
+    ViewData["Title"] = "Edit Service Request";
+}
 
-    <h2>Edit Service Request</h2>
-    <form asp-action="Edit">
-        <input type="hidden" asp-for="ServiceRequestId" />
+<h2>Edit Service Request</h2>
 
-        
-        <div class="form-group">
-            <label>Description</label>
-            <textarea asp-for="Details" class="form-control" required></textarea>
-        </div>
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="ServiceRequest.ServiceRequestId" />
 
-        <div class="form-group">
-            <label>Urgency</label>
-            <select asp-for="Urgency" class="form-control">
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
-            </select>
-        </div>
+    <div class="form-group mb-3">
+        <label class="form-label">Request Type</label>
+        <select asp-for="ServiceRequest.RequestTypeId" asp-items="Model.RequestTypes" class="form-control" required></select>
+        <span asp-validation-for="ServiceRequest.RequestTypeId" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label>Email</label>
-            <input asp-for="Email" class="form-control" type="email" required />
-        </div>
+    <div class="form-group mb-3">
+        <label class="form-label">Description</label>
+        <textarea asp-for="ServiceRequest.Details" class="form-control" required></textarea>
+        <span asp-validation-for="ServiceRequest.Details" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label>Status</label>
-            <select asp-for="Status" class="form-control">
-                <option>Pending</option>
-                <option>In Progress</option>
-                <option>Completed</option>
-            </select>
-        </div>
+    <div class="form-group mb-3">
+        <label class="form-label">Location</label>
+        <input asp-for="ServiceRequest.Location" class="form-control" required />
+        <span asp-validation-for="ServiceRequest.Location" class="text-danger"></span>
+    </div>
 
-        <button type="submit" class="btn btn-primary">Update</button>
-    </form>
+    <div class="form-group mb-3">
+        <label class="form-label">Schedule</label>
+        <input asp-for="ServiceRequest.Schedule" type="datetime-local" class="form-control" required />
+        <span asp-validation-for="ServiceRequest.Schedule" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Urgency</label>
+        <select asp-for="ServiceRequest.Urgency" class="form-control" required>
+            <option value="@Hometown_Application.Models.UrgencyLevel.Low">Low</option>
+            <option value="@Hometown_Application.Models.UrgencyLevel.Medium">Medium</option>
+            <option value="@Hometown_Application.Models.UrgencyLevel.High">High</option>
+        </select>
+        <span asp-validation-for="ServiceRequest.Urgency" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="ServiceRequest.Email" class="form-control" type="email" required />
+        <span asp-validation-for="ServiceRequest.Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Status</label>
+        <select asp-for="ServiceRequest.StatusId" asp-items="Model.Statuses" class="form-control" required></select>
+        <span asp-validation-for="ServiceRequest.StatusId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

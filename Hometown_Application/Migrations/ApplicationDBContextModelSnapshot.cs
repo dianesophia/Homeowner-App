@@ -153,7 +153,7 @@ namespace Hometown_Application.Migrations
 
                             ConcurrencyStamp = "da5c6be4-733e-4325-9710-b7667b0f118f",
 
-                            ConcurrencyStamp = "416ccdf0-dbee-4c26-8819-54522d0e5d65",
+                            //ConcurrencyStamp = "416ccdf0-dbee-4c26-8819-54522d0e5d65",
 
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
@@ -173,9 +173,9 @@ namespace Hometown_Application.Migrations
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "808c6ab4-5646-4c0c-a532-54261a2cbfc8",
 
-                            PasswordHash = "AQAAAAIAAYagAAAAEF25vm/yFzg5RS4r5gNTY/WvcmzOxWsT+0FtJlsYGcmeVabm+hICtPXTh/iM6Pzung==",
+                            /***PasswordHash = "AQAAAAIAAYagAAAAEF25vm/yFzg5RS4r5gNTY/WvcmzOxWsT+0FtJlsYGcmeVabm+hICtPXTh/iM6Pzung==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9aa32387-caa7-4859-9e2c-a59246a85233",
+                            SecurityStamp = "9aa32387-caa7-4859-9e2c-a59246a85233",**/
 
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
