@@ -40,7 +40,8 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     //Billing
     public DbSet<BillModel> Bills { get; set; }
     public DbSet<BillItemsModel> BillItems { get; set; }
-    public DbSet<TransactionModel> TransactionHistory { get; set; }
+    public DbSet<BillAccountModel> BillAccounts { get; set; }
+    public DbSet<BillTransactionModel> BillTransactions { get; set; }
 
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
@@ -144,8 +145,28 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .HasForeignKey(p => p.UserId)
            .OnDelete(DeleteBehavior.NoAction);
 
-    // Relationship for Recipient
-    builder.Entity<ChatMessageModel>()
+       
+
+        builder.Entity<BillAccountModel>()
+           .HasOne(c => c.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(c => c.UserId)
+           .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BillTransactionModel>()
+         .HasOne(c => c.ApplicationUser)
+         .WithMany()
+         .HasForeignKey(c => c.UserId)
+         .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BillTransactionModel>()
+        .HasOne(c => c.BillItemsModel)
+        .WithMany()
+        .HasForeignKey(c => c.BillItemsId)
+        .OnDelete(DeleteBehavior.NoAction);
+
+        // Relationship for Recipient
+        builder.Entity<ChatMessageModel>()
             .HasOne(c => c.Recipient)
             .WithMany()  // No navigation property in ApplicationUser
             .HasForeignKey(c => c.RecipientId)
