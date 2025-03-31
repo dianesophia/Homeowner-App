@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hometown_Application.Models
 {
@@ -6,6 +7,9 @@ namespace Hometown_Application.Models
     {
         [Key]
         public int BillItemsID { get; set; }
+
+        public decimal RemainingBalance { get; set; } // New property to track balance
+
         public string? PaymentName { get; set; }
         public decimal? Amount { get; set; }
         public string? Description { get; set; }

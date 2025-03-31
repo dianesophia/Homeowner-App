@@ -675,11 +675,12 @@
 				 				<i class="fas fa-poll"></i> <span>messages</span>
 							</a>
 						</li>
-						<li>
-							<a class="nav-link" asp-controller="Billing" asp-action="Index">
-				 				<i class="fas fa-poll"></i> <span>Billing</span>
-							</a>
-						</li>
+						<li class="nav-item">
+    <a class="nav-link" asp-controller="Bills" asp-action="OutstandingBalance">Outstanding Balance</a>
+</li>
+	<li class="nav-item">
+    <a class="nav-link" asp-controller="Bills" asp-action="index">Outstanding</a>
+</li>
 
 							<li>
 							<a class="nav-link" asp-controller="BillItems" asp-action="Index">

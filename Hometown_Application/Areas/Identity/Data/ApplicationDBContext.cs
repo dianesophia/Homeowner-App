@@ -40,6 +40,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     //Billing
     public DbSet<BillModel> Bills { get; set; }
     public DbSet<BillItemsModel> BillItems { get; set; }
+    public DbSet<TransactionModel> TransactionHistory { get; set; }
 
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
@@ -58,7 +59,9 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<HouseModel>()
             .HasIndex(h => new { h.BlockNumber, h.LotNumber, h.StreetName })
-            .IsUnique(); 
+            .IsUnique();
+
+       
 
         builder.Entity<FacilityModel>()
                 .HasMany(f => f.Reservations)
@@ -141,9 +144,8 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .HasForeignKey(p => p.UserId)
            .OnDelete(DeleteBehavior.NoAction);
 
-
-        // Relationship for Recipient
-        builder.Entity<ChatMessageModel>()
+    // Relationship for Recipient
+    builder.Entity<ChatMessageModel>()
             .HasOne(c => c.Recipient)
             .WithMany()  // No navigation property in ApplicationUser
             .HasForeignKey(c => c.RecipientId)
@@ -170,8 +172,8 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             );
 
         builder.Entity<BillItemsModel>().HasData(
-       new BillItemsModel { BillItemsID = 1, PaymentName = "Homeowners Association (HOA) Fees", Amount = 2000.00m, Description = "Monthly HOA dues covering maintenance, security, and amenities.", PaymentDuration = "Monthly" },
-       new BillItemsModel { BillItemsID = 2, PaymentName = "Water Bill", Amount = 50.00m, Description = "Monthly water consumption charges.", PaymentDuration = "Monthly" },
+       new BillItemsModel { BillItemsID = 1, PaymentName = "Homeowners Association (HOA) Fees", Amount = 3500.00m, Description = "Monthly HOA dues covering maintenance, security, and amenities.", PaymentDuration = "Monthly" },
+       new BillItemsModel { BillItemsID = 2, PaymentName = "Water Bill", Amount = 100.00m, Description = "Monthly water consumption charges.", PaymentDuration = "Monthly" },
        new BillItemsModel { BillItemsID = 3, PaymentName = "Electricity Bill", Amount = 2500.00m, Description = "Monthly payment for electricity consumption.", PaymentDuration = "Monthly" },
        new BillItemsModel { BillItemsID = 4, PaymentName = "Garbage Collection Fee", Amount = 300.00m, Description = "Monthly fee for waste disposal services.", PaymentDuration = "Monthly" },
        new BillItemsModel { BillItemsID = 5, PaymentName = "Security Fee", Amount = 1500.00m, Description = "Monthly fee for subdivision security services.", PaymentDuration = "Monthly" },
@@ -277,6 +279,9 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .WithMany(h => h.Homeowners)
         .HasForeignKey(h => h.HouseId)
         .OnDelete(DeleteBehavior.Restrict);
+
+        
+
 
         builder.Entity<StaffProfileModel>()
         .HasOne(fc => fc.ApplicationUser)
