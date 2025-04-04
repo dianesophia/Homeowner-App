@@ -19,7 +19,7 @@
 </div>
 
 <!-- Download PDF Button -->
-<form asp-controller="Bills" asp-action="DownloadFeesLiquidationPdf" method="post">
+<form asp-controller="BillsTotal" asp-action="DownloadFeesLiquidationPdf" method="post">
     <input type="hidden" name="totalOutstanding" value="@ViewBag.TotalOutstandingBalance" />
     <input type="hidden" name="totalMonthly" value="@ViewBag.TotalMonthly" />
     <input type="hidden" name="totalQuarterly" value="@ViewBag.TotalQuarterly" />
