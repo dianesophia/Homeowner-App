@@ -14,7 +14,7 @@ namespace Hometown_Application.Models
         public ApplicationUser ApplicationUser { get; set; }
 
         [Column(TypeName = "nvarchar(50)"), Required]
-        public string BlockNumber { get; set; }
+        public string BlockName { get; set; }
 
         [Required]
         public int LotNumber { get; set; }

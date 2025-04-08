@@ -117,7 +117,7 @@ namespace Hometown_Application.Controllers
                     return View(model);
                 }
                 var existingHouse = _context.Houses.FirstOrDefault(h =>
-     h.BlockNumber.ToLower() == model.BlockNumber.ToLower() &&
+     h.BlockName.ToLower() == model.BlockNumber.ToLower() &&
      h.LotNumber == model.LotNumber && // Direct comparison
      h.StreetName.Trim().ToLower() == model.StreetName.Trim().ToLower());
 
@@ -134,7 +134,7 @@ namespace Hometown_Application.Controllers
                 var house = new HouseModel
                 {
                     UserId = user.Id,
-                    BlockNumber = model.BlockNumber,
+                    BlockName = model.BlockNumber,
                     LotNumber = model.LotNumber ?? 0,
                     StreetName = model.StreetName,
                     IsOccupied = true

@@ -93,7 +93,56 @@
         }
 
 
-        [HttpDelete]
+    [HttpPost]
+    [Route("Event/UpdateEvent")]
+    [Authorize(Roles = "Admin")]
+    public IActionResult UpdateEvent([FromBody] EventModel updatedEvent)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage);
+                return BadRequest(new { success = false, message = "Invalid event data.", errors });
+            }
+
+            var existingEvent = _context.Events.FirstOrDefault(e => e.Id == updatedEvent.Id && !e.IsDeleted);
+            if (existingEvent == null)
+            {
+                return NotFound(new { success = false, message = "Event not found." });
+            }
+
+            var adminUser = _userManager.GetUserAsync(User).Result;
+            if (adminUser == null)
+            {
+                return Unauthorized(new { success = false, message = "Unauthorized request." });
+            }
+
+            // Update fields
+            existingEvent.Title = updatedEvent.Title;
+            existingEvent.Description = updatedEvent.Description;
+            existingEvent.DateTimeStart = updatedEvent.DateTimeStart;
+            existingEvent.DateTimeEnd = updatedEvent.DateTimeEnd;
+            existingEvent.Location = updatedEvent.Location;
+            existingEvent.Category = updatedEvent.Category;
+            existingEvent.isAllDay = updatedEvent.isAllDay;
+            existingEvent.UpdatedBy = adminUser.Id;
+            existingEvent.UpdatedOn = DateTime.UtcNow;
+
+            _context.SaveChanges();
+
+            return Json(new { success = true, message = "Event updated successfully!" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { success = false, message = "Error updating event.", error = ex.Message });
+        }
+    }
+
+
+
+    [HttpDelete]
     [Authorize(Roles = "Admin")]
     public IActionResult DeleteEvent(int id)
         {

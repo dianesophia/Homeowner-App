@@ -13,6 +13,12 @@ namespace Hometown_Application.Models
         [Required, StringLength(50)]
         public string Title { get; set; }
 
+        public string Description { get; set; }
+
+        public string Category { get; set; } = "Other"; // Example: Sports, Music, etc
+
+        public bool isAllDay { get; set; } = false;
+
         [Required]
         public DateTime DateTimeStart { get; set; }
             

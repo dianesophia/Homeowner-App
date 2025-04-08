@@ -99,7 +99,7 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
 
             [PersonalData]
             [Column(TypeName = "nvarchar(50)")]
-            public string BlockNumber { get; set; }
+            public string BlockName { get; set; }
 
             [PersonalData]
             public int LotNumber { get; set; }
@@ -207,7 +207,7 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
 
                     // Check if the house already exists
                     var existingHouse = await dbContext.Houses.FirstOrDefaultAsync(h =>
-                        h.BlockNumber == Input.BlockNumber &&
+                        h.BlockName == Input.BlockName &&
                         h.LotNumber == Input.LotNumber &&
                         h.StreetName == Input.StreetName);
 
@@ -241,7 +241,7 @@ namespace Hometown_Application.Areas.Identity.Pages.Account
 
                         var house = new HouseModel
                         {
-                            BlockNumber = Input.BlockNumber,
+                            BlockName = Input.BlockName,
                             LotNumber = Input.LotNumber,
                             StreetName = Input.StreetName,
                             UserId = user.Id

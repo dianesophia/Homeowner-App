@@ -88,7 +88,7 @@
 
         <!-- Searchable Block Dropdown -->
         <div class="form-floating mb-3">
-            <select asp-for="Input.BlockNumber" class="form-control">
+            <select asp-for="Input.BlockName" class="form-control">
                 <option value="">Select Block</option>
                 <option value="aspen">Aspen Heights Block</option>
                 <option value="birch">Birch Haven Block</option>
@@ -111,8 +111,8 @@
                 <option value="spruce">Spruce Meadows Block</option>
                 <option value="willow">Willow Heights Block</option>
             </select>
-            <label asp-for="Input.BlockNumber">Block</label>
-            <span asp-validation-for="Input.BlockNumber" class="text-danger"></span>
+            <label asp-for="Input.BlockName">Block</label>
+            <span asp-validation-for="Input.BlockName" class="text-danger"></span>
         </div>
 
         <!-- Lot Dropdown -->

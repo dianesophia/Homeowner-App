@@ -24,5 +24,7 @@ namespace Hometown_Application.Models
         public string? UpdatedBy { get; set; }
 
         public bool IsDeleted { get; set; } = false;
+
+        public ICollection<BillDetailModel> BillDetails { get; set; }
     }
 }
