@@ -448,6 +448,44 @@
         align-items: flex-start;
     }
 
+    .forum-post {
+        padding: 20px;
+        border-radius: var(--border-radius);
+        background-color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 15px;
+        border-left: 4px solid var(--primary-color);
+        transition: var(--transition);
+    }
+
+        .forum-post:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+        }
+
+    .post-content h4 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+        .post-content h4 a:hover {
+            color: var(--primary-color);
+        }
+
+    .post-preview {
+        line-height: 1.5;
+    }
+
+    .post-interactions span {
+        font-size: 0.9rem;
+    }
+
+    /* Create New Post Button Hover Effect */
+    .text-end .btn:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
 </style>
 
 <div class="content">
@@ -508,65 +546,97 @@
     </div>
 
     <!--Community Forum Section-->
-
-    <div class="container mt-4">
-        <h2 class="text-primary">Community Forum</h2>
+    <div class="recent-activity">
+        <h2>Community Forum</h2>
 
         <!-- Create New Post Button -->
         <div class="text-end mb-3">
-            <a asp-controller="Post" asp-action="Create" class="btn btn-success">➕ Create New Post</a>
+            <a asp-controller="Post" asp-action="Create" class="btn"
+               style="background-color: var(--primary-color); color: white; border-radius: var(--border-radius);
+                  padding: 8px 16px; transition: var(--transition);">
+                <i class="fas fa-plus-circle"></i> Create New Post
+            </a>
         </div>
 
-        <div class="list-group">
+        <div class="forum-posts">
             @foreach (var post in Model.Posts)
             {
-                <div class="list-group-item list-group-item-action mb-3 p-4 shadow-sm rounded border">
-                    <!-- Post Title -->
-                    <h4 class="mb-1">
-                        <a asp-controller="Post" asp-action="Details" asp-route-id="@post.PostId" class="text-decoration-none text-dark fw-bold">
-                            @post.Title
-                        </a>
-                    </h4>
-                    <td>
+                <div class="activity-item forum-post">
+                    <div class="post-content">
+                        <!-- Post Title -->
+                        <h4>
+                            <a asp-controller="Post" asp-action="Details" asp-route-id="@post.PostId"
+                               style="text-decoration: none; color: var(--text-color); font-weight: 600; transition: var(--transition);">
+                                @post.Title
+                            </a>
+                        </h4>
+
+                        <!-- Post Image -->
                         @if (post.Image != null)
                         {
-                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(post.Image)" alt="Post Image" width="100" height="100" />
+                            <div class="post-image" style="margin: 10px 0;">
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(post.Image)"
+                                     alt="Post Image"
+                                     style="max-width: 150px; max-height: 150px; border-radius: 8px; object-fit: cover;" />
+                            </div>
                         }
-                        else
-                        {
-                            <span>No Image</span>
-                        }
 
-                    </td>
+                        <!-- Post Content Preview -->
+                        <p class="post-preview" style="color: #666; margin: 10px 0;">
+                            @if (post.Content.Length > 200)
+                            {
+                                @(post.Content.Substring(0, 200))
+                                <span>...</span>
+                                <a asp-action="Details" asp-route-id="@post.PostId"
+                                   style="color: var(--primary-color); font-weight: 500;">Read More</a>
+                            }
+                            else
+                            {
+                                @post.Content
+                            }
+                        </p>
 
-                    <!-- Post Content Preview -->
-                    <p class="text-muted">
-                        @if (post.Content.Length > 200)
-                        {
-                            @(post.Content.Length > 200 ? $"{post.Content.Substring(0, 200)}..." : post.Content)
+                        <!-- Post Metadata -->
+                        <div class="activity-meta">
+                            <span class="activity-user">
+                                <i class="fas fa-user"></i> @post.ApplicationUser.FirstName @post.ApplicationUser.LastName
+                            </span>
+                            <span class="activity-time">
+                                <i class="fas fa-calendar"></i> @post.AddedOn.ToString("MMMM dd, yyyy")
+                            </span>
+                        </div>
 
-                            <a asp-action="Details" asp-route-id="@post.PostId" class="fw-bold">Read More</a>
-                        }
-                        else
-                        {
-                            @post.Content
-                        }
-                    </p>
-
-                    <!-- Post Metadata -->
-                    <small class="text-secondary">
-                        📝 By <strong>@post.ApplicationUser.FirstName @post.ApplicationUser.LastName</strong> | 📅 @post.AddedOn.ToString("MMMM dd, yyyy")
-                    </small>
-
-                    <!-- Reactions and Comments -->
-                    <div class="mt-2 d-flex align-items-center gap-3">
-                        <span>❤️ @post.Reactions.Count(r => r.Type == "Love")</span>
-                        <span>👍 @post.Reactions.Count(r => r.Type == "Like")</span>
-                        <span>😂 @post.Reactions.Count(r => r.Type == "Haha")</span>
-                        <span>😮 @post.Reactions.Count(r => r.Type == "Wow")</span>
-                        <span>😢 @post.Reactions.Count(r => r.Type == "Sad")</span>
-                        <span>😡 @post.Reactions.Count(r => r.Type == "Angry")</span>
-                        <span>💬 @post.Comments.Count()</span>
+                        <!-- Reactions and Comments -->
+                        <div class="post-interactions" style="display: flex; gap: 15px; margin-top: 10px;">
+                            <span style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-heart" style="color: var(--danger-color);"></i>
+                                @post.Reactions.Count(r => r.Type == "Love")
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-thumbs-up" style="color: var(--primary-color);"></i>
+                                @post.Reactions.Count(r => r.Type == "Like")
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-laugh" style="color: var(--warning-color);"></i>
+                                @post.Reactions.Count(r => r.Type == "Haha")
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-surprise" style="color: var(--info-color);"></i>
+                                @post.Reactions.Count(r => r.Type == "Wow")
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-sad-tear" style="color: var(--secondary-color);"></i>
+                                @post.Reactions.Count(r => r.Type == "Sad")
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-angry" style="color: #e74c3c;"></i>
+                                @post.Reactions.Count(r => r.Type == "Angry")
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-comment" style="color: var(--secondary-color);"></i>
+                                @post.Comments.Count()
+                            </span>
+                        </div>
                     </div>
                 </div>
             }

@@ -16,394 +16,589 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
- <!-- Bootstrap CSS -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- jQuery (required for Bootstrap's JavaScript plugins) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- jQuery (required for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 
-<!-- Bootstrap JS -->
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-	
+
+    <style>
+        :root {
+            --primary-color: #6F754E; /* Earthy Green */
+            --secondary-color: #A08D67; /* Gold/Bronze Accent */
+            --background-color: #E6DDC4; /* Warm Beige */
+            --text-color: #2F3A31; /* Dark Greenish Gray */
+            --primary-light: #8a916a;
+            --primary-dark: #5a6040;
+            --secondary-light: #b8a787;
+            --card-bg: #FFFFFF;
+            --border-radius: 16px;
+            --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 280px;
+            --sidebar-width-collapsed: 90px;
+            --navbar-height: 100px;
+            --notification-bg: rgba(159, 168, 118, 0.95); /* Lighter version of primary color */
+            --notification-border: #6F754E;
+            --notification-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --notification-item-hover: #dde2c6;
+            --notification-count-bg: #d9534f; /* Alert red */
+        }
+
+        * {
+            font-family: 'Marcellus', serif;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body {
+            padding-top: var(--navbar-height);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            box-shadow: var(--shadow);
+            z-index: 1030;
+            min-height: var(--navbar-height);
+            padding: 15px 20px;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .navbar-toggler {
+            border: none;
+        }
+
+            .navbar-toggler:focus {
+                box-shadow: none;
+            }
+
+        .navbar-collapse {
+            background: var(--primary-color);
+            padding: 10px;
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            margin: 0 10px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: 0.3s ease-in-out;
+            color: white;
+        }
+
+            .navbar-nav .nav-link:hover {
+                background: var(--secondary-color);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+            .navbar-nav .nav-link.active {
+                background: var(--primary-light);
+                color: white;
+                font-weight: bold;
+                transform: translateY(-2px);
+            }
+
+        .user-info {
+            background: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+            .user-info i {
+                font-size: 1.2rem;
+            }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 10px;
+            z-index: 1020;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+            .sidebar-toggle:hover {
+                background-color: var(--secondary-color);
+            }
+
+        .sidebar-nav a.active {
+            background-color: var(--primary-color); /* Change to your desired color */
+            border-left: 4px solid var(--secondary-color);
+            font-weight: bold;
+            color: white;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            transition: all 0.3s ease;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--secondary-color);
+            height: calc(100vh - var(--navbar-height));
+            position: fixed;
+            top: var(--navbar-height);
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            z-index: 1010;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: block; /* Ensure sidebar is visible by default */
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) rgba(255, 255, 255, 0.1);
+        }
+
+            .sidebar.collapsed {
+                width: var(--sidebar-width-collapsed);
+            }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .sidebar-nav li {
+                margin-bottom: 10px;
+                width: 100%;
+                position: relative;
+            }
+
+            .sidebar-nav a {
+                display: flex;
+                align-items: center;
+                padding: 10px 20px;
+                color: white;
+                text-decoration: none;
+                transition: 0.2s;
+                border-left: 4px solid transparent;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+                .sidebar-nav a:hover,
+                .sidebar-nav a.active {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border-left: 4px solid white;
+                }
+
+            .sidebar-nav i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+                font-size: 1.1rem;
+            }
+
+        .sidebar.collapsed .sidebar-nav span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-nav a {
+            justify-content: center;
+            padding: 15px 5px;
+        }
+
+        .sidebar.collapsed .sidebar-nav i {
+            margin-right: 0;
+            font-size: 1.3rem;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+            display: none;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+            .sidebar::-webkit-scrollbar-thumb:hover {
+                background: var(--secondary-color);
+            }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            position: relative;
+            padding: 20px;
+            max-width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        .main-with-sidebar {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+        }
+
+            .main-with-sidebar.collapsed {
+                margin-left: var(--sidebar-width-collapsed);
+                width: calc(100% - var(--sidebar-width-collapsed));
+            }
+
+        .container {
+            padding: 20px;
+            max-width: 100%;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .footer {
+            height: 100px; /* Reduced from 100px */
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 0; /* Reduced padding */
+            width: 100%;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: fixed; /* Make footer fixed */
+            bottom: 0; /* Stick to bottom */
+            left: 0;
+            z-index: 1000; /* Ensure it stays above other content */
+        }
+
+        .footer-with-sidebar {
+            margin-left: 150px;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+            max-width: 100%;
+        }
+
+            .footer-with-sidebar.collapsed {
+                margin-left: var(--sidebar-width-collapsed);
+                width: calc(100% - var(--sidebar-width-collapsed));
+                max-width: 100%;
+            }
+
+        /* Dropdown styling */
+        .sidebar-category {
+            padding: 10px 20px;
+            color: white;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            opacity: 0.7;
+        }
+
+        .sidebar-dropdown > a {
+            position: relative;
+        }
+
+            .sidebar-dropdown > a:after {
+                content: "\f107"; /* FontAwesome arrow down icon */
+                font-family: "Font Awesome 5 Free";
+                font-weight: 900;
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                transition: transform 0.3s;
+            }
+
+        .sidebar-dropdown.open > a:after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .sidebar-submenu {
+            display: none;
+            padding-left: 20px;
+            background-color: rgba(0, 0, 0, 0.1);
+            list-style: none;
+        }
+
+            .sidebar-submenu ul {
+                list-style: none;
+                padding-left: 0;
+            }
+
+        .sidebar-dropdown.open > .sidebar-submenu {
+            display: block;
+        }
+
+        .sidebar.collapsed .sidebar-dropdown.open .sidebar-submenu {
+            position: absolute;
+            left: 70px;
+            top: 0;
+            min-width: 180px;
+            background-color: var(--secondary-color);
+            box-shadow: var(--shadow);
+            border-radius: 0 4px 4px 0;
+            z-index: 1000;
+        }
+
+        /* Enhanced Notification Styling */
+        #notificationContainer {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+            #notificationContainer:hover {
+                transform: scale(1.1);
+            }
+
+        #notificationBell {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        #notificationBadge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--notification-count-bg);
+            color: white;
+            border-radius: 50%;
+            padding: 3px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 2px solid white;
+            display: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            min-width: 18px;
+            text-align: center;
+        }
+
+        #notificationDetails {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--notification-bg);
+            border: 1px solid var(--notification-border);
+            border-radius: 8px;
+            width: 320px;
+            box-shadow: var(--notification-shadow);
+            z-index: 1050;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #notificationHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            background-color: var(--primary-color);
+            border-radius: 8px 8px 0 0;
+        }
+
+            #notificationHeader h4 {
+                margin: 0;
+                color: white;
+                font-size: 1.1rem;
+            }
+
+        #clearAllNotifications {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+            #clearAllNotifications:hover {
+                background: rgba(255,255,255,0.2);
+            }
+
+        #notificationList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .notification-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+            .notification-item:hover {
+                background-color: var(--notification-item-hover);
+            }
+
+            .notification-item:last-child {
+                border-bottom: none;
+            }
+
+        .notification-icon {
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex-grow: 1;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .notification-text {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: rgba(47, 58, 49, 0.7);
+            text-align: right;
+        }
+
+        .no-notifications {
+            padding: 15px;
+            text-align: center;
+            color: var(--text-color);
+            font-style: italic;
+        }
 
 
-	<style>
-		:root {
-			--primary-color: #6F754E; /* Earthy Green */
-			--secondary-color: #A08D67; /* Gold/Bronze Accent */
-			--background-color: #E6DDC4; /* Warm Beige */
-			--text-color: #2F3A31; /* Dark Greenish Gray */
-			--card-bg: #FFFFFF;
-			--border-radius: 16px;
-			--shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-			--sidebar-width: 280px;
-			--sidebar-width-collapsed: 90px;
-			--navbar-height: 100px;
-		}
-
-		* {
-			font-family: 'Marcellus', serif;
-		}
-
-		.wrapper {
-			display: flex;
-			flex-direction: column;
-			min-height: 100vh;
-			position: relative;
-			overflow-x: hidden;
-		}
-
-		body {
-			padding-top: var(--navbar-height);
-			background-color: var(--background-color);
-			color: var(--text-color);
-			margin: 0;
-			transition: all 0.3s ease;
-		}
-
-
-		/* Navbar Styling */
-		.navbar {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			background-color: var(--primary-color);
-			box-shadow: var(--shadow);
-			z-index: 1030;
-			min-height: var(--navbar-height);
-			padding: 15px 20px;
-			align-items: center;
-		}
-
-		.navbar-brand {
-			font-size: 1.2rem;
-			font-weight: bold;
-			color: white;
-		}
-
-		.navbar-toggler {
-			border: none;
-		}
-
-			.navbar-toggler:focus {
-				box-shadow: none;
-			}
-
-		.navbar-collapse {
-			background: var(--primary-color);
-			padding: 10px;
-		}
-
-		.navbar-nav .nav-link {
-			font-weight: 500;
-			margin: 0 10px;
-			padding: 8px 16px;
-			border-radius: var(--border-radius);
-			transition: 0.3s ease-in-out;
-			color: white;
-		}
-
-			.navbar-nav .nav-link:hover {
-				background: var(--secondary-color);
-				color: white;
-				transform: translateY(-2px);
-			}
-
-			/* When a tab is active */
-			.navbar-nav .nav-link.active {
-				background: var(--primary-light); /* Change color when tab is active */
-				color: white;
-				font-weight: bold;
-				transform: translateY(-2px);
-			}
-
-
-		.page-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 2rem;
-			flex-wrap: wrap;
-			gap: 20px;
-		}
-		/* Sidebar Toggle Button */
-		.sidebar-toggle {
-			position: fixed;
-			bottom: 20px;
-			left: 10px;
-			z-index: 1020;
-			width: 40px;
-			height: 40px;
-			border-radius: 50%;
-			background-color: var(--primary-color);
-			color: white;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			box-shadow: var(--shadow);
-			transition: all 0.3s ease;
-			border: none;
-		}
-
-			.sidebar-toggle:hover {
-				background-color: var(--secondary-color);
-			}
-
-		.sidebar-nav a.active {
-			background-color: var(--primary-color); /* Change to your desired color */
-			border-left: 4px solid var(--secondary-color);
-			font-weight: bold;
-		}
-
-		.dashboard-wrapper {
-			display: flex;
-			transition: all 0.3s ease;
-		}
-
-
-
-		/* Sidebar Styling */
-		.sidebar {
-			width: var(--sidebar-width);
-			background-color: var(--secondary-color);
-			height: calc(100vh - var(--navbar-height));
-			position: fixed;
-			top: var(--navbar-height);
-			padding: 20px 0;
-			box-shadow: var(--shadow);
-			z-index: 1010;
-			transition: all 0.3s ease;
-			overflow-y: auto;
-			overflow-x: hidden;
-			display: block; /* Ensure sidebar is visible by default */
-			scrollbar-width: thin;
-			scrollbar-color: var(--primary-color) rgba(255, 255, 255, 0.1);
-		}
-
-			.sidebar.collapsed {
-				width: var(--sidebar-width-collapsed);
-			}
-
-		.sidebar-nav {
-			list-style: none;
-			padding: 0;
-			margin: 0;
-		}
-
-			.sidebar-nav li {
-				margin-bottom: 10px;
-				width: 100%;
-				position: relative;
-			}
-
-			.sidebar-nav a {
-				display: flex;
-				align-items: center;
-				padding: 10px 20px;
-				color: white;
-				text-decoration: none;
-				transition: 0.2s;
-				border-left: 4px solid transparent;
-				white-space: nowrap;
-				overflow: hidden;
-			}
-
-				.sidebar-nav a:hover,
-				.sidebar-nav a.active {
-					background-color: rgba(255, 255, 255, 0.1);
-					border-left: 4px solid white;
-				}
-
-			.sidebar-nav i {
-				margin-right: 15px;
-				width: 20px;
-				text-align: center;
-				font-size: 1.1rem;
-			}
-
-		.sidebar.collapsed .sidebar-nav span {
-			display: none;
-		}
-
-		.sidebar.collapsed .sidebar-nav a {
-			justify-content: center;
-			padding: 15px 5px;
-		}
-
-		.sidebar.collapsed .sidebar-nav i {
-			margin-right: 0;
-			font-size: 1.3rem;
-		}
-		.sidebar::-webkit-scrollbar {
-			width: 8px; 
-			display: none;
-		}
-
-		.sidebar::-webkit-scrollbar-track {
-			background: rgba(255, 255, 255, 0.1); 
-			border-radius: 10px;
-		}
-
-		.sidebar::-webkit-scrollbar-thumb {
-			background: var(--primary-color);
-			border-radius: 10px;
-			transition: 0.3s;
-		}
-
-			.sidebar::-webkit-scrollbar-thumb:hover {
-				background: var(--secondary-color); 
-			}
-
-
-		.main-container {
-			display: flex;
-			flex: 1;
-			position: relative;
-		}
-
-		.main-content {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			min-height: calc(100vh - var(--navbar-height));
-		}
-
-		.main-with-sidebar {
-			margin-left: var(--sidebar-width);
-			width: calc(100% - var(--sidebar-width));
-			transition: all 0.3s ease;
-		}
-
-			.main-with-sidebar.collapsed {
-				margin-left: var(--sidebar-width-collapsed);
-				width: calc(100% - var(--sidebar-width-collapsed));
-			}
-
-		.container {
-			padding: 20px;
-			max-width: 100%;
-			transition: all 0.3s ease;
-			flex: 1;
-		}
-
-		.footer {
-			background-color: var(--primary-color);
-			color: white;
-			text-align: center;
-			padding: 15px 0;
-			width: 100%;
-			transition: all 0.3s ease;
-			overflow: hidden;
-		}
-
-		.footer-with-sidebar {
-			margin-left: 150px;
-			width: calc(100% - var(--sidebar-width));
-			transition: all 0.3s ease;
-			max-width: 100%;
-		}
-
-			.footer-with-sidebar.collapsed {
-				margin-left: var(--sidebar-width-collapsed);
-				width: calc(100% - var(--sidebar-width-collapsed));
-				max-width: 100%;
-			}
-
-		/* Dropdown styling */
-		.sidebar-category {
-			padding: 10px 20px;
-			color: white;
-			font-size: 0.9rem;
-			text-transform: uppercase;
-			letter-spacing: 1px;
-			margin-top: 15px;
-			opacity: 0.7;
-		}
-
-		.sidebar-dropdown > a {
-			position: relative;
-		}
-
-			.sidebar-dropdown > a:after {
-				content: "\f107"; /* FontAwesome arrow down icon */
-				font-family: "Font Awesome 5 Free";
-				font-weight: 900;
-				position: absolute;
-				right: 15px;
-				top: 50%;
-				transform: translateY(-50%);
-				transition: transform 0.3s;
-			}
-
-		.sidebar-dropdown.open > a:after {
-			transform: translateY(-50%) rotate(180deg); /* Rotate arrow when open */
-		}
-
-		.sidebar-submenu {
-			display: none; /* Hide submenus by default */
-			padding-left: 20px; /* Indent submenu items */
-			background-color: rgba(0, 0, 0, 0.1); /* Slightly darker background */
-			list-style: none;
-		}
-
-			.sidebar-submenu ul {
-				list-style: none;
-				padding-left: 0;
-			}
-
-		.sidebar-dropdown.open > .sidebar-submenu {
-			display: block; /* Show when open */
-		}
-
-		/* Collapsible sidebar submenu positioning */
-		.sidebar.collapsed .sidebar-dropdown.open .sidebar-submenu {
-			position: absolute;
-			left: 70px; /* Match the --sidebar-width-collapsed value */
-			top: 0;
-			min-width: 180px;
-			background-color: var(--secondary-color);
-			box-shadow: var(--shadow);
-			border-radius: 0 4px 4px 0;
-			z-index: 1000;
-		}
-
-	</style>
+    </style>
 </head>
 <body>
     <div class="wrapper">
         <!-- Header -->
-		<header>
-			<nav class="navbar navbar-expand-lg navbar-light">
-				<div class="container-fluid">
-					@if (SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null)
-					{
-						<a class="navbar-brand text-white" asp-controller="Dashboard" asp-action="Index" style="font-weight: normal;">
-							<i class="fas fa-home me-2"></i>
-							Golden Haven
-						</a>
-					}
-					else
-					{
-						<span class="navbar-brand text-white" style="font-weight: normal;">
-							<i class="fas fa-home me-2"></i>
-							Golden Haven
-						</span>
-					}
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container-fluid">
+                    @if (SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null)
+                    {
+                        <a class="navbar-brand text-white" asp-controller="Dashboard" asp-action="Index" style="font-weight: normal;">
+                            <i class="fas fa-home me-2"></i>
+                            Golden Haven
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="navbar-brand text-white" style="font-weight: normal;">
+                            <i class="fas fa-home me-2"></i>
+                            Golden Haven
+                        </span>
+                    }
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <partial name="_LoginPartial.cshtml" />
+                    </div>
 
-					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-						<span class="navbar-toggler-icon"></span>
-					</button>
-					<div class="collapse navbar-collapse" id="navbarNav">
-						<partial name="_LoginPartial.cshtml" />
-					</div>
-				</div>
-			</nav>
-		</header>
+                    <!-- Enhanced Notifications -->
+                    <div id="notificationContainer">
+                        <div id="notificationBell">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <span id="notificationBadge">0</span>
+                    </div>
 
+                    <div id="notificationDetails">
+                        <div id="notificationHeader">
+                            <h4>Notifications</h4>
+                            <button id="clearAllNotifications">Clear All</button>
+                        </div>
+                        <div id="notificationList">
+                            <div class="no-notifications">No new notifications</div>
+                        </div>
+                    </div>
 
+                    <audio id="notificationSound">
+                        <source src="/audio/notification.mp3" type="audio/mpeg">
+                        <source src="/audio/notification.ogg" type="audio/ogg">
+                        <source src="/audio/notification.wav" type="audio/wav">
+                    </audio>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Sidebar Navigation -->
 		<div class="d-flex">
 			<!-- Sidebar Toggle Button (Only visible when logged in) -->
 			@if (SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null)
@@ -444,273 +639,263 @@
 								</li>
 							}
 						}
-						<li>
-							<a href="/Dashboard" data-page="dashboard">
-								<i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
-							</a>
-						</li>
 
-						<!--Notifications Icon-->
-					<div id="notificationContainer" style="position: relative; display: inline-block; cursor: pointer;">
-    <i class="fa fa-bell fa-2x"></i>
-    <span id="notificationBadge" style="
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: red;
-        color: white;
-        border-radius: 50%;
-        padding: 2px 6px;
-        font-size: 12px;
-        display: none;">0</span>
-</div>
-
-<div id="notificationDetails" style="display:none; position: fixed; top: 50px; right: 20px; background: #fff; border: 1px solid #ddd; padding: 10px; width: 300px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    <h4>Notifications</h4>
-    <ul id="notificationList" style="list-style: none; padding: 0; margin: 0;"></ul>
-</div>
-
-<audio id="notificationSound">
-    <source src="/audio/notification.mp3" type="audio/mpeg">
-    <source src="/audio/notification.ogg" type="audio/ogg">
-    <source src="/audio/notification.wav" type="audio/wav">
-</audio>
-
-						<!-- Communication Category -->
-						<div class="sidebar-category"><span>Communication</span></div>
-						<li>
-							<a href="/Contact" data-page="contact">
-								<i class="fas fa-address-book"></i> <span>Contacts</span>
-							</a>
-						</li>
-						<!--<li class="sidebar-dropdown">
-							<a href="javascript:void(0)">
-								<i class="fas fa-envelope"></i> <span>Messaging</span>
-							</a>
-							<div class="sidebar-submenu">
-								<ul>
-									<li>
-										<a href="/Message/Inbox" data-page="inbox">
-											<i class="fas fa-inbox"></i> <span>Inbox</span>
-										</a>
-									</li>
-									<li>
-										<a href="/Message/Sent" data-page="sent">
-											<i class="fas fa-paper-plane"></i> <span>Sent</span>
-										</a>
-									</li>
-									<li>
-										<a href="/Message/Compose" data-page="compose">
-											<i class="fas fa-pen"></i> <span>Compose</span>
-										</a>
-									</li>
-								</ul>
-							</div>
-				</li>-->
-
-						<!-- Management Category 
-						<div class="sidebar-category"><span>Management</span></div>
-						<li>
-							<a href="/Event" data-page="event">
-								<i class="fas fa-calendar"></i> <span>Calendar</span>
-							</a>
-						</li>
-						<li>
-							<a href="/Document" data-page="document">
-								<i class="fas fa-file-alt"></i> <span>Documents</span>
-							</a>
-						</li>
-						<li>
-							<a href="/FeedbackComplaint" data-page="issues">
-								<i class="fas fa-exclamation-circle"></i> <span>Issues</span>
-							</a>
-						</li>-->
-
-						<!-- Admin Functions -->
-						@if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
-						{
-							<div class="sidebar-category"><span>Admin Management</span></div>
-							<li class="sidebar-dropdown">
-								<a href="javascript:void(0)">
-									<i class="fas fa-users-cog"></i> <span>Users</span>
-								</a>
-								<div class="sidebar-submenu">
-									<ul>
-										<li>
-											<a class="nav-link" asp-controller="ManageUsers" asp-action="Index">
-												<i class="fas fa-users"></i> <span>Manage Users</span>
-											</a>
-										</li>
-										<li>
-											<a class="nav-link" asp-controller="CreateStaff" asp-action="CreateStaff">
-												<i class="fas fa-user-plus"></i> <span>Create Staff</span>
-											</a>
-										</li>
-									</ul>
-								</div>
-							</li>
-							<li class="sidebar-dropdown">
-								<a href="javascript:void(0)">
-									<i class="fas fa-building"></i> <span>Facility</span>
-								</a>
-								<div class="sidebar-submenu">
-									<ul>
-										<li>
-											<a class="nav-link" asp-controller="Facility" asp-action="Index">
-												<i class="fas fa-cogs"></i> <span>Facility Management</span>
-											</a>
-										</li>
-										<li>
-											<a class="nav-link" asp-controller="Reservation" asp-action="ManageReservations">
-												<i class="fas fa-calendar-check"></i> <span>Reservation Management</span>
-											</a>
-										</li>
-									</ul>
-								</div>
-							</li>
-							<!--<li>
-								<a class="nav-link" asp-controller="ServiceRequest" asp-action="Create">
-									<i class="fas fa-tasks"></i> <span>Create Request</span>
-								</a>
-							</li>-->
-						}
+                <!-- Dashboard -->
+                <li>
+                    <a href="/Dashboard" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                    </a>
+                </li>
 
 
-						<!-- Facilities & Reservations -->
-						<div class="sidebar-category"><span>Facilities</span></div>
-						<li class="sidebar-dropdown">
-							<a href="javascript:void(0)">
-								<i class="fas fa-building"></i> <span>Reservations</span>
-							</a>
-							<div class="sidebar-submenu">
-								<ul>
-									<li>
-										<a class="nav-link" asp-controller="Reservation" asp-action="AvailableFacilities">
-											<i class="fas fa-search"></i> <span>Available Facilities</span>
-										</a>
-									</li>
-									<li>
-										<a class="nav-link" asp-controller="Reservation" asp-action="ReservationStatusReport">
-											<i class="fas fa-clipboard-list"></i> <span>My Reservations</span>
-										</a>
-									</li>
-								</ul>
-							</div>
-						</li>
+                <!-- Communication Category -->
+                <div class="sidebar-category"><span>Communication</span></div>
+                <li>
+                    <a href="/Contact" data-page="contact">
+                        <i class="fas fa-address-book"></i> <span>Contacts</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Chat" data-page="chat">
+                        <i class="fas fa-envelope"></i> <span>Messages</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Post" data-page="post">
+                        <i class="fas fa-comments"></i> <span>Community Forum</span>
+                    </a>
+                </li>
 
-						<!-- Common Actions -->
-						<div class="sidebar-category"><span>Quick Access</span></div>
-						<!--<li>
-							<a class="nav-link" asp-controller="Contact" asp-action="Index">
-								<i class="fas fa-address-book"></i> <span>Contacts</span>
-							</a>
-						</li>-->
-						<li>
-							<a class="nav-link" asp-controller="Event" asp-action="Index">
-								<i class="fas fa-calendar"></i> <span>Calendar</span>
-							</a>
-						</li>
-						<li class="sidebar-dropdown">
-							<a href="javascript:void(0)">
-								<i class="fas fa-file-alt"></i> <span>Documents</span>
-							</a>
-							<div class="sidebar-submenu">
-								<ul>
-									<li>
-										<a class="nav-link" asp-controller="Document" asp-action="Index">
-											<i class="fas fa-folder-open"></i> <span>Browse</span>
-										</a>
-									</li>
-									<li>
-										<a class="nav-link" asp-controller="Document" asp-action="FileDownload">
-											<i class="fas fa-download"></i> <span>Download</span>
-										</a>
-									</li>
-								</ul>
-							</div>
-						</li>
-						<li>
-							<a class="nav-link" asp-controller="FeedbackComplaint" asp-action="Index">
-								<i class="fas fa-exclamation-circle"></i> <span>Issues</span>
-							</a>
-						</li>
-						<li>
-							<a class="nav-link" asp-controller="Poll" asp-action="Index">
-								<i class="fas fa-poll"></i> <span>Poll Survey</span>
-							</a>
-						</li>
-						<!--Ang admin ra ang makakita aniii-->
-						<li>
-							<a class="nav-link" asp-controller="RequestType" asp-action="Index">
-								<i class="fas fa-poll"></i> <span>Create Service</span>
-							</a>
-						</li>
-						<!--Ang homeowner ra makakita anii-->
-						<li>
-							<a class="nav-link" asp-controller="ServiceRequest" asp-action="Create">
-								<i class="fas fa-poll"></i> <span>Create Request</span>
-							</a>
-						</li>
+                <!-- Admin Functions -->
+                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                {
+                    <div class="sidebar-category"><span>Admin Management</span></div>
+                    <li class="sidebar-dropdown">
+                        <a href="javascript:void(0)">
+                            <i class="fas fa-users-cog"></i> <span>Users</span>
+                        </a>
+                        <div class="sidebar-submenu">
+                            <ul>
+                                <li>
+                                    <a href="/ManageUsers/Index" data-page="manage-users">
+                                        <i class="fas fa-users"></i> <span>Manage Users</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/CreateStaff/CreateStaff" data-page="create-staff">
+                                        <i class="fas fa-user-plus"></i> <span>Create Staff</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="sidebar-dropdown">
+                        <a href="javascript:void(0)">
+                            <i class="fas fa-building"></i> <span>Facility</span>
+                        </a>
+                        <div class="sidebar-submenu">
+                            <ul>
+                                <li>
+                                    <a href="/Facility/Index" data-page="facility-management">
+                                        <i class="fas fa-cogs"></i> <span>Facility Management</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/Reservation/ManageReservations" data-page="reservation-management">
+                                        <i class="fas fa-calendar-check"></i> <span>Reservation Management</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="/RequestType" data-page="requesttype">
+                            <i class="fas fa-cogs"></i> <span>Create Service</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/BillItems" data-page="billitems">
+                            <i class="fas fa-file-invoice-dollar"></i> <span>Bill Items</span>
+                        </a>
+                    </li>
+                }
 
-						<li>
-							<a class="nav-link" asp-controller="VisitorGatepass" asp-action="Index">
-				 				<i class="fas fa-poll"></i> <span>Create Visitor Gatepass</span>
-							</a>
-						</li
+                <!-- Facilities & Reservations -->
+                <div class="sidebar-category"><span>Facilities</span></div>
+                <li class="sidebar-dropdown">
+                    <a href="javascript:void(0)">
+                        <i class="fas fa-building"></i> <span>Reservations</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <ul>
+                            <li>
+                                <a href="/Reservation/AvailableFacilities" data-page="available-facilities">
+                                    <i class="fas fa-search"></i> <span>Available Facilities</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Reservation/ReservationStatusReport" data-page="my-reservations">
+                                    <i class="fas fa-clipboard-list"></i> <span>My Reservations</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
 
-						<li>
-							<a class="nav-link" asp-controller="VehicleGatepass" asp-action="Index">
-				 				<i class="fas fa-poll"></i> <span>Create Vehicle Gatepass</span>
-							</a>
-						</li>
+                <li class="sidebar-dropdown">
+                    <a href="javascript:void(0)">
+                        <i class="fas fa-building"></i> <span>Services and Requests</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <ul>
+                            <li>
+                                <a href="/ServiceRequest/Create" data-page="servicerequest">
+                                    <i class="fas fa-tasks"></i> <span>Create Request</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/VisitorGatepass" data-page="visitorgatepass">
+                                    <i class="fas fa-id-badge"></i> <span>Visitor Gatepass</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/VehicleGatepass" data-page="vehiclegatepass">
+                                    <i class="fas fa-car"></i> <span>Vehicle Gatepass</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
 
-						<li>
-							<a class="nav-link" asp-controller="Post" asp-action="Index">
-				 				<i class="fas fa-poll"></i> <span>Community Forum</span>
-							</a>
-						</li>
+                <!-- Finance -->
+                <div class="sidebar-category"><span>Finance</span></div>
+                <li>
+                    <a href="/Billing" data-page="billing">
+                        <i class="fas fa-file-invoice"></i> <span>Billing</span>
+                    </a>
+                </li>
 
-						<li>
-							<a class="nav-link" asp-controller="Chat" asp-action="Index">
-				 				<i class="fas fa-poll"></i> <span>messages</span>
-							</a>
-						</li>
-						<li>
-							<a class="nav-link" asp-controller="Billing" asp-action="Index">
-				 				<i class="fas fa-poll"></i> <span>Billing</span>
-							</a>
-						</li>
+                <!-- Common Tools -->
+                <div class="sidebar-category"><span>Tools</span></div>
+                <li>
+                    <a href="/Event" data-page="event">
+                        <i class="fas fa-calendar"></i> <span>Calendar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Poll" data-page="poll">
+                        <i class="fas fa-poll"></i> <span>Poll Survey</span>
+                    </a>
+                </li>
+                <li class="sidebar-dropdown">
+                    <a href="javascript:void(0)">
+                        <i class="fas fa-file-alt"></i> <span>Documents</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <ul>
+                            <li>
+                                <a href="/Document" data-page="document">
+                                    <i class="fas fa-folder-open"></i> <span>Browse</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Document/FileDownload" data-page="filedownload">
+                                    <i class="fas fa-download"></i> <span>Download</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
 
-							<li>
-							<a class="nav-link" asp-controller="BillItems" asp-action="Index">
-				 				<i class="fas fa-poll"></i> <span>Bill Items</span>
-							</a>
-						</li>
+                <!-- Logout -->
+                <li>
+                    <a href="/Home" data-page="home">
+                        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        }
+        <!-- Main Content -->
+        <div class="container @(SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null ? "main-with-sidebar" : "")" id="main-container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+        <footer class="footer @(SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null ? "footer-with-sidebar" : "")" id="footer">
+            <div class="container">
+                <p>© @DateTime.Now.Year Golden Haven. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
 
-						<li>
-						<li>
-							<a class="nav-link" asp-controller="Home" asp-action="Index">
-								<i class="fas fa-sign-out-alt"></i> <span>Logout</span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			}
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
-			<!-- Main Content -->
-			<div class="container @(SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null ? "main-with-sidebar" : "")" id="main-container">
-				<main role="main" class="pb-3">
-					@RenderBody()
-				</main>
-			</div>
-		</div>
+    <!-- Updated JavaScript for sidebar and notifications -->
+    <script>
+            $(document).ready(function () {
+                // Apply sidebar state based on localStorage
+                const sidebarState = localStorage.getItem('sidebarCollapsed');
 
-		<footer class="footer @(SignInManager.IsSignedIn(User) && ViewData["HideSidebar"] == null ? "footer-with-sidebar" : "")" id="footer">
-			<div class="container">
-				<p>© @DateTime.Now.Year Golden Haven. All rights reserved.</p>
-			</div>
-		</footer>
-	</div>
+                // Get current URL path for active tab detection
+                const currentPath = window.location.pathname.toLowerCase();
+
+                // Initial setup based on saved state
+                if (sidebarState === 'true') {
+                    $('#sidebar').addClass('collapsed');
+                    $('#main-container').addClass('collapsed');
+                    $('#footer').addClass('collapsed');
+                    $('#sidebar-toggle i').removeClass('fa-bars').addClass('fa-chevron-right');
+                }
+
+                // Create sidebar toggle button if it doesn't exist
+                if ($('#sidebar-toggle').length === 0) {
+                    $('body').append('<button id="sidebar-toggle" class="sidebar-toggle"><i class="fas fa-bars"></i></button>');
+                }
+
+                // Auto-collapse all dropdowns initially
+                $('.sidebar-dropdown').removeClass('open');
+                $('.sidebar-submenu').hide();
+
+                // Handle dropdown toggles with auto-collapse functionality
+                $('.sidebar-dropdown > a').on('click', function(e) {
+                    e.preventDefault();
+                    const parent = $(this).parent();
+
+                    // Close all other open dropdowns
+                    $('.sidebar-dropdown.open').not(parent).removeClass('open').find('.sidebar-submenu').slideUp(200);
+
+                    // Toggle the clicked submenu
+                    parent.toggleClass('open');
+                    const submenu = parent.find('.sidebar-submenu');
+
+                    if (parent.hasClass('open')) {
+                        submenu.slideDown(200);
+                    } else {
+                        submenu.slideUp(200);
+                    }
+                });
+
+                // Set active class and open parent dropdown for current page
+                function setActiveTab() {
+                    let activeFound = false;
+
+                    $('.sidebar-nav a').each(function() {
+                        if ($(this).attr('href') && $(this).attr('href') !== 'javascript:void(0)') {
+                            const linkPath = $(this).attr('href').toLowerCase();
+
+                            // Check if the current URL matches this link
+                            if (currentPath === linkPath ||
+                                (currentPath.startsWith(linkPath) && linkPath !== '/') ||
+                                (currentPath === '/' && linkPath === '/dashboard')) {
+
+                                $(this).addClass('active');
+                                activeFound = true;
+
+                                // If this
 
 	<!-- Scripts -->
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>

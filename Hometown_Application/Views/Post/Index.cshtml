@@ -1,66 +1,265 @@
 ﻿<!--Backup purpose onlyy-->
 @model IEnumerable<Hometown_Application.Models.PostModel>
 
-<div class="container mt-4">
-    <h2 class="text-primary">Community Forum</h2>
+<!-- Community Forum Section -->
+<div class="recent-activity">
+    <h2>Community Forum</h2>
 
     <!-- Create New Post Button -->
-    <div class="text-end mb-3">
-        <a asp-action="Create" class="btn btn-success">➕ Create New Post</a>
+    <div style="text-align: right; margin-bottom: 20px;">
+        <a asp-action="Create" class="forum-create-btn">
+            <i class="fas fa-plus-circle"></i> Create New Post
+        </a>
     </div>
 
-    <div class="list-group">
+    <div class="forum-posts">
         @foreach (var post in Model)
         {
-            <div class="list-group-item list-group-item-action mb-3 p-4 shadow-sm rounded border">
-                <!-- Post Title -->
-                <h4 class="mb-1">
-                    <a asp-action="Details" asp-route-id="@post.PostId" class="text-decoration-none text-dark fw-bold">
-                        @post.Title
-                    </a>
-                </h4>
-                <td>
-                    @if (post.Image != null)
-                    {
-                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(post.Image)" alt="Post Image" width="100" height="100" />
-                    }
-                    else
-                    {
-                        <span>No Image</span>
-                    }
+            <div class="forum-post">
+                <div class="forum-post-content">
+                    <!-- Post Title -->
+                    <h4>
+                        <a asp-action="Details" asp-route-id="@post.PostId">
+                            @post.Title
+                        </a>
+                    </h4>
 
-                </td>
+                    <!-- Post Image -->
+                    <div class="post-image">
+                        @if (post.Image != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(post.Image)" alt="Post Image" />
+                        }
+                    </div>
 
-                <!-- Post Content Preview -->
-                <p class="text-muted">
-                    @if (post.Content.Length > 200)
-                    {
-                        @(post.Content.Length > 200 ? $"{post.Content.Substring(0, 200)}..." : post.Content)
+                    <!-- Post Content Preview -->
+                    <p class="post-preview">
+                        @if (post.Content.Length > 200)
+                        {
+                            @(post.Content.Substring(0, 200))
+                            <span>...</span>
+                            <a asp-action="Details" asp-route-id="@post.PostId" class="read-more">Read More</a>
+                        }
+                        else
+                        {
+                            @post.Content
+                        }
+                    </p>
 
-                                       <a asp-action = "Details" asp-route-id = "@post.PostId" class="fw-bold">Read More</a>
-                    }
-                    else
-                    {
-                @post.Content
-                    }
-            </p>
+                    <!-- Post Metadata -->
+                    <div class="post-meta">
+                        <span class="post-author">
+                            <i class="fas fa-user"></i> @post.ApplicationUser.FirstName
+                        </span>
+                        <span class="post-date">
+                            <i class="fas fa-calendar-alt"></i> @post.AddedOn.ToString("MMMM dd, yyyy")
+                        </span>
+                    </div>
 
-            <!-- Post Metadata -->
-            <small class="text-secondary">
-                📝 By <strong>@post.ApplicationUser.FirstName</strong> | 📅 @post.AddedOn.ToString("MMMM dd, yyyy")
-            </small>
+                    <!-- Reactions and Comments -->
+                    <div class="post-reactions">
+                        @{
+                            int loveCount = 0;
+                            int likeCount = 0;
+                            int hahaCount = 0;
+                            int wowCount = 0;
+                            int sadCount = 0;
+                            int angryCount = 0;
 
-            <!-- Reactions and Comments -->
-            <div class="mt-2 d-flex align-items-center gap-3">
-                <span>❤️ @post.Reactions.Count(r => r.Type == "Love")</span>
-                <span>👍 @post.Reactions.Count(r => r.Type == "Like")</span>
-                <span>😂 @post.Reactions.Count(r => r.Type == "Haha")</span>
-                <span>😮 @post.Reactions.Count(r => r.Type == "Wow")</span>
-                <span>😢 @post.Reactions.Count(r => r.Type == "Sad")</span>
-                <span>😡 @post.Reactions.Count(r => r.Type == "Angry")</span>
-                <span>💬 @post.Comments.Count()</span>
+                            foreach (var reaction in post.Reactions)
+                            {
+                                switch (reaction.Type)
+                                {
+                                    case "Love": loveCount++; break;
+                                    case "Like": likeCount++; break;
+                                    case "Haha": hahaCount++; break;
+                                    case "Wow": wowCount++; break;
+                                    case "Sad": sadCount++; break;
+                                    case "Angry": angryCount++; break;
+                                }
+                            }
+                        }
+                        <span class="reaction"><i class="fas fa-heart"></i> @loveCount</span>
+                        <span class="reaction"><i class="fas fa-thumbs-up"></i> @likeCount</span>
+                        <span class="reaction"><i class="fas fa-laugh"></i> @hahaCount</span>
+                        <span class="reaction"><i class="fas fa-surprise"></i> @wowCount</span>
+                        <span class="reaction"><i class="fas fa-sad-tear"></i> @sadCount</span>
+                        <span class="reaction"><i class="fas fa-angry"></i> @angryCount</span>
+                        <span class="reaction"><i class="fas fa-comment"></i> @post.Comments.Count</span>
+                    </div>
+                </div>
             </div>
-        </div>
         }
     </div>
 </div>
+
+<style>
+    /* Community Forum Styles */
+    .forum-create-btn {
+        display: inline-block;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        transition: var(--transition);
+        font-weight: 500;
+    }
+
+        .forum-create-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            color: white;
+        }
+
+        .forum-create-btn i {
+            margin-right: 8px;
+        }
+
+    .forum-posts {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .forum-post {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        transition: var(--transition);
+        border-left: 4px solid var(--primary-color);
+    }
+
+        .forum-post:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .forum-post h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+            .forum-post h4 a {
+                color: var(--text-color);
+                text-decoration: none;
+                transition: var(--transition);
+            }
+
+                .forum-post h4 a:hover {
+                    color: var(--primary-color);
+                }
+
+    .post-image {
+        margin: 10px 0;
+    }
+
+        .post-image img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+    .post-preview {
+        color: #666;
+        margin: 15px 0;
+        line-height: 1.6;
+    }
+
+    .read-more {
+        color: var(--primary-color);
+        font-weight: 500;
+        text-decoration: none;
+        margin-left: 5px;
+    }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+    .post-meta {
+        display: flex;
+        gap: 20px;
+        color: #777;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+
+    .post-author, .post-date {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .post-author i, .post-date i {
+            color: var(--secondary-color);
+        }
+
+    .post-reactions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .reaction {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+        .reaction i {
+            transition: var(--transition);
+        }
+
+        .reaction:nth-child(1) i {
+            color: #e74c3c;
+        }
+        /* Love */
+        .reaction:nth-child(2) i {
+            color: var(--primary-color);
+        }
+        /* Like */
+        .reaction:nth-child(3) i {
+            color: #f39c12;
+        }
+        /* Haha */
+        .reaction:nth-child(4) i {
+            color: #3498db;
+        }
+        /* Wow */
+        .reaction:nth-child(5) i {
+            color: #9b59b6;
+        }
+        /* Sad */
+        .reaction:nth-child(6) i {
+            color: #e74c3c;
+        }
+        /* Angry */
+        .reaction:nth-child(7) i {
+            color: var(--secondary-color);
+        }
+        /* Comments */
+
+        .reaction:hover i {
+            transform: scale(1.2);
+        }
+
+    {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .post-reactions {
+        gap: 10px;
+    }
+
+</style>
