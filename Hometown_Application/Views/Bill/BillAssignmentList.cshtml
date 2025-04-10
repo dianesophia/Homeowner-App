@@ -1,0 +1,46 @@
+﻿    @model IEnumerable<Hometown_Application.Models.BillAssignmentModel>
+
+    @{
+        ViewData["Title"] = "Bill Assignment List";
+    }
+
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>All Bill Assignments</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Bill Assignment ID</th>
+                            <th>User</th>
+                            <th>Bill Name</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th>Due Date</th>
+                            <th>Issued Date</th>
+                            <th>Status</th>
+                            <th>Paid Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var billAssignment in Model)
+                        {
+                            <tr>
+                                <td>@billAssignment.BillAssignmentId</td>
+                                <td>@billAssignment.ApplicationUser?.FirstName ApplicationUser?.LastName</td>
+                                <td>@billAssignment.BillName</td>
+                                <td>@billAssignment.Amount.ToString("C")</td>
+                                <td>@billAssignment.Description</td>
+                                <td>@billAssignment.DueDate.ToString("MM/dd/yyyy")</td>
+                                <td>@billAssignment.IssuedDate.ToString("MM/dd/yyyy")</td>
+                                <td>@(billAssignment.IsPaid ? "Paid" : "Not Paid")</td>
+                                <td>@(billAssignment.PaidDate.HasValue ? billAssignment.PaidDate.Value.ToString("MM/dd/yyyy") : "N/A")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>

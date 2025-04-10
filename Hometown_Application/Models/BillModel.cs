@@ -23,13 +23,32 @@ namespace Hometown_Application.Models
         public DateTime DueDate { get; set; }
 
         public decimal TotalAmount { get; set; }
-
-        public string Status { get; set; } = "Pending"; // Pending, Paid, Overdue
+        public decimal RemainingBalance { get; set; }
+         
+        public string? Status { get; set; } = "Pending"; // Pending, Paid, Overdue
 
         public string? Remarks { get; set; }
 
+        public bool IsPaid { get; set; }
+
         public ICollection<BillDetailModel> BillDetails { get; set; }
 
-        public ICollection<PaymentModel> Payments { get; set; }
+        public ICollection<BillPaymentModel> Payments { get; set; }
+
+        public BillModel()
+        {
+            RemainingBalance = TotalAmount;
+        }
+
+        public void UpdateRemainingBalance(decimal paymentAmount)
+        {
+            RemainingBalance -= paymentAmount;
+
+            if (RemainingBalance <= 0)
+            {
+                IsPaid = true;
+                RemainingBalance = 0; // Ensure remaining balance doesn't go negative
+            }
+        }
     }
 }

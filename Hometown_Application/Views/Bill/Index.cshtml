@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Hometown_Application.Models.BillModel>
+
+@{
+    ViewData["Title"] = "Bills List";
+}
+
+<h2>Bills</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Bill ID</th>
+            <th>Issue Date</th>
+            <th>Due Date</th>
+            <th>Total Amount</th>
+            <th>Remaining Balance</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bill in Model)
+        {
+            <tr>
+                <td>@bill.BillId</td>
+                <td>@bill.IssueDate.ToShortDateString()</td>
+                <td>@bill.DueDate.ToShortDateString()</td>
+                <td>@bill.TotalAmount</td>
+                <td>@bill.RemainingBalance</td>
+                <td>@bill.Status</td>
+                <td>
+                    <a href="@Url.Action("Details", "Bill", new { id = bill.BillId })" class="btn btn-info">View</a>
+                    <a href="@Url.Action("MakePayment", "Bill", new { id = bill.BillId })" class="btn btn-success">Make Payment</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -43,6 +43,11 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<BillAccountModel> BillAccounts { get; set; }
     public DbSet<BillTransactionModel> BillTransactions { get; set; }
 
+    public DbSet<BillPaymentModel> BillPayment { get; set; }
+    public DbSet<BillAssignmentModel> BillAssignment { get; set; }
+
+    public DbSet<BillDetailModel> BillDetail { get; set; }
+
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
     public DbSet<PollQuestionModel> PollQuestions { get; set; }
@@ -56,13 +61,13 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-            base.OnModelCreating(builder);
+        base.OnModelCreating(builder);
 
         builder.Entity<HouseModel>()
             .HasIndex(h => new { h.BlockName, h.LotNumber, h.StreetName })
             .IsUnique();
 
-       
+
 
         builder.Entity<FacilityModel>()
                 .HasMany(f => f.Reservations)
@@ -70,14 +75,14 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
                 .HasForeignKey(r => r.FacilityId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-        
+
         builder.Entity<ReservationModel>()
            .HasOne(fc => fc.ApplicationUser)
            .WithMany()
            .HasForeignKey(fc => fc.UserId)
            .OnDelete(DeleteBehavior.Cascade);
 
-        
+
         builder.Entity<FeedbackComplaintModel>()
            .HasOne(fc => fc.ApplicationUser)
            .WithMany()
@@ -145,7 +150,19 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .HasForeignKey(p => p.UserId)
            .OnDelete(DeleteBehavior.NoAction);
 
-       
+
+        builder.Entity<BillAssignmentModel>()
+           .HasOne(c => c.ApplicationUser)
+           .WithMany()
+           .HasForeignKey(c => c.UserId)
+           .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BillAssignmentModel>()
+        .HasOne(c => c.Bill)  // Correct the navigation property to 'Bill' (not 'BillModel')
+        .WithMany()  // This means a Bill can be assigned to many BillAssignments
+        .HasForeignKey(c => c.BillId)  // BillAssignmentModel has a BillId to reference the Bill
+        .OnDelete(DeleteBehavior.NoAction);  // Set the delete behavior (you can change this based on your requirements)
+
 
         builder.Entity<BillAccountModel>()
            .HasOne(c => c.ApplicationUser)
@@ -206,47 +223,52 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
        new BillItemsModel { BillItemsID = 11, PaymentName = "Road Maintenance Fee", Amount = 1000.00m, Description = "Annual fee for road maintenance and repairs.", PaymentDuration = "Yearly" }
    );
 
+        /*  builder.Entity<BillModel>().HasData(
+               new BillModel { BillId = 1, UserId = "111", TotalAmount = 3500.00m, IssueDate = DateTime.UtcNow, DueDate = DateTime.UtcNow.AddDays(30), IsPaid = false },
+               new BillModel { BillId = 2, UserId = "112", TotalAmount = 100.00m, IssueDate = DateTime.UtcNow, DueDate = DateTime.UtcNow.AddDays(30), IsPaid = false}
+           );
+          */
 
         // ✅ Seeding Roles
-         var roles = new List<IdentityRole>
+        var roles = new List<IdentityRole>
          {
              new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
              new IdentityRole { Id = "2", Name = "HomeOwner", NormalizedName = "HOMEOWNER" },
              new IdentityRole { Id = "3", Name = "Staff", NormalizedName = "STAFF" }
          };
-         builder.Entity<IdentityRole>().HasData(roles);
+        builder.Entity<IdentityRole>().HasData(roles);
 
         // ✅ Seeding Users
 
-       /* var adminRole = new IdentityRole("Admin") { Id = "1", NormalizedName = "ADMIN" };
-        var homeOwnerRole = new IdentityRole("HomeOwner") { Id = "2", NormalizedName = "HOMEOWNER" };
-        var staffRole = new IdentityRole("Staff") { Id = "3", NormalizedName = "STAFF" };
-       */
+        /* var adminRole = new IdentityRole("Admin") { Id = "1", NormalizedName = "ADMIN" };
+         var homeOwnerRole = new IdentityRole("HomeOwner") { Id = "2", NormalizedName = "HOMEOWNER" };
+         var staffRole = new IdentityRole("Staff") { Id = "3", NormalizedName = "STAFF" };
+        */
         var hasher = new PasswordHasher<ApplicationUser>();
 
-      /*  var adminUser = new ApplicationUser
-        {
-            Id = "999", // Unique ID for Admin
-            UserName = "admin@admin.com",
-            NormalizedUserName = "ADMIN@ADMIN.COM",
-            Email = "admin@admin.com",
-            NormalizedEmail = "ADMIN@ADMIN.COM",
-            EmailConfirmed = true,
-            FirstName = "System",
-            LastName = "Admin",
-            PasswordHash = hasher.HashPassword(null, "Admin1234*") // Secure password
-        };
+        /*  var adminUser = new ApplicationUser
+          {
+              Id = "999", // Unique ID for Admin
+              UserName = "admin@admin.com",
+              NormalizedUserName = "ADMIN@ADMIN.COM",
+              Email = "admin@admin.com",
+              NormalizedEmail = "ADMIN@ADMIN.COM",
+              EmailConfirmed = true,
+              FirstName = "System",
+              LastName = "Admin",
+              PasswordHash = hasher.HashPassword(null, "Admin1234*") // Secure password
+          };
 
-        // ✅ Add Admin User
-        builder.Entity<ApplicationUser>().HasData(adminUser);
+          // ✅ Add Admin User
+          builder.Entity<ApplicationUser>().HasData(adminUser);
 
-        builder.Entity<IdentityUserRole<string>>().HasData(
-   new IdentityUserRole<string> { UserId = "999", RoleId = "1" } // Assigning Admin Role
-);*/
+          builder.Entity<IdentityUserRole<string>>().HasData(
+     new IdentityUserRole<string> { UserId = "999", RoleId = "1" } // Assigning Admin Role
+  );*/
 
         builder.Entity<ApplicationUser>().HasData(
     //Staffs
-    new ApplicationUser { Id = "100", UserName = "elon.musk@example.com", NormalizedUserName = "ELON.MUSK@EXAMPLE.COM", Email = "elon.musk@example.com", NormalizedEmail = "ELON.MUSK@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Elon", LastName = "Musk", PasswordHash = hasher.HashPassword(null, "ElonMusk123*"), ProfilePicturePath="wwwroot/images/picc.png" },
+    new ApplicationUser { Id = "100", UserName = "elon.musk@example.com", NormalizedUserName = "ELON.MUSK@EXAMPLE.COM", Email = "elon.musk@example.com", NormalizedEmail = "ELON.MUSK@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Elon", LastName = "Musk", PasswordHash = hasher.HashPassword(null, "ElonMusk123*"), ProfilePicturePath = "wwwroot/images/picc.png" },
     new ApplicationUser { Id = "102", UserName = "bill.gates@example.com", NormalizedUserName = "BILL.GATES@EXAMPLE.COM", Email = "bill.gates@example.com", NormalizedEmail = "BILL.GATES@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Bill", LastName = "Gates", PasswordHash = hasher.HashPassword(null, "BillGates123*") },
     new ApplicationUser { Id = "103", UserName = "mark.zuckerberg@example.com", NormalizedUserName = "MARK.ZUCKERBERG@EXAMPLE.COM", Email = "mark.zuckerberg@example.com", NormalizedEmail = "MARK.ZUCKERBERG@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Mark", LastName = "Zuckerberg", PasswordHash = hasher.HashPassword(null, "MarkZuck123*") },
     new ApplicationUser { Id = "104", UserName = "sundar.pichai@example.com", NormalizedUserName = "SUNDAR.PICHAI@EXAMPLE.COM", Email = "sundar.pichai@example.com", NormalizedEmail = "SUNDAR.PICHAI@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Sundar", LastName = "Pichai", PasswordHash = hasher.HashPassword(null, "SundarPichai123*") },
@@ -287,23 +309,47 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     new ApplicationUser { Id = "136", UserName = "cheryl.sandberg@example.com", NormalizedUserName = "CHERYL.SANDBERG@EXAMPLE.COM", Email = "cheryl.sandberg@example.com", NormalizedEmail = "CHERYL.SANDBERG@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Cheryl", LastName = "Sandberg", PasswordHash = hasher.HashPassword(null, "CherylSandberg123*") },
     new ApplicationUser { Id = "137", UserName = "karen.smith@example.com", NormalizedUserName = "KAREN.SMITH@EXAMPLE.COM", Email = "karen.smith@example.com", NormalizedEmail = "KAREN.SMITH@EXAMPLE.COM", EmailConfirmed = true, FirstName = "Karen", LastName = "Smith", PasswordHash = hasher.HashPassword(null, "KarenSmith123*") },
     new ApplicationUser { Id = "138", UserName = "david.lee@example.com", NormalizedUserName = "DAVID.LEE@EXAMPLE.COM", Email = "david.lee@example.com", NormalizedEmail = "DAVID.LEE@EXAMPLE.COM", EmailConfirmed = true, FirstName = "David", LastName = "Lee", PasswordHash = hasher.HashPassword(null, "DavidLee123*") },
-     new ApplicationUser { Id = "139", UserName = "james.taylor@example.com", NormalizedUserName = "JAMES.TAYLOR@EXAMPLE.COM", Email = "james.taylor@example.com", NormalizedEmail = "JAMES.TAYLOR@EXAMPLE.COM", EmailConfirmed = true, FirstName = "James", LastName = "Taylor", PasswordHash = hasher.HashPassword(null, "JamesTaylor123*") }
+    new ApplicationUser { Id = "139", UserName = "james.taylor@example.com", NormalizedUserName = "JAMES.TAYLOR@EXAMPLE.COM", Email = "james.taylor@example.com", NormalizedEmail = "JAMES.TAYLOR@EXAMPLE.COM", EmailConfirmed = true, FirstName = "James", LastName = "Taylor", PasswordHash = hasher.HashPassword(null, "JamesTaylor123*") }
     );
 
 
 
         builder.Entity<HouseModel>().HasData(
         new HouseModel { HouseId = 1, UserId = "100", BlockName = "AspenHeight", LotNumber = 1, StreetName = "Ashwood Lane", IsOccupied = true },
-        new HouseModel { HouseId = 2, UserId = "102", BlockName = "BirchHaven", LotNumber = 2, StreetName = "Birchwood Avenue", IsOccupied = true },
-        new HouseModel { HouseId = 3, UserId = "103", BlockName = "CedarCrest", LotNumber = 3, StreetName = "Ivy Lane", IsOccupied = true },
-        new HouseModel { HouseId = 4, UserId = "104", BlockName = "Oakwood", LotNumber = 4, StreetName = "Oakwood Lane", IsOccupied = true },
-        new HouseModel { HouseId = 5, UserId = "105", BlockName = "Elmwood", LotNumber = 5, StreetName = "Birchwood Lane", IsOccupied = true },
-        new HouseModel { HouseId = 6, UserId = "106", BlockName = "GoldenOak", LotNumber = 1, StreetName = "Golden Leaf", IsOccupied = true },
-        new HouseModel { HouseId = 7, UserId = "107", BlockName = "Rosewood", LotNumber = 2, StreetName = "Rosewood Lane", IsOccupied = true },
-        new HouseModel { HouseId = 8, UserId = "108", BlockName = "MapleGrove", LotNumber = 3, StreetName = "Maplewood Avenue", IsOccupied = true },
-        new HouseModel { HouseId = 9, UserId = "109", BlockName = "Silver Springs", LotNumber = 4, StreetName = "Pinewood Lane", IsOccupied = true },
-        new HouseModel { HouseId = 10, UserId = "110", BlockName = "Magnolia Ridge", LotNumber = 5, StreetName = "Pearl Road", IsOccupied = true }
+        new HouseModel { HouseId = 2, UserId = "102", BlockName = "AspenHeight", LotNumber = 2, StreetName = "Ashwood Lane", IsOccupied = true },
+        new HouseModel { HouseId = 3, UserId = "103", BlockName = "AspenHeight", LotNumber = 3, StreetName = "Ashwood Lane", IsOccupied = true },
+        new HouseModel { HouseId = 4, UserId = "104", BlockName = "AspenHeight", LotNumber = 4, StreetName = "Ashwood Lane", IsOccupied = true },
+        new HouseModel { HouseId = 5, UserId = "105", BlockName = "AspenHeight", LotNumber = 5, StreetName = "Ashwood Lane", IsOccupied = true },
 
+        new HouseModel { HouseId = 6, UserId = "106", BlockName = "BirchHaven", LotNumber = 1, StreetName = "Birchwood Avenue", IsOccupied = true },
+        new HouseModel { HouseId = 7, UserId = "107", BlockName = "BirchHaven", LotNumber = 2, StreetName = "Birchwood Avenue", IsOccupied = true },
+        new HouseModel { HouseId = 8, UserId = "108", BlockName = "BirchHaven", LotNumber = 3, StreetName = "Birchwood Avenue", IsOccupied = true },
+        new HouseModel { HouseId = 9, UserId = "109", BlockName = "BirchHaven", LotNumber = 4, StreetName = "Birchwood Avenue", IsOccupied = true },
+        new HouseModel { HouseId = 10, UserId = "110", BlockName = "BirchHaven", LotNumber = 5, StreetName = "Birchwood Avenue", IsOccupied = true },
+
+        new HouseModel { HouseId = 11, UserId = "111", BlockName = "CedarCrest", LotNumber = 1, StreetName = "Cedar Hollow Road", IsOccupied = true },
+        new HouseModel { HouseId = 12, UserId = "112", BlockName = "CedarCrest", LotNumber = 2, StreetName = "Cedar Hollow Road", IsOccupied = true },
+        new HouseModel { HouseId = 13, UserId = "113", BlockName = "CedarCrest", LotNumber = 3, StreetName = "Cedar Hollow Road", IsOccupied = true },
+        new HouseModel { HouseId = 14, UserId = "114", BlockName = "CedarCrest", LotNumber = 4, StreetName = "Cedar Hollow Road", IsOccupied = true },
+        new HouseModel { HouseId = 15, UserId = "115", BlockName = "CedarCrest", LotNumber = 5, StreetName = "Cedar Hollow Road", IsOccupied = true },
+
+        new HouseModel { HouseId = 16, UserId = "116", BlockName = "ChestnutGrove", LotNumber = 1, StreetName = "Chestnut Boulevard", IsOccupied = true },
+        new HouseModel { HouseId = 17, UserId = "117", BlockName = "ChestnutGrove", LotNumber = 2, StreetName = "Chestnut Boulevard", IsOccupied = true },
+        new HouseModel { HouseId = 18, UserId = "118", BlockName = "ChestnutGrove", LotNumber = 3, StreetName = "Chestnut Boulevard", IsOccupied = true },
+        new HouseModel { HouseId = 19, UserId = "119", BlockName = "ChestnutGrove", LotNumber = 4, StreetName = "Chestnut Boulevard", IsOccupied = true },
+        new HouseModel { HouseId = 20, UserId = "120", BlockName = "ChestnutGrove", LotNumber = 5, StreetName = "Chestnut Boulevard", IsOccupied = true },
+
+        new HouseModel { HouseId = 21, UserId = "121", BlockName = "CrystalLake", LotNumber = 1, StreetName = "Crystal Drive", IsOccupied = true },
+        new HouseModel { HouseId = 22, UserId = "122", BlockName = "CrystalLake", LotNumber = 2, StreetName = "Crystal Drive", IsOccupied = true },
+        new HouseModel { HouseId = 23, UserId = "123", BlockName = "CrystalLake", LotNumber = 3, StreetName = "Crystal Drive", IsOccupied = true },
+        new HouseModel { HouseId = 24, UserId = "124", BlockName = "CrystalLake", LotNumber = 4, StreetName = "Crystal Drive", IsOccupied = true },
+        new HouseModel { HouseId = 25, UserId = "125", BlockName = "CrystalLake", LotNumber = 5, StreetName = "Crystal Drive", IsOccupied = true },
+
+        new HouseModel { HouseId = 26, UserId = "126", BlockName = "ElmwoodBlock", LotNumber = 1, StreetName = "Elmwood Drive", IsOccupied = true },
+        new HouseModel { HouseId = 27, UserId = "127", BlockName = "ElmwoodBlock", LotNumber = 2, StreetName = "Elmwood Drive", IsOccupied = true },
+        new HouseModel { HouseId = 28, UserId = "128", BlockName = "ElmwoodBlock", LotNumber = 3, StreetName = "Elmwood Drive", IsOccupied = true },
+        new HouseModel { HouseId = 29, UserId = "129", BlockName = "ElmwoodBlock", LotNumber = 4, StreetName = "Elmwood Drive", IsOccupied = true },
+        new HouseModel { HouseId = 30, UserId = "130", BlockName = "ElmwoodBlock", LotNumber = 5, StreetName = "Elmwood Drive", IsOccupied = true }
 
     );
         
@@ -320,6 +366,41 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     new StaffProfileModel { StaffId = 10, UserId = "110", Department = StaffDepartment.IT, Position = "System Administrator", HireDate = DateTime.Parse("2020-09-20"), Salary = 35000.00m, IsActiveEmployee = true, IsAlsoHomeOwner = true, Address = "789 Pine St", EmergencyContactName = "Alice Brown", EmergencyContactNumber = "5678901234", EmergencyContactRelation = "Sister", AccountCreatedBy = "admin", AccountCreatedOn = DateTime.UtcNow }
 );
 
+        builder.Entity<HomeownerProfileModel>().HasData(
+            new HomeownerProfileModel { HomeownerId = 1, UserId = "111", IsApproved = true},
+            new HomeownerProfileModel { HomeownerId = 2, UserId = "112", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 3, UserId = "113", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 4, UserId = "114", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 5, UserId = "115", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 6, UserId = "116", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 7, UserId = "117", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 8, UserId = "118", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 9, UserId = "119", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 10, UserId = "120", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 11, UserId = "121", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 12, UserId = "122", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 13, UserId = "123", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 14, UserId = "124", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 15, UserId = "125", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 16, UserId = "126", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 17, UserId = "127", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 18, UserId = "128", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 19, UserId = "129", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 20, UserId = "130", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 21, UserId = "131", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 22, UserId = "132", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 23, UserId = "133", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 24, UserId = "134", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 25, UserId = "135", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 26, UserId = "136", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 27, UserId = "137", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 28, UserId = "138", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 29, UserId = "139", IsApproved = true },
+            new HomeownerProfileModel { HomeownerId = 30, UserId = "140", IsApproved = true }
+
+
+        );
+
 
         builder.Entity<IdentityUserRole<string>>().HasData(
     new IdentityUserRole<string> { UserId = "100", RoleId = "3" }, // Elon Musk -> Staff
@@ -331,7 +412,40 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     new IdentityUserRole<string> { UserId = "107", RoleId = "3" },  // Jack Dorsey -> Staff
     new IdentityUserRole<string> { UserId = "108", RoleId = "3" }, // Larry Page -> Staff
     new IdentityUserRole<string> { UserId = "109", RoleId = "3" }, // Sergey Brin -> Staff
-    new IdentityUserRole<string> { UserId = "110", RoleId = "3" }  // Steve Jobs -> Staff
+    new IdentityUserRole<string> { UserId = "110", RoleId = "3" },  // Steve Jobs -> Staff
+
+    new IdentityUserRole<string> { UserId = "111", RoleId = "2" }, // Sheryl Sandberg -> Homeowner
+    new IdentityUserRole<string> { UserId = "112", RoleId = "2" }, // Reed Hastings -> Homeowner
+    new IdentityUserRole<string> { UserId = "113", RoleId = "2" }, // Marissa Mayer -> Homeowner
+    new IdentityUserRole<string> { UserId = "114", RoleId = "2" }, // Elizabeth Holmes -> Homeowner
+    new IdentityUserRole<string> { UserId = "115", RoleId = "2" }, // Susan Wojcicki -> Homeowner
+    new IdentityUserRole<string> { UserId = "116", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "117", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "118", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "119", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "120", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "121", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "122", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "123", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "124", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "125", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "126", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "127", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "128", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "129", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "130", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "131", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "132", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "133", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "134", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "135", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "136", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "137", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "138", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "139", RoleId = "2" },
+    new IdentityUserRole<string> { UserId = "140", RoleId = "2" }
+
+
 );
 
         builder.Entity<HomeownerProfileModel>()

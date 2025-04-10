@@ -1,4 +1,7 @@
-﻿namespace Hometown_Application.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Hometown_Application.Models
 {
     public class BillDetailModel
     {

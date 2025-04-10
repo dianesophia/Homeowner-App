@@ -1,0 +1,25 @@
+﻿@model List<Hometown_Application.Models.BillModel>
+
+@{
+    ViewData["Title"] = "Homeowner Dashboard";
+}
+
+<h2>Homeowner Dashboard</h2>
+
+<div class="row">
+    @foreach (var bill in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Remaining Balance</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>Remaining Balance:</strong> @bill.RemainingBalance.ToString("C")
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

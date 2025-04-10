@@ -675,13 +675,25 @@
 				 				<i class="fas fa-poll"></i> <span>messages</span>
 							</a>
 						</li>
-						<li class="nav-item">
-   <a asp-controller="BillPayment" asp-action="Pay">Make a Payment</a>
 
-</li>
-	<li class="nav-item">
-    <a class="nav-link" asp-controller="BillsTotal" asp-action="index">Outstanding</a>
-</li>
+
+						<li class="nav-item">
+							 <a asp-controller="Bill" asp-action="AdminBoard">Bill Admin board</a>
+
+						</li>
+							<li class="nav-item">
+							 <a asp-controller="Bill" asp-action="HomeownerBoard">Bill Homeowner board</a>
+
+						</li>
+
+
+						<li class="nav-item">
+							 <a asp-controller="BillPayment" asp-action="Pay">Make a Payment</a>
+
+						</li>
+							<li class="nav-item">
+							<a class="nav-link" asp-controller="BillsTotal" asp-action="index">Bill Liquidation</a>
+						</li>
 
 							<li>
 							<a class="nav-link" asp-controller="BillItems" asp-action="Index">
@@ -899,7 +911,7 @@
         const listItem = document.createElement("li");
         listItem.style.borderBottom = "1px solid #ccc";
         listItem.style.padding = "8px";
-        listItem.innerHTML = `<strong>🔔 New Post:</strong> ${message}`;
+        listItem.innerHTML = `<strong>🔔 New Notification:</strong> ${message}`;
         list.prepend(listItem);
     }
 

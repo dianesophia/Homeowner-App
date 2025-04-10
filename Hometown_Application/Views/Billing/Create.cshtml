@@ -1,0 +1,28 @@
+﻿@using Hometown_Application.Areas.Identity.Data
+@model Hometown_Application.Models.BillModel
+
+@{
+    ViewData["Title"] = "Create Bill";
+}
+
+<h2>Create New Bill</h2>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="UserId" class="control-label">Homeowner</label>
+        <select asp-for="UserId" class="form-control" asp-items="@(new SelectList(ViewData["UserId"] as IEnumerable<ApplicationUser>, "Id", "UserName"))"></select>
+    </div>
+    <div class="form-group">
+        <label asp-for="DueDate" class="control-label"></label>
+        <input asp-for="DueDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="TotalAmount" class="control-label"></label>
+        <input asp-for="TotalAmount" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Remarks" class="control-label"></label>
+        <textarea asp-for="Remarks" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
