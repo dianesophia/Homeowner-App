@@ -1,10 +1,15 @@
 ﻿@model Hometown_Application.ViewModels.ServiceRequestListViewModel
 
 @{
-    ViewData["Title"] = "Admin View - All Service Requests";
+    ViewData["Title"] = "Admin - Service Requests";
 }
 
-<h2>Admin View - All Service Requests</h2>
+<h2>Admin - Service Requests</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
 
 @if (TempData["Error"] != null)
 {
@@ -45,9 +50,22 @@
                     <td>@request.Urgency</td>
                     <td>@request.Email</td>
                     <td>
-                        <span class="badge @(request.Status?.StatusName == "Completed" ? "bg-success" : "bg-warning")">
-                            @request.Status?.StatusName
-                        </span>
+                        <form asp-action="UpdateServiceRequestStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@request.ServiceRequestId" />
+                            <select name="newStatusId" onchange="this.form.submit()">
+                                @foreach (var status in Model.Statuses)
+                                {
+                                    if (request.StatusId.ToString() == status.Value)
+                                    {
+                                        <option value="@status.Value" selected>@status.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@status.Value">@status.Text</option>
+                                    }
+                                }
+                            </select>
+                        </form>
                     </td>
                     <td>
                         <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning btn-sm">Edit</a>
@@ -73,12 +91,10 @@
         </ul>
     </nav>
 }
-else
+else if (TempData["Error"] == null)
 {
     <p class="text-center">No service requests found.</p>
 }
-
-<a asp-action="Index" class="btn btn-primary">Back to Index</a>
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

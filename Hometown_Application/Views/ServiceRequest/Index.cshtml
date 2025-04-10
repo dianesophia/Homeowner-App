@@ -6,19 +6,15 @@
 
 <h2>Service Requests</h2>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
-
-<!-- Admin and Homeowner View Buttons -->
-<div class="mb-3">
-    @if (User.IsInRole("Admin"))
-    {
-        <a href="@Url.Action("AdminView", "ServiceRequest")" class="btn btn-primary">Admin View</a>
-    }
-    <a href="@Url.Action("HomeownerView", "ServiceRequest")" class="btn btn-secondary">Homeowner View</a>
-</div>
 
 @if (Model.Requests != null && Model.Requests.Any())
 {
@@ -54,9 +50,31 @@
                     <td>@request.Urgency</td>
                     <td>@request.Email</td>
                     <td>
-                        <span class="badge @(request.Status?.StatusName == "Completed" ? "bg-success" : "bg-warning")">
-                            @request.Status?.StatusName
-                        </span>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <form asp-action="UpdateServiceRequestStatus" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@request.ServiceRequestId" />
+                                <select name="newStatusId" onchange="this.form.submit()">
+                                    @foreach (var status in Model.Statuses)
+                                    {
+                                        if (request.StatusId.ToString() == status.Value)
+                                        {
+                                            <option value="@status.Value" selected>@status.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@status.Value">@status.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="badge @(request.Status?.StatusName == "Completed" ? "bg-success" : "bg-warning")">
+                                @request.Status?.StatusName
+                            </span>
+                        }
                     </td>
                     <td>
                         <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning btn-sm">Edit</a>
@@ -82,9 +100,9 @@
         </ul>
     </nav>
 }
-else
+else if (TempData["Error"] == null)
 {
-    <p class="text-center">No service requests found.</p>
+    <p class="text-center">No service requests found. <a asp-action="Create">Create a new request</a>.</p>
 }
 
 <a asp-action="Create" class="btn btn-success">New Request</a>

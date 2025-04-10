@@ -150,11 +150,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-
-                            ConcurrencyStamp = "da5c6be4-733e-4325-9710-b7667b0f118f",
-
-                            //ConcurrencyStamp = "416ccdf0-dbee-4c26-8819-54522d0e5d65",
-
+                            ConcurrencyStamp = "813f3e9e-9d17-4579-91d8-7dfa8a7dbe51",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -168,15 +164,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-
-                            PasswordHash = "AQAAAAIAAYagAAAAEACydk2qEUbe8bPXia/Dafnp1aezaFgg3MfJCHt8oJRp9FxWuGLNeBq0L8h4JrCuIw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJQETeXyfzN5LCth9XI0ilJPcZaD5O5Dej6cOsqLErsJlOD91KvgEv0UDhVS9F6kjQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "808c6ab4-5646-4c0c-a532-54261a2cbfc8",
-
-                            /***PasswordHash = "AQAAAAIAAYagAAAAEF25vm/yFzg5RS4r5gNTY/WvcmzOxWsT+0FtJlsYGcmeVabm+hICtPXTh/iM6Pzung==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "9aa32387-caa7-4859-9e2c-a59246a85233",**/
-
+                            SecurityStamp = "1aa8f41b-e751-473f-8c2c-14640fd7ad70",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -287,7 +277,6 @@ namespace Hometown_Application.Migrations
 
                     b.ToTable("Comments");
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.ContactModel", b =>
                 {
@@ -458,6 +447,9 @@ namespace Hometown_Application.Migrations
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -786,7 +778,6 @@ namespace Hometown_Application.Migrations
                     b.ToTable("Posts");
                 });
 
-
             modelBuilder.Entity("Hometown_Application.Models.QuestionOptionModel", b =>
                 {
                     b.Property<int>("OptionId")
@@ -812,7 +803,6 @@ namespace Hometown_Application.Migrations
 
                     b.ToTable("QuestionOptions");
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.ReactionModel", b =>
                 {
@@ -841,7 +831,6 @@ namespace Hometown_Application.Migrations
 
                     b.ToTable("Reactions");
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.RequestTypeModel", b =>
                 {
@@ -954,11 +943,6 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -998,11 +982,12 @@ namespace Hometown_Application.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime?>("AddedOn")
+                    b.Property<DateTime>("AddedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CancelReason")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("CancelledOn")
                         .HasColumnType("datetime2");
@@ -1012,7 +997,8 @@ namespace Hometown_Application.Migrations
 
                     b.Property<string>("Details")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -1021,29 +1007,28 @@ namespace Hometown_Application.Migrations
                     b.Property<int?>("HomeownerId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsDeleted")
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("RejectedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RejectedReason")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<int?>("RequestTypeId")
-                        .IsRequired()
+                    b.Property<int>("RequestTypeId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Schedule")
-                        .IsRequired()
+                    b.Property<DateTime>("Schedule")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("StatusId")
-                        .IsRequired()
+                    b.Property<int>("StatusId")
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
@@ -1053,9 +1038,12 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Urgency")
+                    b.Property<int>("Urgency")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ServiceRequestId");
 
@@ -1064,6 +1052,8 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("RequestTypeId");
 
                     b.HasIndex("StatusId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ServiceRequests");
                 });
@@ -1224,7 +1214,6 @@ namespace Hometown_Application.Migrations
                             StatusName = "Closed"
                         });
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.VehicleGatepassModel", b =>
                 {
@@ -1399,7 +1388,6 @@ namespace Hometown_Application.Migrations
                     b.ToTable("VisitorGatepasses");
                 });
 
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -1563,12 +1551,11 @@ namespace Hometown_Application.Migrations
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.ChatMessageModel", b =>
                 {
@@ -1645,7 +1632,7 @@ namespace Hometown_Application.Migrations
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -1658,7 +1645,7 @@ namespace Hometown_Application.Migrations
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -1730,7 +1717,6 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-
             modelBuilder.Entity("Hometown_Application.Models.QuestionOptionModel", b =>
                 {
                     b.HasOne("Hometown_Application.Models.PollQuestionModel", "Question")
@@ -1741,7 +1727,6 @@ namespace Hometown_Application.Migrations
 
                     b.Navigation("Question");
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.ReactionModel", b =>
                 {
@@ -1761,7 +1746,6 @@ namespace Hometown_Application.Migrations
 
                     b.Navigation("Post");
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.ReservationModel", b =>
                 {
@@ -1801,6 +1785,14 @@ namespace Hometown_Application.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
                     b.Navigation("Homeowner");
 
                     b.Navigation("RequestType");
@@ -1818,14 +1810,13 @@ namespace Hometown_Application.Migrations
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("House");
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.VehicleGatepassModel", b =>
                 {
@@ -1848,7 +1839,6 @@ namespace Hometown_Application.Migrations
 
                     b.Navigation("ApplicationUser");
                 });
-
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
@@ -1908,7 +1898,6 @@ namespace Hometown_Application.Migrations
                     b.Navigation("SentMessages");
                 });
 
-
             modelBuilder.Entity("Hometown_Application.Models.FacilityModel", b =>
                 {
                     b.Navigation("Reservations");
@@ -1937,7 +1926,6 @@ namespace Hometown_Application.Migrations
 
                     b.Navigation("Reactions");
                 });
-
 
             modelBuilder.Entity("Hometown_Application.Models.QuestionOptionModel", b =>
                 {

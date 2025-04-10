@@ -76,9 +76,10 @@ namespace Hometown_Application.Models
         [ForeignKey("StatusId")]
         public StatusModel? Status { get; set; }
 
-        public string? UserId { get; set; }
+        [Required]
+        public string UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public ApplicationUser? User { get; set; }
+        public virtual ApplicationUser? ApplicationUser { get; set; }
     }
 }

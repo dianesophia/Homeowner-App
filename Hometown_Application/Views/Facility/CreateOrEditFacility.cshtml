@@ -1,11 +1,7 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using Hometown_Application.Areas.Identity.Data
-@inject UserManager<ApplicationUser> UserManager
-
-@model Hometown_Application.Models.FacilityModel
+﻿@model Hometown_Application.Models.FacilityModel
 
 @{
-    var user = await UserManager.GetUserAsync(User);
+    ViewData["Title"] = Model.FacilityId == 0 ? "Create Facility" : "Edit Facility";
 }
 
 <style>
@@ -27,59 +23,6 @@
         --transition: all 0.3s ease;
     }
 
-    .navbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--primary-color);
-        box-shadow: var(--shadow);
-        z-index: 1000;
-        min-height: 100px;
-        padding: 15px 20px;
-        font-family: 'Marcellus', serif;
-    }
-
-    .navbar-brand {
-        font-size: 1.2rem;
-        font-weight: normal;
-        color: white;
-    }
-
-        .navbar-brand:hover {
-            transform: scale(1.05);
-        }
-
-    .navbar-nav .nav-link {
-        color: white;
-        font-weight: 500;
-        margin: 0 10px;
-        padding: 8px 16px;
-        border-radius: var(--border-radius);
-        transition: var(--transition);
-    }
-
-        .navbar-nav .nav-link:hover {
-            background: var(--primary-light);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-    .user-info {
-        background: var(--primary-light);
-        padding: 8px 16px;
-        border-radius: var(--border-radius);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-        .user-info i {
-            font-size: 1.2rem;
-        }
-
     .page-title {
         font-size: 2.2rem;
         color: var(--text-color);
@@ -100,239 +43,190 @@
             border-radius: 3px;
         }
 
-    .facility-form-container {
+    .form-container {
         width: 100%;
+        max-width: 600px;
         margin: 2rem auto;
         background-color: white;
         border-radius: var(--border-radius);
         box-shadow: var(--shadow);
         padding: 25px;
-        margin-bottom: 150px;
     }
 
     .form-group {
         margin-bottom: 1.5rem;
     }
 
-    .form-control {
-        display: block;
-        width: 100%;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-        transition: var(--transition);
-        margin-bottom: 1rem;
-    }
-
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            display: block;
         }
 
-    .form-select {
-        display: block;
-        width: 100%;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-        transition: var(--transition);
-        margin-bottom: 1rem;
-    }
-
-        .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
         }
 
-    .current-image {
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: var(--background-color);
-        border-radius: var(--border-radius);
-    }
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 5px rgba(111, 117, 78, 0.3);
+                outline: none;
+            }
 
-    .img-thumbnail {
-        border-radius: var(--border-radius);
-        border: 1px solid var(--primary-light);
-        max-width: 100px;
-        height: auto;
-    }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
 
-    .submit-btn {
+    .btn-submit {
         background-color: var(--primary-color);
+        border-color: var(--primary-color);
         color: white;
-        border: none;
-        border-radius: var(--button-radius);
-        padding: 12px 36px;
         font-weight: 500;
+        border-radius: 8px;
+        padding: 10px 20px;
         transition: var(--transition);
         cursor: pointer;
     }
 
-        .submit-btn:hover {
+        .btn-submit:hover {
             background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-    label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: var(--text-color);
-    }
-
-    .form-label {
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-
-    #form-group {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .col-md-8 {
-        width: 100%;
-        max-width: 100%;
-        flex: 0 0 100%;
-    }
-
-    form {
-        width: 100%;
-    }
-
-    .action-button {
-        background-color: var(--secondary-color);
+    .btn-cancel {
+        background-color: var(--danger-color);
+        border-color: var(--danger-color);
         color: white;
-        border: none;
-        border-radius: var(--border-radius);
-        padding: 12px 24px;
         font-weight: 500;
+        border-radius: 8px;
+        padding: 10px 20px;
         transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        cursor: pointer;
+        margin-left: 10px;
     }
 
-        .action-button:hover {
-            background-color: var(--secondary-light);
+        .btn-cancel:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
             transform: translateY(-2px);
-            color: white;
-            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .action-button i {
-            font-size: 1.1rem;
+    .form-check {
+        margin-bottom: 1rem;
+    }
+
+        .form-check input {
+            margin-right: 5px;
         }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.2);
+        color: var(--danger-color);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
 </style>
+
 <div class="content">
-    <!-- Page Header -->
     <div class="page-header">
-        <h1 class="page-title">Manage Users</h1>
+        <h1 class="page-title">@(Model.FacilityId == 0 ? "Create Facility" : "Edit Facility")</h1>
     </div>
-    <div class="facility-form-container">
-    <form id="FacilityForm" asp-action="CreateOrEditFacility" asp-controller="Facility" enctype="multipart/form-data" onsubmit="return validateFacilityForm()">
-        <input type="hidden" name="Id" value="@Model?.FacilityId" />
-        <input type="hidden" name="AddedBy" value="@user?.Id" />
 
-        <div class="form-group">
-            <label for="facilityName" class="form-label">Facility Name</label>
-            <input id="facilityName" class="form-control" type="text" placeholder="Enter facility name" name="Name" value="@Model?.Name" required />
-        </div>
+    <div class="form-container">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
 
-        <div class="form-group">
-            <label for="FacilityTypeSelect" class="form-label">Facility Type</label>
-            <select id="FacilityTypeSelect" name="Type" class="form-select" onchange="toggleOtherInput()" required>
-                <option value="" selected disabled>Choose Facility Type</option>
-                <option value="Conference Room" selected="@(Model?.Type == "Conference Room" ? "selected" : null)">Conference Room</option>
-                <option value="Sports Complex" selected="@(Model?.Type == "Sports Complex" ? "selected" : null)">Sports Complex</option>
-                <option value="Auditorium" selected="@(Model?.Type == "Auditorium" ? "selected" : null)">Auditorium</option>
-                <option value="Other">Other</option>
-            </select>
-            <input id="OtherFacilityTypeInput" class="form-control" type="text" name="OtherType" value="@Model?.OtherType" placeholder="Please specify" style="display:@(Model?.Type == "Other" ? "block" : "none");" />
-        </div>
+        <form asp-action="CreateOrEditFacility" method="post" enctype="multipart/form-data">
+            <!-- Hidden field for FacilityId -->
+            <input type="hidden" asp-for="FacilityId" />
 
-        <div class="form-group">
-            <label for="facilityCapacity" class="form-label">Capacity</label>
-            <input id="facilityCapacity" class="form-control" type="number" placeholder="Enter capacity" name="Capacity" value="@Model?.Capacity" required />
-        </div>
+            <div class="form-group">
+                <label asp-for="Name">Facility Name</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label for="facilityDescription" class="form-label">Description</label>
-            <textarea id="facilityDescription" class="form-control" placeholder="Enter description" name="Description" rows="4">@Model?.Description</textarea>
-        </div>
+            <div class="form-group">
+                <label asp-for="Type">Facility Type</label>
+                <select asp-for="Type" class="form-control" onchange="toggleOtherType(this)">
+                    <option value="Auditorium">Auditorium</option>
+                    <option value="Conference Room">Conference Room</option>
+                    <option value="Gym">Gym</option>
+                    <option value="Other">Other</option>
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label for="FacilityImageUpload" class="form-label">Facility Image</label>
-            <input class="form-control" type="file" name="file" id="FacilityImageUpload" accept="image/*" />
-            @if (Model?.Image != null && Model.Image.Length > 0)
-            {
-                var base64Image = Convert.ToBase64String(Model.Image);
-                var imgSrc = $"data:image/jpeg;base64,{base64Image}";
-                <div class="current-image">
-                    <p>Current Image:</p>
-                    <img src="@imgSrc" alt="Facility Image" class="img-thumbnail" />
-                </div>
-            }
-        </div>
+            <div class="form-group">
+                <label asp-for="Capacity">Capacity</label>
+                <input asp-for="Capacity" class="form-control" type="number" />
+                <span asp-validation-for="Capacity" class="text-danger"></span>
+            </div>
 
-        <button class="action-button" type="submit">Submit</button>
-    </form>
+            <div class="form-group">
+                <label asp-for="Description">Description</label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-check">
+                <input asp-for="IsAvailable" type="checkbox" class="form-check-input" />
+                <label asp-for="IsAvailable" class="form-check-label">Is Available</label>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Image">Facility Image</label>
+                <input type="file" name="file" class="form-control" />
+                @if (Model.Image != null && Model.Image.Length > 0)
+                {
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)" alt="Current Facility Image" class="img-thumbnail mt-2" style="max-width: 200px;" />
+                }
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn-submit">Save</button>
+                <a asp-action="Index" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
-</div>
 
-<script>
-    function toggleOtherInput() {
-        var select = document.getElementById('FacilityTypeSelect');
-        var input = document.getElementById('OtherFacilityTypeInput');
-        if (select.value === "Other") {
-            input.style.display = "block";
-            input.setAttribute("required", "true");
-        } else {
-            input.style.display = "none";
-            input.removeAttribute("required");
-        }
-    }
 
-    function validateFacilityForm() {
-        var name = document.querySelector('input[name="Name"]').value.trim();
-        var type = document.getElementById('FacilityTypeSelect').value;
-        var otherType = document.getElementById('OtherFacilityTypeInput').value.trim();
-        var capacity = document.querySelector('input[name="Capacity"]').value.trim();
-        var fileInput = document.getElementById("FacilityImageUpload");
-        var allowedExtensions = ["jpg", "jpeg", "png", "gif"];
-
-        if (name === "" || type === "" || capacity === "") {
-            alert("Please fill out all required fields.");
-            return false;
-        }
-
-        if (type === "Other" && otherType === "") {
-            alert("Please specify the facility type.");
-            return false;
-        }
-
-        if (fileInput.files.length > 0) {
-            var fileName = fileInput.files[0].name;
-            var fileExtension = fileName.split('.').pop().toLowerCase();
-            if (!allowedExtensions.includes(fileExtension)) {
-                alert("Invalid file type! Please upload an image (JPG, JPEG, PNG, GIF).");
-                return false;
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleOtherType(select) {
+            var otherTypeGroup = document.getElementById("otherTypeGroup");
+            if (select.value === "Other") {
+                otherTypeGroup.style.display = "block";
+            } else {
+                otherTypeGroup.style.display = "none";
             }
         }
-
-        return true;
-    }
-
-    // Initialize the form on load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set the other type input visibility on page load
-        toggleOtherInput();
-    });
-</script>
+    </script>
+}

@@ -44,46 +44,47 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<PollResponseModel> PollResponses { get; set; }
     
     public DbSet<ServiceRequestModel> ServiceRequests { get; set; }
-
     public DbSet<RequestTypeModel> RequestTypes { get; set; }
     public DbSet<ServiceStaffAssignmentModel> ServiceStaffAssignments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-            base.OnModelCreating(builder);
-           builder.Entity<FacilityModel>()
-                .HasMany(f => f.Reservations)
-                .WithOne(r => r.Facility)
-                .HasForeignKey(r => r.FacilityId)
-                .OnDelete(DeleteBehavior.Cascade);
+        base.OnModelCreating(builder);
 
-        
+        // Facility ↔ Reservation
+        builder.Entity<FacilityModel>()
+            .HasMany(f => f.Reservations)
+            .WithOne(r => r.Facility)
+            .HasForeignKey(r => r.FacilityId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Reservation ↔ ApplicationUser
         builder.Entity<ReservationModel>()
-           .HasOne(fc => fc.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(fc => fc.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(fc => fc.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(fc => fc.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        
+        // FeedbackComplaint ↔ ApplicationUser
         builder.Entity<FeedbackComplaintModel>()
-           .HasOne(fc => fc.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(fc => fc.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(fc => fc.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(fc => fc.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-
+        // VehicleGatepass ↔ ApplicationUser
         builder.Entity<VehicleGatepassModel>()
-           .HasOne(fc => fc.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(fc => fc.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(fc => fc.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(fc => fc.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
+        // VisitorGatepass ↔ ApplicationUser
         builder.Entity<VisitorGatepassModel>()
-           .HasOne(fc => fc.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(fc => fc.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
-
+            .HasOne(fc => fc.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(fc => fc.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Community Forum
         builder.Entity<PostModel>()
@@ -100,7 +101,7 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<ReactionModel>()
             .HasOne(r => r.Post)
-            .WithMany(p => p.Reactions)  // Allow multiple reactions per post
+            .WithMany(p => p.Reactions)
             .HasForeignKey(r => r.PostId)
             .OnDelete(DeleteBehavior.NoAction);
 
@@ -112,24 +113,22 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<CommentModel>()
             .HasOne(c => c.Post)
-            .WithMany(p => p.Comments)  // Allow multiple comments per post
+            .WithMany(p => p.Comments)
             .HasForeignKey(c => c.PostId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        //Chat
-
+        // Chat
         builder.Entity<ChatMessageModel>()
-       .HasOne(c => c.Sender)
-       .WithMany()  // No navigation property in ApplicationUser
-       .HasForeignKey(c => c.SenderId)
-       .OnDelete(DeleteBehavior.NoAction); // Prevent cascading delete
+            .HasOne(c => c.Sender)
+            .WithMany()
+            .HasForeignKey(c => c.SenderId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        // Relationship for Recipient
         builder.Entity<ChatMessageModel>()
             .HasOne(c => c.Recipient)
-            .WithMany()  // No navigation property in ApplicationUser
+            .WithMany()
             .HasForeignKey(c => c.RecipientId)
-            .OnDelete(DeleteBehavior.NoAction); // Prevent cascading delete
+            .OnDelete(DeleteBehavior.NoAction);
 
 
         builder.Entity<StatusModel>().HasData(
@@ -194,55 +193,52 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         };
         builder.Entity<ApplicationUser>().HasData(users);
 
-      
+        // HomeownerProfile ↔ ApplicationUser (Change to NO ACTION to avoid cascading conflict)
         builder.Entity<HomeownerProfileModel>()
-          .HasOne(fc => fc.ApplicationUser)
-          .WithMany()
-          .HasForeignKey(fc => fc.UserId)
-          .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(fc => fc.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(fc => fc.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<HomeownerProfileModel>()
-        .HasOne(h => h.House)
-        .WithMany(h => h.Homeowners)
-        .HasForeignKey(h => h.HouseId)
-        .OnDelete(DeleteBehavior.Restrict);
+            .HasOne(h => h.House)
+            .WithMany(h => h.Homeowners)
+            .HasForeignKey(h => h.HouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // StaffProfile ↔ ApplicationUser
+        builder.Entity<StaffProfileModel>()
+            .HasOne(fc => fc.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(fc => fc.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<StaffProfileModel>()
-        .HasOne(fc => fc.ApplicationUser)
-        .WithMany()
-        .HasForeignKey(fc => fc.UserId)
-        .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(s => s.House)
+            .WithMany()
+            .HasForeignKey(s => s.HouseId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Entity<StaffProfileModel>()
-     .HasOne(s => s.House)
-     .WithMany()
-     .HasForeignKey(s => s.HouseId)
-     .OnDelete(DeleteBehavior.Restrict);
-
+        // AdminProfile ↔ ApplicationUser
         builder.Entity<AdminProfileModel>()
-        .HasOne(fc => fc.ApplicationUser)
-        .WithMany()
-        .HasForeignKey(fc => fc.UserId)
-        .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(fc => fc.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(fc => fc.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        builder.Entity<FeedbackComplaintModel>()
-           .HasOne(fc => fc.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(fc => fc.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
-
+        // House ↔ ApplicationUser
         builder.Entity<HouseModel>()
-           .HasOne(fc => fc.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(fc => fc.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(fc => fc.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(fc => fc.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-
+        // FeedbackComplaint ↔ Status
         builder.Entity<FeedbackComplaintModel>()
-        .HasOne(fc => fc.Status)
-        .WithMany()
-        .HasForeignKey(fc => fc.StatusId)
-        .OnDelete(DeleteBehavior.Restrict);
+            .HasOne(fc => fc.Status)
+            .WithMany()
+            .HasForeignKey(fc => fc.StatusId)
+            .OnDelete(DeleteBehavior.Restrict);
 
 
         /*  builder.Entity<ServiceRequestModel>()
@@ -266,31 +262,38 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
              .HasForeignKey(sp => sp.UserId)
              .OnDelete(DeleteBehavior.Restrict);
         */
-   
-     
 
-        // 🔹 ServiceRequest ↔ Status (FK)
+
+
+        // ServiceRequest ↔ ApplicationUser (Explicitly configure UserId relationship)
+        builder.Entity<ServiceRequestModel>()
+            .HasOne(sr => sr.ApplicationUser)
+            .WithMany()
+            .HasForeignKey(sr => sr.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ServiceRequest ↔ Status
         builder.Entity<ServiceRequestModel>()
             .HasOne(sr => sr.Status)
-            .WithMany() // No navigation property in StatusModel
+            .WithMany()
             .HasForeignKey(sr => sr.StatusId)
-            .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete
+            .OnDelete(DeleteBehavior.Restrict);
 
-        // 🔹 ServiceRequest ↔ RequestType (FK)
+        // ServiceRequest ↔ RequestType
         builder.Entity<ServiceRequestModel>()
             .HasOne(sr => sr.RequestType)
             .WithMany()
             .HasForeignKey(sr => sr.RequestTypeId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // 🔹 ServiceRequest ↔ Homeowner (FK)
+        // ServiceRequest ↔ Homeowner
         builder.Entity<ServiceRequestModel>()
             .HasOne(sr => sr.Homeowner)
             .WithMany()
             .HasForeignKey(sr => sr.HomeownerId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // Configure Poll-related relationships
+        // Poll-related relationships
         builder.Entity<PollModel>()
             .HasOne(p => p.Creator)
             .WithMany()
@@ -332,7 +335,5 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             .WithMany(o => o.Responses)
             .HasForeignKey(r => r.SelectedOptionId)
             .OnDelete(DeleteBehavior.Restrict);
-
-       
     }
 }

@@ -11,14 +11,13 @@ namespace Hometown_Application.ViewModels
         public int TotalPages { get; set; }
         public string SortBy { get; set; }
         public bool Ascending { get; set; }
+        public List<SelectListItem> Statuses { get; set; } // Added to hold the list of statuses
     }
 
     public class CreateServiceRequestViewModel
     {
         public ServiceRequestModel ServiceRequest { get; set; }
         public List<RequestTypeModel> RequestTypes { get; set; }
-        public List<SelectListItem> Statuses { get; set; }
-        public string SearchQuery { get; set; }
     }
 
     public class EditServiceRequestViewModel

@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Hometown_Application.Areas.Identity.Data;
 using Hometown_Application.Data;
 using Hometown_Application.Models;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,13 +16,11 @@ namespace Hometown_Application.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<ReservationController> _logger;
 
-        public ReservationController(ApplicationDBContext context, UserManager<ApplicationUser> userManager, ILogger<ReservationController> logger)
+        public ReservationController(ApplicationDBContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
-            _logger = logger;
         }
 
         // User View: List Reservations for Current User
@@ -42,110 +38,71 @@ namespace Hometown_Application.Controllers
             return View(reservations);
         }
 
+        // GET: Reservation/AvailableFacilities
         public async Task<IActionResult> AvailableFacilities()
         {
+            // Get facilities that are not deleted
             var facilities = await _context.Facility
                 .Where(f => !f.IsDeleted)
                 .ToListAsync();
-            return View(facilities);
-        }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> UpdateReservationStatus(int id, string newStatus)
-        {
-            if (id <= 0)
+            // Debug: Log all facilities before filtering
+            Console.WriteLine($"Before Filtering: Found {facilities.Count} facilities (IsDeleted = false)");
+            foreach (var facility in facilities)
             {
-                return BadRequest("Invalid reservation ID.");
+                Console.WriteLine($"Facility: {facility.Name}, IsAvailable: {facility.IsAvailable}, IsDeleted: {facility.IsDeleted}");
             }
 
-            var reservation = await _context.Reservation
-                .FirstOrDefaultAsync(r => r.ReservationId == id && !r.IsDeleted);
-
-            if (reservation == null)
+            // Create a list of FacilityViewModel objects
+            var facilityViewModels = new List<FacilityViewModel>();
+            foreach (var facility in facilities)
             {
-                return NotFound("Reservation not found.");
-            }
+                // Check if the facility has any active reservations
+                var hasActiveReservations = await _context.Reservation
+                    .AnyAsync(r => r.FacilityId == facility.FacilityId && !r.IsDeleted);
 
-            var validStatuses = new[] { "Pending", "Approved", "Declined" };
-            if (string.IsNullOrEmpty(newStatus) || !validStatuses.Contains(newStatus))
-            {
-                return BadRequest("Invalid status value.");
-            }
-
-            try
-            {
-                reservation.Status = newStatus;
-                reservation.UpdatedOn = DateTime.UtcNow;
-                reservation.UpdatedBy = _userManager.GetUserId(User) ?? throw new InvalidOperationException("User ID not found.");
-
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Reservation {Id} status updated to {NewStatus}", id, newStatus);
-                TempData["ActiveTab"] = newStatus;
-                TempData["SuccessMessage"] = $"Reservation status updated to {newStatus} successfully.";
-
-                // Preserve the original statusFilter or show all reservations
-                var originalStatusFilter = Request.Query["statusFilter"].ToString() ?? "";
-                return RedirectToAction("ManageReservations", new
+                // Only include facilities that are marked as available and have no active reservations
+                if (facility.IsAvailable && !hasActiveReservations)
                 {
-                    statusFilter = string.IsNullOrEmpty(originalStatusFilter) ? "" : originalStatusFilter,
-                    search = Request.Query["search"].ToString(),
-                    pageNumber = Request.Query["pageNumber"].ToString() ?? "1"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating reservation status for ID: {Id}", id);
-                ModelState.AddModelError("", $"An error occurred while updating the reservation status: {ex.Message}");
-                return View("Error");
-            }
-        }
-
-        // Admin View: Manage Reservations with Tabs
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ManageReservations(string search, string statusFilter, int pageNumber = 1, int pageSize = 10)
-        {
-            var query = _context.Reservation
-                .Include(r => r.Facility)
-                .Include(r => r.ApplicationUser)
-                .Where(r => !r.IsDeleted)
-                .AsQueryable();
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(r => r.Facility != null && r.Facility.Name.Contains(search));
+                    facilityViewModels.Add(new FacilityViewModel
+                    {
+                        Facility = facility,
+                        HasActiveReservations = hasActiveReservations
+                    });
+                }
+                else
+                {
+                    // If the facility has active reservations but IsAvailable is true, correct the status
+                    if (hasActiveReservations && facility.IsAvailable)
+                    {
+                        Console.WriteLine($"Correcting IsAvailable for {facility.Name}: Has active reservations, setting IsAvailable to false");
+                        facility.IsAvailable = false;
+                        _context.Update(facility);
+                    }
+                    else if (!facility.IsAvailable)
+                    {
+                        Console.WriteLine($"Excluding {facility.Name}: IsAvailable is false");
+                    }
+                }
             }
 
-            if (!string.IsNullOrEmpty(statusFilter))
+            await _context.SaveChangesAsync();
+
+            // Debug: Log the facilities after filtering
+            Console.WriteLine($"After Filtering: Found {facilityViewModels.Count} facilities");
+            foreach (var vm in facilityViewModels)
             {
-                query = query.Where(r => r.Status == statusFilter);
+                Console.WriteLine($"Facility: {vm.Facility.Name}, IsAvailable: {vm.Facility.IsAvailable}, IsDeleted: {vm.Facility.IsDeleted}, HasActiveReservations: {vm.HasActiveReservations}");
             }
 
-            var totalReservations = await query.CountAsync();
-            var reservations = await query
-                .OrderBy(r => r.ReservationDate)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var model = new ReservationListViewModel
-            {
-                Reservations = reservations,
-                SearchQuery = search,
-                StatusFilter = statusFilter,
-                PageNumber = pageNumber,
-                TotalPages = (int)Math.Ceiling((double)totalReservations / pageSize)
-            };
-
-            return View(model);
+            return View(facilityViewModels);
         }
 
         // Create/Edit Reservation (User Action)
         public async Task<IActionResult> CreateOrEdit(int? id, int? facilityId)
         {
             ViewBag.Facilities = new SelectList(await _context.Facility
-                .Where(f => !f.IsDeleted)
+                .Where(f => !f.IsDeleted && f.IsAvailable)
                 .ToListAsync(), "FacilityId", "Name");
 
             var user = await _userManager.GetUserAsync(User);
@@ -154,8 +111,7 @@ namespace Hometown_Application.Controllers
                 return View(new ReservationModel
                 {
                     FacilityId = facilityId ?? 0,
-                    UserId = user?.Id,
-                    Status = "Pending"
+                    UserId = user?.Id
                 });
             }
 
@@ -181,21 +137,25 @@ namespace Hometown_Application.Controllers
                 return Unauthorized();
             }
 
-            // Decode RowVersion from Base64 if provided
-            if (!string.IsNullOrEmpty(Request.Form["RowVersion"]))
-            {
-                reservation.RowVersion = Convert.FromBase64String(Request.Form["RowVersion"]);
-            }
-
             if (!ModelState.IsValid)
             {
                 ViewBag.Facilities = new SelectList(await _context.Facility
-                    .Where(f => !f.IsDeleted)
+                    .Where(f => !f.IsDeleted && f.IsAvailable)
                     .ToListAsync(), "FacilityId", "Name");
                 return View(reservation);
             }
 
-            // Check for time conflicts
+            // Check for time conflicts and facility availability
+            var facility = await _context.Facility.FindAsync(reservation.FacilityId);
+            if (facility == null || !facility.IsAvailable)
+            {
+                ModelState.AddModelError("", "Selected facility is not available.");
+                ViewBag.Facilities = new SelectList(await _context.Facility
+                    .Where(f => !f.IsDeleted && f.IsAvailable)
+                    .ToListAsync(), "FacilityId", "Name");
+                return View(reservation);
+            }
+
             var hasConflict = await _context.Reservation
                 .AnyAsync(r => r.FacilityId == reservation.FacilityId
                     && !r.IsDeleted
@@ -207,7 +167,7 @@ namespace Hometown_Application.Controllers
             {
                 ModelState.AddModelError("", "This time slot is already booked.");
                 ViewBag.Facilities = new SelectList(await _context.Facility
-                    .Where(f => !f.IsDeleted)
+                    .Where(f => !f.IsDeleted && f.IsAvailable)
                     .ToListAsync(), "FacilityId", "Name");
                 return View(reservation);
             }
@@ -216,12 +176,14 @@ namespace Hometown_Application.Controllers
             {
                 if (reservation.ReservationId == 0) // Create
                 {
-                    reservation.AddedBy = user.Id; // Ensure AddedBy is set
+                    reservation.AddedBy = user.Id;
                     reservation.UserId = user.Id;
                     reservation.AddedOn = DateTime.UtcNow;
-                    reservation.Status = "Pending";
-                    reservation.RowVersion = null; // New records won’t have a RowVersion yet
                     _context.Reservation.Add(reservation);
+
+                    // Mark facility as Not Available after successful reservation
+                    facility.IsAvailable = false;
+                    _context.Update(facility);
                 }
                 else // Update
                 {
@@ -233,44 +195,106 @@ namespace Hometown_Application.Controllers
                         return NotFound();
                     }
 
-                    // Handle concurrency
-                    if (existing.RowVersion != reservation.RowVersion)
+                    // If the facility has changed, mark the old facility as available if no other reservations exist
+                    if (existing.FacilityId != reservation.FacilityId)
                     {
-                        ModelState.AddModelError("", "The reservation was modified by another user. Please refresh and try again.");
-                        ViewBag.Facilities = new SelectList(await _context.Facility
-                            .Where(f => !f.IsDeleted)
-                            .ToListAsync(), "FacilityId", "Name");
-                        return View(reservation);
+                        var oldFacility = await _context.Facility.FindAsync(existing.FacilityId);
+                        if (oldFacility != null)
+                        {
+                            var hasOtherReservations = await _context.Reservation
+                                .AnyAsync(r => r.FacilityId == existing.FacilityId && !r.IsDeleted && r.ReservationId != existing.ReservationId);
+                            if (!hasOtherReservations)
+                            {
+                                oldFacility.IsAvailable = true;
+                                _context.Update(oldFacility);
+                            }
+                        }
+
+                        // Mark the new facility as not available
+                        facility.IsAvailable = false;
+                        _context.Update(facility);
                     }
 
                     existing.FacilityId = reservation.FacilityId;
                     existing.ReservationDate = reservation.ReservationDate;
                     existing.StartTime = reservation.StartTime;
                     existing.EndTime = reservation.EndTime;
-                    existing.Status = reservation.Status;
                     existing.UpdatedBy = user.Id;
                     existing.UpdatedOn = DateTime.UtcNow;
-                    existing.RowVersion = reservation.RowVersion; // Update RowVersion
                     _context.Update(existing);
                 }
 
                 await _context.SaveChangesAsync();
                 return RedirectToAction("ReservationStatusReport");
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                ModelState.AddModelError("", "The reservation was modified by another user. Please refresh and try again.");
-            }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while saving the reservation.");
-                // Log error here in production
+                ModelState.AddModelError("", "An error occurred while saving the reservation: " + ex.Message);
             }
 
             ViewBag.Facilities = new SelectList(await _context.Facility
-                .Where(f => !f.IsDeleted)
+                .Where(f => !f.IsDeleted && f.IsAvailable)
                 .ToListAsync(), "FacilityId", "Name");
             return View(reservation);
+        }
+        // GET: Reservation/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var reservation = await _context.Reservation
+                .Include(r => r.Facility)
+                .FirstOrDefaultAsync(r => r.ReservationId == id && !r.IsDeleted);
+
+            if (reservation == null)
+            {
+                return NotFound();
+            }
+
+            return View(reservation);
+        }
+
+        // POST: Reservation/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var reservation = await _context.Reservation
+                .Include(r => r.Facility)
+                .FirstOrDefaultAsync(r => r.ReservationId == id);
+
+            if (reservation != null)
+            {
+                reservation.IsDeleted = true;
+                _context.Update(reservation);
+
+                // Check if there are any other active reservations for this facility
+                var hasActiveReservations = await _context.Reservation
+                    .AnyAsync(r => r.FacilityId == reservation.FacilityId && !r.IsDeleted);
+
+                if (!hasActiveReservations)
+                {
+                    // If no active reservations, mark the facility as available
+                    var facility = await _context.Facility.FindAsync(reservation.FacilityId);
+                    if (facility != null)
+                    {
+                        facility.IsAvailable = true;
+                        _context.Update(facility);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Reservation has been deleted, and the facility is now available if no other reservations exist.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Reservation not found.";
+            }
+
+            return RedirectToAction(nameof(ReservationStatusReport));
         }
     }
 }

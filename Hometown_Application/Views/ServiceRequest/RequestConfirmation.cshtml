@@ -14,8 +14,7 @@
             {
                 <div class="alert alert-danger">@TempData["Error"]</div>
             }
-
-            @if (Model != null && Model.Any())
+            else if (Model != null && Model.Any())
             {
                 <p class="lead">Below are all the service requests you have submitted:</p>
 

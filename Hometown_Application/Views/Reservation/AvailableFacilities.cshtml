@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Hometown_Application.Models.FacilityModel>
+﻿@model IEnumerable<Hometown_Application.Models.FacilityViewModel>
+
 @{
     ViewData["Title"] = "Available Facilities";
 }
@@ -22,59 +23,6 @@
         --transition: all 0.3s ease;
     }
 
-    .navbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--primary-color);
-        box-shadow: var(--shadow);
-        z-index: 1000;
-        min-height: 100px;
-        padding: 15px 20px;
-        font-family: 'Marcellus', serif;
-    }
-
-    .navbar-brand {
-        font-size: 1.2rem;
-        font-weight: normal;
-        color: white;
-    }
-
-        .navbar-brand:hover {
-            transform: scale(1.05);
-        }
-
-    .navbar-nav .nav-link {
-        color: white;
-        font-weight: 500;
-        margin: 0 10px;
-        padding: 8px 16px;
-        border-radius: var(--border-radius);
-        transition: var(--transition);
-    }
-
-        .navbar-nav .nav-link:hover {
-            background: var(--primary-light);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-    .user-info {
-        background: var(--primary-light);
-        padding: 8px 16px;
-        border-radius: var(--border-radius);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-        .user-info i {
-            font-size: 1.2rem;
-        }
-
     .page-title {
         font-size: 2.2rem;
         color: var(--text-color);
@@ -95,193 +43,207 @@
             border-radius: 3px;
         }
 
-
     .facilities-container {
-        width: 100%;
-        margin: 2rem auto;
-        background-color: white;
+        background-color: var(--card-bg);
         border-radius: var(--border-radius);
         box-shadow: var(--shadow);
-        padding: 25px;
+        padding: 20px;
+        margin-top: 1rem;
     }
 
-    .table {
+    .facilities-table {
         width: 100%;
-        margin-bottom: 1rem;
-        color: var(--text-color);
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 8px;
-        overflow: hidden;
+        border-collapse: collapse;
+        margin-bottom: 0;
     }
 
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: rgba(111, 117, 78, 0.05);
-    }
+        .facilities-table th,
+        .facilities-table td {
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+        }
 
-    .table thead th {
-        vertical-align: middle;
-        padding: 0.75rem;
-        border-bottom: 2px solid var(--primary-light);
-        background-color: var(--primary-color);
-        color: white;
-        font-weight: 500;
-        text-align: center;
-    }
+        .facilities-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
 
-    .table tbody td {
-        padding: 0.75rem;
-        vertical-align: middle;
-        border-top: 1px solid #dee2e6;
-        text-align: center;
-    }
+        .facilities-table td {
+            border-bottom: 1px solid #dee2e6;
+            color: var(--text-color);
+        }
 
-    .btn {
-        font-weight: 500;
-        border-radius: 8px;
-        padding: 8px 16px;
-        transition: var(--transition);
-        cursor: pointer;
-    }
+        .facilities-table tr:last-child td {
+            border-bottom: none;
+        }
 
-    .btn-primary {
+        .facilities-table img {
+            max-width: 50px;
+            max-height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+    .btn-reserve {
         background-color: var(--primary-color);
         border-color: var(--primary-color);
         color: white;
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 6px 12px;
+        transition: var(--transition);
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
     }
 
-        .btn-primary:hover {
+        .btn-reserve:hover {
             background-color: var(--primary-dark);
             border-color: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-    .form-control {
-        display: block;
-        width: 100%;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-        transition: var(--transition);
+    .search-box {
+        margin-bottom: 1rem;
     }
 
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+        .search-box input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
         }
 
-    .form-label {
+    .status-available {
+        color: var(--success-color);
         font-weight: 500;
-        margin-bottom: 0.5rem;
-        display: block;
-        color: var(--text-color);
     }
 
-    .search-box {
-        background-color: rgba(111, 117, 78, 0.05);
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        border: 1px solid rgba(111, 117, 78, 0.1);
-    }
-
-    .badge {
-        padding: 0.5em 0.8em;
+    .status-not-available {
+        color: var(--danger-color);
         font-weight: 500;
-        border-radius: 6px;
     }
 
-    .bg-warning {
-        background-color: var(--warning-color) !important;
+    .text-muted {
+        color: #6c757d;
+        font-style: italic;
     }
 
-    .text-dark {
-        color: #212529 !important;
-    }
-
-    .facility-image {
-        max-width: 100px;
-        max-height: 100px;
+    .debug-info {
+        background-color: #f8f9fa;
+        padding: 10px;
         border-radius: 8px;
-        border: 3px solid var(--primary-light);
-        object-fit: cover;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #495057;
     }
 </style>
 
 <div class="content">
     <div class="page-header">
-        <div>
-            <h1 class="page-title">Available Facilities</h1>
-        </div>
+        <h1 class="page-title">Available Facilities</h1>
     </div>
 
     <div class="facilities-container">
-        <div class="search-box">
-            <label for="searchInput" class="form-label"><strong>Search Facilities:</strong></label>
-            <input type="text" id="searchInput" class="form-control" placeholder="Enter facility name..." onkeyup="filterFacilities()">
+        <!-- Debug: Display the number of facilities and their details -->
+        <div class="debug-info">
+            <p>Debug: Found @Model.Count() facilities</p>
+            @if (Model.Any())
+            {
+                <ul>
+                    @foreach (var vm in Model)
+                    {
+                        <li>
+                            @vm.Facility.Name: IsAvailable = @vm.Facility.IsAvailable, IsDeleted = @vm.Facility.IsDeleted
+                            (Active Reservations: @(vm.HasActiveReservations ? "Yes" : "No"))
+                        </li>
+                    }
+                </ul>
+            }
         </div>
 
-        <table class="table table-striped" id="facilityTable">
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Capacity</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var facility in Model)
-                {
-                    var hasPendingReservation = facility.Reservations?.Any(r => r.Status == "Pending" && !r.IsDeleted) ?? false;
+        <div class="search-box">
+            <input type="text" placeholder="Enter facility name..." id="searchInput" onkeyup="searchFacilities()" />
+        </div>
+
+        @if (Model.Any())
+        {
+            <table class="facilities-table" id="facilitiesTable">
+                <thead>
                     <tr>
-                        <td>
-                            @if (facility.Image != null && facility.Image.Length > 0)
-                            {
-                                var base64Image = Convert.ToBase64String(facility.Image);
-                                var imgSrc = $"data:image/jpeg;base64,{base64Image}";
-                                <img src="@imgSrc" alt="Facility Image" class="facility-image" />
-                            }
-                            else
-                            {
-                                <span>No Image</span>
-                            }
-                        </td>
-                        <td class="facility-name">@facility.Name</td>
-                        <td>@facility.Type</td>
-                        <td>@facility.Capacity</td>
-                        <td>
-                            @if (hasPendingReservation)
-                            {
-                                <span class="badge bg-warning text-dark">Pending Reservation</span>
-                            }
-                            else
-                            {
-                                <a asp-action="CreateOrEdit" asp-controller="Reservation" asp-route-facilityId="@facility.FacilityId" class="btn btn-primary">Reserve</a>
-                            }
-                        </td>
+                        <th scope="col">Image</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Capacity</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var vm in Model)
+                    {
+                        var item = vm.Facility;
+                        var imageSrc = item.Image != null && item.Image.Length > 0
+                        ? $"data:image/jpeg;base64,{Convert.ToBase64String(item.Image)}"
+                        : null;
+                        <tr>
+                            <td>
+                                @if (imageSrc != null)
+                                {
+                                    <img src="@imageSrc" alt="@item.Name Facility Image" class="img-thumbnail" />
+                                }
+                                else
+                                {
+                                    <span>No Image</span>
+                                }
+                            </td>
+                            <td>@item.Name</td>
+                            <td>@(item.Type == "Other" ? item.OtherType : item.Type)</td>
+                            <td>@item.Capacity</td>
+                            <td>
+                                <span class="status-available">Available</span>
+                            </td>
+                            <td>
+                                <a asp-action="CreateOrEdit" asp-route-facilityId="@item.FacilityId" class="btn-reserve">Reserve</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted">No available facilities found. Please check back later or create a new facility.</p>
+        }
     </div>
 </div>
 
-<script>
-    function filterFacilities() {
-        var input = document.getElementById("searchInput");
-        var filter = input.value.toLowerCase();
-        var table = document.getElementById("facilityTable");
-        var tr = table.getElementsByTagName("tr");
-        for (var i = 1; i < tr.length; i++) { // Skip table header
-            var td = tr[i].getElementsByClassName("facility-name")[0];
-            if (td) {
-                var txtValue = td.textContent || td.innerText;
-                tr[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+@section Scripts {
+    <script>
+        function searchFacilities() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("facilitiesTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1]; // Search by Name (second column)
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
             }
         }
-    }
-</script>
+    </script>
+}
