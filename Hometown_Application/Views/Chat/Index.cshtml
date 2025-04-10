@@ -3,36 +3,405 @@
     ViewData["Title"] = "Chat";
 }
 
-<h2>Chat</h2>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<!-- Notification Bell -->
-<div id="notificationBell" class="notification-container">
-    <span class="bell-icon">🔔</span>
-    <span id="notificationCount" class="notification-badge">0</span>
-</div>
+    /* Center container */
+    .page-content-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
 
-<!-- Select recipient -->
-<label for="recipientSelect">Select User:</label>
-<div class="user-selection">
-    <img id="selectedProfilePic" src="" alt="Profile" class="profile-pic hidden">
-    <select id="recipientSelect">
-        <option value="" data-image="">-- Choose a user --</option>
-        @foreach (var user in ViewBag.Users)
-        {
-            <option value="@user.Id" data-image="@user.ProfilePicture">
-                @user.FirstName @user.LastName
-            </option>
+    /* Page Title Styling - Keeping original format */
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
         }
-    </select>
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+        width: 100%;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+    }
+
+    /* Notification Bell - Green */
+    .notification-container {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+
+    .bell-icon {
+        font-size: 24px;
+        color: var(--success-color);
+        background-color: rgba(25, 135, 84, 0.1);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+    }
+
+    .notification-container:hover .bell-icon {
+        background-color: var(--success-color);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: var(--danger-color);
+        color: white;
+        font-size: 12px;
+        padding: 4px 7px;
+        border-radius: 50%;
+        display: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* User Selection - Same width as chat container */
+    .user-selection-container {
+        margin: 20px 0;
+        width: 700px;
+        max-width: 100%;
+    }
+
+    .user-selection-label {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .user-selection {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        background-color: var(--card-bg);
+        padding: 12px 20px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        width: 100%;
+    }
+
+        .user-selection:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+    .profile-pic {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary-light);
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    select#recipientSelect {
+        padding: 10px 15px;
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(0,0,0,0.1);
+        background-color: #f9f9f9;
+        color: var(--text-color);
+        font-size: 1rem;
+        flex-grow: 1;
+        outline: none;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+        select#recipientSelect:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(111, 117, 78, 0.2);
+        }
+
+    /* Chat Container - With background */
+    #chatContainer {
+        width: 700px;
+        max-width: 100%;
+        height: 500px;
+        border-radius: var(--border-radius);
+        background-color: var(--card-bg);
+        box-shadow: var(--shadow);
+        margin-bottom: 20px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #chatBox {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+        overflow-y: auto;
+        flex-grow: 1;
+        /* New chat box background */
+        background-color: #f0f7ea;
+    }
+
+    .chat-message {
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        word-wrap: break-word;
+        font-size: 15px;
+        line-height: 1.4;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .sent {
+        align-self: flex-end;
+        background-color: var(--primary-color);
+        color: white;
+        text-align: right;
+        border-bottom-right-radius: 4px;
+        margin-left: 25%;
+    }
+
+    .received {
+        align-self: flex-start;
+        background-color: #f0f0f0;
+        color: var(--text-color);
+        text-align: left;
+        border-bottom-left-radius: 4px;
+        margin-right: 25%;
+    }
+
+    /* Message Input Area */
+    .message-input {
+        display: flex;
+        padding: 15px;
+        background-color: var(--card-bg);
+        border-top: 1px solid rgba(0,0,0,0.05);
+        align-items: center;
+        gap: 10px;
+    }
+
+    #messageInput {
+        flex-grow: 1;
+        padding: 12px 16px;
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(0,0,0,0.1);
+        background-color: #f9f9f9;
+        font-size: 15px;
+        color: var(--text-color);
+        outline: none;
+        transition: var(--transition);
+    }
+
+        #messageInput:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(111, 117, 78, 0.2);
+        }
+
+    #sendButton {
+        padding: 12px 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 500;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        #sendButton:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        #sendButton:active {
+            transform: translateY(0);
+        }
+
+    /* Empty State */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #888;
+        text-align: center;
+        padding: 20px;
+    }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--secondary-light);
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            max-width: 80%;
+        }
+
+        .chat-message
+
+    {
+        max-width: 85%;
+    }
+
+    #chatContainer {
+        height: 400px;
+    }
+
+    .user-selection {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-selection-container {
+        width: 100%;
+        padding: 0 15px;
+    }
+    /* User Selection - Same width as chat container */
+    .user-selection-container {
+        margin: 20px 0;
+        width: 700px;
+        max-width: 100%;
+        padding: 0; /* Remove padding */
+    }
+
+    .user-selection {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        background-color: var(--card-bg);
+        padding: 12px 20px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        width: 100%;
+        flex-direction: row; /* Change from column back to row */
+    }
+
+    /* Remove or comment out these overrides in the media query section */
+    /*
+    .user-selection {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-selection-container {
+        width: 100%;
+        padding: 0 15px;
+    }
+    */
+
+</style>
+
+<!-- Original Page Header (Not Changed) -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Chat</h1>
+        <p class="page-subtitle">Connect with community members</p>
+    </div>
+
+    <!-- Notification Bell (Green) 
+    <div id="notificationBell" class="notification-container">
+        <div class="bell-icon">🔔</div>
+        <span id="notificationCount" class="notification-badge">0</span>
+    </div>-->
 </div>
 
-<div id="chatContainer">
-    <div id="chatBox"></div>
-</div>
+<!-- Centered Content -->
+<div class="page-content-center">
+    <!-- User Selection Area -->
+    <div class="user-selection-container">
+        <label for="recipientSelect" class="user-selection-label">Select User to Chat With:</label>
+        <div class="user-selection">
+            <img id="selectedProfilePic" src="" alt="Profile" class="profile-pic hidden">
+            <select id="recipientSelect">
+                <option value="" data-image="">-- Choose a user --</option>
+                @foreach (var user in ViewBag.Users)
+                {
+                    <option value="@user.Id" data-image="@user.ProfilePicture">
+                        @user.FirstName @user.LastName
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
 
-<div class="message-input">
-    <input type="text" id="messageInput" placeholder="Type a message..." />
-    <button id="sendButton">Send</button>
+    <!-- Chat Container -->
+    <div id="chatContainer">
+        <div id="chatBox">
+            <div class="empty-state">
+                <i class="fas fa-comments"></i>
+                <p>Select a user to start chatting</p>
+            </div>
+        </div>
+
+        <div class="message-input">
+            <input type="text" id="messageInput" placeholder="Type a message..." />
+            <button id="sendButton">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </div>
+    </div>
 </div>
 
 <audio id="messageSound" preload="auto">
@@ -52,16 +421,22 @@
 
         let unreadCount = 0; // Track unread messages
         const messageSound = document.getElementById("messageSound");
+        const chatBox = document.getElementById("chatBox");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+        const recipientSelect = document.getElementById("recipientSelect");
 
+        // Connect to SignalR hub
         connection.start().then(() => {
             console.log("✅ SignalR Connected!");
         }).catch(err => console.error("❌ SignalR Error:", err));
 
+        // Handle displaying messages in the chat box
         function addMessageToChatBox(sender, message, isSender) {
-            const chatBox = document.getElementById("chatBox");
-            if (!chatBox) {
-                console.error("❌ Error: Chat box not found.");
-                return;
+            // Remove empty state if present
+            const emptyState = chatBox.querySelector('.empty-state');
+            if (emptyState) {
+                chatBox.removeChild(emptyState);
             }
 
             const newMessage = document.createElement("div");
@@ -72,13 +447,13 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        document.getElementById("sendButton").addEventListener("click", function () {
-            const messageInput = document.getElementById("messageInput");
+        // Send message handler
+        sendButton.addEventListener("click", function () {
             const message = messageInput.value.trim();
-            const recipientId = document.getElementById("recipientSelect").value;
+            const recipientId = recipientSelect.value;
 
             if (!recipientId) {
-                alert("Please select a recipient.");
+                alert("Please select a recipient first.");
                 return;
             }
 
@@ -98,37 +473,72 @@
                 }
                 addMessageToChatBox("You", message, true);
                 messageInput.value = "";
+                messageInput.focus();
             })
-            .catch(err => console.error("❌ Error sending message:", err));
+            .catch(err => {
+                console.error("❌ Error sending message:", err);
+                alert("Failed to send message. Please try again.");
+            });
         });
 
-        document.getElementById("recipientSelect").addEventListener("change", function () {
-            const recipientId = this.value;
-            const chatBox = document.getElementById("chatBox");
-
-            if (!chatBox) {
-                console.error("❌ Error: Chat box not found.");
-                return;
+        // Allow sending with Enter key
+        messageInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendButton.click();
             }
+        });
+
+        // Load chat history when selecting a user
+        recipientSelect.addEventListener("change", function () {
+            const recipientId = this.value;
 
             if (!recipientId) {
-                chatBox.innerHTML = "<p>Select a user to start chatting.</p>";
+                chatBox.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>Select a user to start chatting</p>
+                    </div>`;
                 return;
             }
+
+            // Show loading state
+            chatBox.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading conversation...</p>
+                </div>`;
 
             fetch(`/Chat/GetMessages?recipientId=${recipientId}`)
                 .then(response => response.json())
                 .then(messages => {
                     chatBox.innerHTML = "";
-                    messages.forEach(msg => addMessageToChatBox(msg.sender, msg.message, msg.sender === "You"));
 
-                    // ✅ Reset unread messages count when user opens chat
+                    if (messages.length === 0) {
+                        chatBox.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-comment-dots"></i>
+                                <p>No previous messages. Start the conversation!</p>
+                            </div>`;
+                    } else {
+                        messages.forEach(msg => addMessageToChatBox(msg.sender, msg.message, msg.sender === "You"));
+                    }
+
+                    // Reset unread messages count when user opens chat
                     unreadCount = 0;
                     updateNotificationBadge();
                 })
-                .catch(err => console.error("❌ Error loading messages:", err));
+                .catch(err => {
+                    console.error("❌ Error loading messages:", err);
+                    chatBox.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Failed to load messages. Please try again.</p>
+                        </div>`;
+                });
         });
 
+        // Play notification sound
         function playNotificationSound() {
             if (messageSound) {
                 messageSound.play().catch(err => {
@@ -137,18 +547,20 @@
             }
         }
 
+        // Handle incoming messages
         connection.on("ReceivePrivateMessage", (sender, message) => {
             console.log(`📩 New message from ${sender}: ${message}`);
             addMessageToChatBox(sender, message, false);
 
-            // ✅ Play notification sound 🔊
+            // Play notification sound
             playNotificationSound();
 
-            // ✅ Increment unread count and update badge
+            // Update notification badge
             unreadCount++;
             updateNotificationBadge();
         });
 
+        // Update notification badge
         function updateNotificationBadge() {
             const badge = document.getElementById("notificationCount");
             if (unreadCount > 0) {
@@ -159,130 +571,18 @@
             }
         }
 
-        // ✅ Display selected user's profile picture
-        document.getElementById("recipientSelect").addEventListener("change", function () {
+        // Display selected user's profile picture
+        recipientSelect.addEventListener("change", function () {
             const selectedOption = this.options[this.selectedIndex];
             const profilePic = document.getElementById("selectedProfilePic");
             const imageUrl = selectedOption.getAttribute("data-image");
 
-            if (imageUrl) {
+            if (imageUrl && imageUrl !== "") {
                 profilePic.src = imageUrl;
                 profilePic.classList.remove("hidden");
             } else {
                 profilePic.classList.add("hidden");
             }
         });
-
     </script>
 }
-
-<style>
-    /* Chat Container */
-    #chatContainer {
-        width: 100%;
-        max-width: 500px;
-        height: 400px;
-        overflow-y: scroll;
-        border: 1px solid #ddd;
-        padding: 10px;
-        background-color: #f9f9f9;
-        display: flex;
-        flex-direction: column;
-    }
-
-    #chatBox {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        padding: 10px;
-    }
-
-    .chat-message {
-        max-width: 75%;
-        padding: 10px;
-        border-radius: 10px;
-        word-wrap: break-word;
-        font-size: 14px;
-    }
-
-    .sent {
-        align-self: flex-end;
-        background-color: #007bff;
-        color: white;
-        text-align: right;
-    }
-
-    .received {
-        align-self: flex-start;
-        background-color: #e5e5e5;
-        color: black;
-        text-align: left;
-    }
-
-    .message-input {
-        display: flex;
-        margin-top: 10px;
-    }
-
-    #messageInput {
-        width: 80%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    #sendButton {
-        padding: 8px 15px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-
-        #sendButton:hover {
-            background-color: #0056b3;
-        }
-
-    /* User Selection */
-    .user-selection {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .profile-pic {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    /* Notification Bell */
-    .notification-container {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-        margin-bottom: 10px;
-    }
-
-    .bell-icon {
-        font-size: 24px;
-    }
-
-    .notification-badge {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: red;
-        color: white;
-        font-size: 12px;
-        padding: 4px 7px;
-        border-radius: 50%;
-        display: none;
-    }
-</style>

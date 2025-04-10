@@ -395,12 +395,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             new HomeownerProfileModel { HomeownerId = 26, UserId = "136", IsApproved = true },
             new HomeownerProfileModel { HomeownerId = 27, UserId = "137", IsApproved = true },
             new HomeownerProfileModel { HomeownerId = 28, UserId = "138", IsApproved = true },
-            new HomeownerProfileModel { HomeownerId = 29, UserId = "139", IsApproved = true },
-            new HomeownerProfileModel { HomeownerId = 30, UserId = "140", IsApproved = true }
+            new HomeownerProfileModel { HomeownerId = 29, UserId = "139", IsApproved = true }
+          
 
 
         );
-
+      
 
         builder.Entity<IdentityUserRole<string>>().HasData(
     new IdentityUserRole<string> { UserId = "100", RoleId = "3" }, // Elon Musk -> Staff
@@ -442,8 +442,8 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     new IdentityUserRole<string> { UserId = "136", RoleId = "2" },
     new IdentityUserRole<string> { UserId = "137", RoleId = "2" },
     new IdentityUserRole<string> { UserId = "138", RoleId = "2" },
-    new IdentityUserRole<string> { UserId = "139", RoleId = "2" },
-    new IdentityUserRole<string> { UserId = "140", RoleId = "2" }
+    new IdentityUserRole<string> { UserId = "139", RoleId = "2" }
+  //  new IdentityUserRole<string> { UserId = "140", RoleId = "2" }
 
 
 );
