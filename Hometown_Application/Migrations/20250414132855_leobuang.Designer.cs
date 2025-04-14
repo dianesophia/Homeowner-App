@@ -4,6 +4,7 @@ using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250414132855_leobuang")]
+    partial class leobuang
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,6 +34,9 @@ namespace Hometown_Application.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("AdminProfilesAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BillAssignmentModelBillAssignmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
@@ -111,6 +117,9 @@ namespace Hometown_Application.Migrations
                     b.Property<byte[]>("ProfilePicture")
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<string>("ProfilePicturePath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -131,6 +140,8 @@ namespace Hometown_Application.Migrations
 
                     b.HasIndex("AdminProfilesAdminId");
 
+                    b.HasIndex("BillAssignmentModelBillAssignmentId");
+
                     b.HasIndex("HomeownerProfilesHomeownerId");
 
                     b.HasIndex("NormalizedEmail")
@@ -150,11 +161,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-<<<<<<< Updated upstream
-                            ConcurrencyStamp = "813f3e9e-9d17-4579-91d8-7dfa8a7dbe51",
-=======
                             ConcurrencyStamp = "32c1a819-061b-49e0-ace7-b12532f21274",
->>>>>>> Stashed changes
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -168,13 +175,6 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-<<<<<<< Updated upstream
-                            PasswordHash = "AQAAAAIAAYagAAAAEJQETeXyfzN5LCth9XI0ilJPcZaD5O5Dej6cOsqLErsJlOD91KvgEv0UDhVS9F6kjQ==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "1aa8f41b-e751-473f-8c2c-14640fd7ad70",
-                            TwoFactorEnabled = false,
-                            UserName = "elon.musk@example.com"
-=======
                             PasswordHash = "AQAAAAIAAYagAAAAEPSZPz/0H9EzA2+jxfWRHmAnc3c7UFPLFa2ef1Wx2eMJ1JMnviKhEmr0um4U5+2okw==",
                             PhoneNumberConfirmed = false,
                             ProfilePicturePath = "wwwroot/images/picc.png",
@@ -1093,7 +1093,6 @@ namespace Hometown_Application.Migrations
                             SecurityStamp = "53c976a9-2cb9-4b42-85c6-df31c15f9de0",
                             TwoFactorEnabled = false,
                             UserName = "james.taylor@example.com"
->>>>>>> Stashed changes
                         });
                 });
 
@@ -1126,8 +1125,6 @@ namespace Hometown_Application.Migrations
                     b.ToTable("AdminProfiles");
                 });
 
-<<<<<<< Updated upstream
-=======
             modelBuilder.Entity("Hometown_Application.Models.BillAccountModel", b =>
                 {
                     b.Property<int>("BillAccountId")
@@ -1541,7 +1538,6 @@ namespace Hometown_Application.Migrations
                     b.ToTable("BillTransactions");
                 });
 
->>>>>>> Stashed changes
             modelBuilder.Entity("Hometown_Application.Models.ChatMessageModel", b =>
                 {
                     b.Property<int>("ChatId")
@@ -1727,11 +1723,19 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime>("AddedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("DateTimeEnd")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateTimeStart")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1752,6 +1756,9 @@ namespace Hometown_Application.Migrations
 
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("isAllDay")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -1788,9 +1795,6 @@ namespace Hometown_Application.Migrations
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1892,13 +1896,13 @@ namespace Hometown_Application.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HomeownerId"));
 
-                    b.Property<string>("ApoprovedBy")
+                    b.Property<string>("ApprovedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ApprovedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("HouseId")
+                    b.Property<int?>("HouseModelHouseId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsApproved")
@@ -1928,13 +1932,11 @@ namespace Hometown_Application.Migrations
 
                     b.HasKey("HomeownerId");
 
-                    b.HasIndex("HouseId");
+                    b.HasIndex("HouseModelHouseId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("HomeownerProfiles");
-<<<<<<< Updated upstream
-=======
 
                     b.HasData(
                         new
@@ -2314,7 +2316,6 @@ namespace Hometown_Application.Migrations
                             RegisteredOn = new DateTime(2025, 4, 14, 13, 28, 54, 651, DateTimeKind.Utc).AddTicks(9570),
                             UserId = "139"
                         });
->>>>>>> Stashed changes
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
@@ -2325,16 +2326,18 @@ namespace Hometown_Application.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("HouseId"));
 
-                    b.Property<string>("BlockNumber")
+                    b.Property<string>("BlockName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<bool?>("IsOccupied")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LotNumber")
+                    b.Property<int>("LotNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("StreetName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("UserId")
@@ -2345,7 +2348,282 @@ namespace Hometown_Application.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("House");
+                    b.HasIndex("BlockName", "LotNumber", "StreetName")
+                        .IsUnique();
+
+                    b.ToTable("Houses");
+
+                    b.HasData(
+                        new
+                        {
+                            HouseId = 1,
+                            BlockName = "AspenHeight",
+                            IsOccupied = true,
+                            LotNumber = 1,
+                            StreetName = "Ashwood Lane",
+                            UserId = "100"
+                        },
+                        new
+                        {
+                            HouseId = 2,
+                            BlockName = "AspenHeight",
+                            IsOccupied = true,
+                            LotNumber = 2,
+                            StreetName = "Ashwood Lane",
+                            UserId = "102"
+                        },
+                        new
+                        {
+                            HouseId = 3,
+                            BlockName = "AspenHeight",
+                            IsOccupied = true,
+                            LotNumber = 3,
+                            StreetName = "Ashwood Lane",
+                            UserId = "103"
+                        },
+                        new
+                        {
+                            HouseId = 4,
+                            BlockName = "AspenHeight",
+                            IsOccupied = true,
+                            LotNumber = 4,
+                            StreetName = "Ashwood Lane",
+                            UserId = "104"
+                        },
+                        new
+                        {
+                            HouseId = 5,
+                            BlockName = "AspenHeight",
+                            IsOccupied = true,
+                            LotNumber = 5,
+                            StreetName = "Ashwood Lane",
+                            UserId = "105"
+                        },
+                        new
+                        {
+                            HouseId = 6,
+                            BlockName = "BirchHaven",
+                            IsOccupied = true,
+                            LotNumber = 1,
+                            StreetName = "Birchwood Avenue",
+                            UserId = "106"
+                        },
+                        new
+                        {
+                            HouseId = 7,
+                            BlockName = "BirchHaven",
+                            IsOccupied = true,
+                            LotNumber = 2,
+                            StreetName = "Birchwood Avenue",
+                            UserId = "107"
+                        },
+                        new
+                        {
+                            HouseId = 8,
+                            BlockName = "BirchHaven",
+                            IsOccupied = true,
+                            LotNumber = 3,
+                            StreetName = "Birchwood Avenue",
+                            UserId = "108"
+                        },
+                        new
+                        {
+                            HouseId = 9,
+                            BlockName = "BirchHaven",
+                            IsOccupied = true,
+                            LotNumber = 4,
+                            StreetName = "Birchwood Avenue",
+                            UserId = "109"
+                        },
+                        new
+                        {
+                            HouseId = 10,
+                            BlockName = "BirchHaven",
+                            IsOccupied = true,
+                            LotNumber = 5,
+                            StreetName = "Birchwood Avenue",
+                            UserId = "110"
+                        },
+                        new
+                        {
+                            HouseId = 11,
+                            BlockName = "CedarCrest",
+                            IsOccupied = true,
+                            LotNumber = 1,
+                            StreetName = "Cedar Hollow Road",
+                            UserId = "111"
+                        },
+                        new
+                        {
+                            HouseId = 12,
+                            BlockName = "CedarCrest",
+                            IsOccupied = true,
+                            LotNumber = 2,
+                            StreetName = "Cedar Hollow Road",
+                            UserId = "112"
+                        },
+                        new
+                        {
+                            HouseId = 13,
+                            BlockName = "CedarCrest",
+                            IsOccupied = true,
+                            LotNumber = 3,
+                            StreetName = "Cedar Hollow Road",
+                            UserId = "113"
+                        },
+                        new
+                        {
+                            HouseId = 14,
+                            BlockName = "CedarCrest",
+                            IsOccupied = true,
+                            LotNumber = 4,
+                            StreetName = "Cedar Hollow Road",
+                            UserId = "114"
+                        },
+                        new
+                        {
+                            HouseId = 15,
+                            BlockName = "CedarCrest",
+                            IsOccupied = true,
+                            LotNumber = 5,
+                            StreetName = "Cedar Hollow Road",
+                            UserId = "115"
+                        },
+                        new
+                        {
+                            HouseId = 16,
+                            BlockName = "ChestnutGrove",
+                            IsOccupied = true,
+                            LotNumber = 1,
+                            StreetName = "Chestnut Boulevard",
+                            UserId = "116"
+                        },
+                        new
+                        {
+                            HouseId = 17,
+                            BlockName = "ChestnutGrove",
+                            IsOccupied = true,
+                            LotNumber = 2,
+                            StreetName = "Chestnut Boulevard",
+                            UserId = "117"
+                        },
+                        new
+                        {
+                            HouseId = 18,
+                            BlockName = "ChestnutGrove",
+                            IsOccupied = true,
+                            LotNumber = 3,
+                            StreetName = "Chestnut Boulevard",
+                            UserId = "118"
+                        },
+                        new
+                        {
+                            HouseId = 19,
+                            BlockName = "ChestnutGrove",
+                            IsOccupied = true,
+                            LotNumber = 4,
+                            StreetName = "Chestnut Boulevard",
+                            UserId = "119"
+                        },
+                        new
+                        {
+                            HouseId = 20,
+                            BlockName = "ChestnutGrove",
+                            IsOccupied = true,
+                            LotNumber = 5,
+                            StreetName = "Chestnut Boulevard",
+                            UserId = "120"
+                        },
+                        new
+                        {
+                            HouseId = 21,
+                            BlockName = "CrystalLake",
+                            IsOccupied = true,
+                            LotNumber = 1,
+                            StreetName = "Crystal Drive",
+                            UserId = "121"
+                        },
+                        new
+                        {
+                            HouseId = 22,
+                            BlockName = "CrystalLake",
+                            IsOccupied = true,
+                            LotNumber = 2,
+                            StreetName = "Crystal Drive",
+                            UserId = "122"
+                        },
+                        new
+                        {
+                            HouseId = 23,
+                            BlockName = "CrystalLake",
+                            IsOccupied = true,
+                            LotNumber = 3,
+                            StreetName = "Crystal Drive",
+                            UserId = "123"
+                        },
+                        new
+                        {
+                            HouseId = 24,
+                            BlockName = "CrystalLake",
+                            IsOccupied = true,
+                            LotNumber = 4,
+                            StreetName = "Crystal Drive",
+                            UserId = "124"
+                        },
+                        new
+                        {
+                            HouseId = 25,
+                            BlockName = "CrystalLake",
+                            IsOccupied = true,
+                            LotNumber = 5,
+                            StreetName = "Crystal Drive",
+                            UserId = "125"
+                        },
+                        new
+                        {
+                            HouseId = 26,
+                            BlockName = "ElmwoodBlock",
+                            IsOccupied = true,
+                            LotNumber = 1,
+                            StreetName = "Elmwood Drive",
+                            UserId = "126"
+                        },
+                        new
+                        {
+                            HouseId = 27,
+                            BlockName = "ElmwoodBlock",
+                            IsOccupied = true,
+                            LotNumber = 2,
+                            StreetName = "Elmwood Drive",
+                            UserId = "127"
+                        },
+                        new
+                        {
+                            HouseId = 28,
+                            BlockName = "ElmwoodBlock",
+                            IsOccupied = true,
+                            LotNumber = 3,
+                            StreetName = "Elmwood Drive",
+                            UserId = "128"
+                        },
+                        new
+                        {
+                            HouseId = 29,
+                            BlockName = "ElmwoodBlock",
+                            IsOccupied = true,
+                            LotNumber = 4,
+                            StreetName = "Elmwood Drive",
+                            UserId = "129"
+                        },
+                        new
+                        {
+                            HouseId = 30,
+                            BlockName = "ElmwoodBlock",
+                            IsOccupied = true,
+                            LotNumber = 5,
+                            StreetName = "Elmwood Drive",
+                            UserId = "130"
+                        });
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.PollModel", b =>
@@ -2666,6 +2944,11 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -2705,12 +2988,11 @@ namespace Hometown_Application.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("AddedOn")
+                    b.Property<DateTime?>("AddedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CancelReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CancelledOn")
                         .HasColumnType("datetime2");
@@ -2720,8 +3002,7 @@ namespace Hometown_Application.Migrations
 
                     b.Property<string>("Details")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -2730,28 +3011,29 @@ namespace Hometown_Application.Migrations
                     b.Property<int?>("HomeownerId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
+                    b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RejectedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RejectedReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RequestTypeId")
+                    b.Property<int?>("RequestTypeId")
+                        .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Schedule")
+                    b.Property<DateTime?>("Schedule")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("StatusId")
+                    b.Property<int?>("StatusId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
@@ -2761,12 +3043,9 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Urgency")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
+                    b.Property<string>("Urgency")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ServiceRequestId");
 
@@ -2775,8 +3054,6 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("RequestTypeId");
 
                     b.HasIndex("StatusId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("ServiceRequests");
                 });
@@ -2846,9 +3123,6 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("HireDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("HouseId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActiveEmployee")
                         .HasColumnType("bit");
 
@@ -2882,13 +3156,9 @@ namespace Hometown_Application.Migrations
 
                     b.HasKey("StaffId");
 
-                    b.HasIndex("HouseId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("StaffProfiles");
-<<<<<<< Updated upstream
-=======
 
                     b.HasData(
                         new
@@ -3081,7 +3351,6 @@ namespace Hometown_Application.Migrations
                             Salary = 35000.00m,
                             UserId = "110"
                         });
->>>>>>> Stashed changes
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.StatusModel", b =>
@@ -3331,6 +3600,26 @@ namespace Hometown_Application.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "HomeOwner",
+                            NormalizedName = "HOMEOWNER"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            Name = "Staff",
+                            NormalizedName = "STAFF"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -3420,8 +3709,6 @@ namespace Hometown_Application.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-<<<<<<< Updated upstream
-=======
 
                     b.HasData(
                         new
@@ -3619,7 +3906,6 @@ namespace Hometown_Application.Migrations
                             UserId = "139",
                             RoleId = "2"
                         });
->>>>>>> Stashed changes
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -3649,6 +3935,10 @@ namespace Hometown_Application.Migrations
                         .WithMany()
                         .HasForeignKey("AdminProfilesAdminId");
 
+                    b.HasOne("Hometown_Application.Models.BillAssignmentModel", null)
+                        .WithMany("Users")
+                        .HasForeignKey("BillAssignmentModelBillAssignmentId");
+
                     b.HasOne("Hometown_Application.Models.HomeownerProfileModel", "HomeownerProfiles")
                         .WithMany()
                         .HasForeignKey("HomeownerProfilesHomeownerId");
@@ -3669,10 +3959,99 @@ namespace Hometown_Application.Migrations
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillAccountModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillAssignmentModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Models.BillModel", "Bill")
+                        .WithMany()
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Bill");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillDetailModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Models.BillModel", "Bill")
+                        .WithMany("BillDetails")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hometown_Application.Models.BillItemsModel", "BillItemType")
+                        .WithMany("BillDetails")
+                        .HasForeignKey("BillItemsID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bill");
+
+                    b.Navigation("BillItemType");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillPaymentModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Models.BillModel", "Bill")
+                        .WithMany("Payments")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bill");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillTransactionModel", b =>
+                {
+                    b.HasOne("Hometown_Application.Models.BillItemsModel", "BillItemsModel")
+                        .WithMany()
+                        .HasForeignKey("BillItemsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("BillItemsModel");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ChatMessageModel", b =>
@@ -3742,20 +4121,17 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.HomeownerProfileModel", b =>
                 {
-                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
+                    b.HasOne("Hometown_Application.Models.HouseModel", null)
                         .WithMany("Homeowners")
-                        .HasForeignKey("HouseId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("HouseModelHouseId");
 
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-
-                    b.Navigation("House");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.HouseModel", b =>
@@ -3763,7 +4139,7 @@ namespace Hometown_Application.Migrations
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -3903,14 +4279,6 @@ namespace Hometown_Application.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
                     b.Navigation("Homeowner");
 
                     b.Navigation("RequestType");
@@ -3920,20 +4288,13 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.StaffProfileModel", b =>
                 {
-                    b.HasOne("Hometown_Application.Models.HouseModel", "House")
-                        .WithMany()
-                        .HasForeignKey("HouseId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-
-                    b.Navigation("House");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.VehicleGatepassModel", b =>
@@ -4014,6 +4375,23 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ReceivedMessages");
 
                     b.Navigation("SentMessages");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillAssignmentModel", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillItemsModel", b =>
+                {
+                    b.Navigation("BillDetails");
+                });
+
+            modelBuilder.Entity("Hometown_Application.Models.BillModel", b =>
+                {
+                    b.Navigation("BillDetails");
+
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.FacilityModel", b =>
