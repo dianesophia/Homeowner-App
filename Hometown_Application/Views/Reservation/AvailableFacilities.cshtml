@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<Hometown_Application.Models.FacilityViewModel>
-
 @{
     ViewData["Title"] = "Available Facilities";
 }
@@ -43,82 +42,46 @@
             border-radius: 3px;
         }
 
-    .facilities-container {
+    .facility-table-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 2rem auto;
         background-color: var(--card-bg);
         border-radius: var(--border-radius);
         box-shadow: var(--shadow);
-        padding: 20px;
+        padding: 25px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
         margin-top: 1rem;
     }
 
-    .facilities-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 0;
-    }
-
-        .facilities-table th,
-        .facilities-table td {
+        .table th,
+        .table td {
             padding: 12px 15px;
             text-align: left;
-            vertical-align: middle;
+            border-bottom: 1px solid #ddd;
         }
 
-        .facilities-table th {
+        .table th {
             background-color: var(--primary-color);
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.9rem;
         }
 
-        .facilities-table td {
-            border-bottom: 1px solid #dee2e6;
+        .table td {
             color: var(--text-color);
         }
 
-        .facilities-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .facilities-table img {
-            max-width: 50px;
-            max-height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-    .btn-reserve {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        color: white;
-        font-weight: 500;
+    .facility-image {
+        max-width: 50px;
+        max-height: 50px;
         border-radius: 8px;
-        padding: 6px 12px;
-        transition: var(--transition);
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
+        object-fit: cover;
     }
-
-        .btn-reserve:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-    .search-box {
-        margin-bottom: 1rem;
-    }
-
-        .search-box input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
 
     .status-available {
         color: var(--success-color);
@@ -130,120 +93,86 @@
         font-weight: 500;
     }
 
-    .text-muted {
-        color: #6c757d;
-        font-style: italic;
+    .btn {
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: var(--transition);
+        cursor: pointer;
     }
 
-    .debug-info {
-        background-color: #f8f9fa;
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-        color: #495057;
+    .btn-reserve {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
     }
+
+        .btn-reserve:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 </style>
 
 <div class="content">
     <div class="page-header">
-        <h1 class="page-title">Available Facilities</h1>
+        <div>
+            <h1 class="page-title">Facilities</h1>
+        </div>
     </div>
 
-    <div class="facilities-container">
-        <!-- Debug: Display the number of facilities and their details -->
-        <div class="debug-info">
-            <p>Debug: Found @Model.Count() facilities</p>
-            @if (Model.Any())
-            {
-                <ul>
-                    @foreach (var vm in Model)
-                    {
-                        <li>
-                            @vm.Facility.Name: IsAvailable = @vm.Facility.IsAvailable, IsDeleted = @vm.Facility.IsDeleted
-                            (Active Reservations: @(vm.HasActiveReservations ? "Yes" : "No"))
-                        </li>
-                    }
-                </ul>
-            }
-        </div>
+    <div class="facility-table-container">
+        <form asp-action="AvailableFacilities" method="get">
+            <div class="form-group">
+                <input type="text" name="searchString" class="form-control" placeholder="Enter facility name..." value="@ViewData["CurrentFilter"]" />
+            </div>
+        </form>
 
-        <div class="search-box">
-            <input type="text" placeholder="Enter facility name..." id="searchInput" onkeyup="searchFacilities()" />
-        </div>
-
-        @if (Model.Any())
-        {
-            <table class="facilities-table" id="facilitiesTable">
-                <thead>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
                     <tr>
-                        <th scope="col">Image</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Capacity</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var vm in Model)
-                    {
-                        var item = vm.Facility;
-                        var imageSrc = item.Image != null && item.Image.Length > 0
-                        ? $"data:image/jpeg;base64,{Convert.ToBase64String(item.Image)}"
-                        : null;
-                        <tr>
-                            <td>
-                                @if (imageSrc != null)
-                                {
-                                    <img src="@imageSrc" alt="@item.Name Facility Image" class="img-thumbnail" />
-                                }
-                                else
-                                {
-                                    <span>No Image</span>
-                                }
-                            </td>
-                            <td>@item.Name</td>
-                            <td>@(item.Type == "Other" ? item.OtherType : item.Type)</td>
-                            <td>@item.Capacity</td>
-                            <td>
+                        <td>
+                            @if (item.Facility.Image != null && item.Facility.Image.Length > 0)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.Facility.Image)" alt="@item.Facility.Name" class="facility-image" />
+                            }
+                            else
+                            {
+                                <span>No Image</span>
+                            }
+                        </td>
+                        <td>@item.Facility.Name</td>
+                        <td>@item.Facility.Type</td>
+                        <td>@item.Facility.Capacity</td>
+                        <td>
+                            @if (item.Facility.IsAvailable)
+                            {
                                 <span class="status-available">Available</span>
-                            </td>
-                            <td>
-                                <a asp-action="CreateOrEdit" asp-route-facilityId="@item.FacilityId" class="btn-reserve">Reserve</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <p class="text-muted">No available facilities found. Please check back later or create a new facility.</p>
-        }
+                            }
+                            else
+                            {
+                                <span class="status-not-available">Not Available</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="CreateOrEdit" asp-route-facilityId="@item.Facility.FacilityId" class="btn btn-reserve">Reserve</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        function searchFacilities() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("searchInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("facilitiesTable");
-            tr = table.getElementsByTagName("tr");
-
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1]; // Search by Name (second column)
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        }
-    </script>
-}

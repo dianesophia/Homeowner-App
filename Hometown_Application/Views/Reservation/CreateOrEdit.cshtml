@@ -1,9 +1,5 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using Hometown_Application.Areas.Identity.Data
-@inject UserManager<ApplicationUser> UserManager
-@model Hometown_Application.Models.ReservationModel
+﻿@model Hometown_Application.Models.ReservationModel
 @{
-    var user = await UserManager.GetUserAsync(User);
     ViewData["Title"] = Model.ReservationId == 0 ? "Create Reservation" : "Edit Reservation";
 }
 
@@ -184,6 +180,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        .btn-primary:disabled {
+            background-color: #a0a0a0;
+            border-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
     .btn-secondary {
         background-color: #6c757d;
         border-color: #6c757d;
@@ -235,7 +237,6 @@
     </div>
 
     <div class="reservation-form-container">
-        <!-- Display Facility Image (if editing) -->
         @if (Model.ReservationId != 0 && Model.Facility?.Image != null && Model.Facility.Image.Length > 0)
         {
             <div class="form-group">
@@ -246,8 +247,8 @@
 
         <form id="ReservationForm" asp-action="CreateOrEdit" asp-controller="Reservation" onsubmit="return validateReservationForm()">
             <input type="hidden" name="ReservationId" value="@Model?.ReservationId" />
-            <input type="hidden" name="UserId" value="@user?.Id" />
-            <input type="hidden" name="AddedBy" value="@user?.Id" />
+            <input type="hidden" name="UserId" value="@ViewBag.UserId" />
+            <input type="hidden" name="AddedBy" value="@ViewBag.UserId" />
 
             <div class="form-group">
                 <label class="form-label" for="FacilityId">Facility</label>
@@ -268,17 +269,20 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="StartTime">Start Time</label>
-                <input class="form-control" id="StartTime" type="time" name="StartTime" value="@Model?.StartTime.ToString("HH:mm")" required />
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="EndTime">End Time</label>
-                <input class="form-control" id="EndTime" type="time" name="EndTime" value="@Model?.EndTime.ToString("HH:mm")" required />
+                <label class="form-label" for="SelectedTimeSlotIndex">Time Slot</label>
+                <select class="form-select" id="SelectedTimeSlotIndex" name="SelectedTimeSlotIndex" required>
+                    <option value="" disabled selected>Select a time slot</option>
+                    @foreach (var timeSlot in ViewBag.TimeSlots)
+                    {
+                        <option value="@timeSlot.Index" selected="@(Model?.SelectedTimeSlotIndex == timeSlot.Index ? "selected" : null)">
+                            @timeSlot.DisplayText
+                        </option>
+                    }
+                </select>
             </div>
 
             <div class="buttons-container">
-                <button class="btn btn-primary" type="submit">Submit</button>
+                <button class="btn btn-primary" type="submit" id="submitButton">Submit</button>
                 <a asp-action="ReservationStatusReport" class="btn btn-secondary">Back to My Reservations</a>
             </div>
         </form>
@@ -303,24 +307,67 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        function validateReservationForm() {
-            var facility = document.querySelector('select[name="FacilityId"]').value;
-            var date = document.querySelector('input[name="ReservationDate"]').value;
-            var startTime = document.querySelector('input[name="StartTime"]').value;
-            var endTime = document.querySelector('input[name="EndTime"]').value;
+        $(document).ready(function () {
+            // Listen for changes to the facility, date, or time slot
+            $('#FacilityId, #ReservationDate, #SelectedTimeSlotIndex').change(function () {
+                checkTimeSlotAvailability();
+            });
 
-            if (!facility || facility === "" || !date || !startTime || !endTime) {
-                alert("Please fill in all required fields, including selecting a valid facility.");
-                return false;
+            // Function to check time slot availability
+            function checkTimeSlotAvailability() {
+                var facilityId = $('#FacilityId').val();
+                var reservationDate = $('#ReservationDate').val();
+                var timeSlotIndex = $('#SelectedTimeSlotIndex').val();
+
+                // Only proceed if all fields are filled
+                if (facilityId && reservationDate && timeSlotIndex !== "") {
+                    $.ajax({
+                        url: '@Url.Action("CheckTimeSlotAvailability", "Reservation")',
+                        type: 'GET',
+                        data: {
+                            facilityId: facilityId,
+                            reservationDate: reservationDate,
+                            timeSlotIndex: timeSlotIndex
+                        },
+                        success: function (response) {
+                            if (!response.isAvailable) {
+                                alert(response.message);
+                                $('#submitButton').prop('disabled', true); // Disable the submit button
+                            } else {
+                                $('#submitButton').prop('disabled', false); // Enable the submit button
+                            }
+                        },
+                        error: function () {
+                            alert('An error occurred while checking the time slot availability. Please try again.');
+                            $('#submitButton').prop('disabled', true); // Disable on error
+                        }
+                    });
+                } else {
+                    $('#submitButton').prop('disabled', false); // Enable if fields are not yet filled
+                }
             }
 
-            if (startTime >= endTime) {
-                alert("End time must be later than start time.");
-                return false;
-            }
+            // Form validation before submission
+            function validateReservationForm() {
+                var facility = document.querySelector('select[name="FacilityId"]').value;
+                var date = document.querySelector('input[name="ReservationDate"]').value;
+                var timeSlot = document.querySelector('select[name="SelectedTimeSlotIndex"]').value;
 
-            return true;
-        }
+                if (!facility || facility === "" || !date || !timeSlot || timeSlot === "") {
+                    alert("Please fill in all required fields, including selecting a valid facility and time slot.");
+                    return false;
+                }
+
+                // Additional check to ensure the submit button is enabled (i.e., time slot is available)
+                if ($('#submitButton').prop('disabled')) {
+                    alert("The selected time slot is already reserved. Please choose a different time slot.");
+                    return false;
+                }
+
+                return true;
+            }
+        });
     </script>
 }

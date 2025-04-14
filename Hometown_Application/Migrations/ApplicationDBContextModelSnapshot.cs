@@ -150,7 +150,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "813f3e9e-9d17-4579-91d8-7dfa8a7dbe51",
+                            ConcurrencyStamp = "6e8fa21a-ebe6-4b93-98de-5b194acba6ba",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -164,9 +164,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJQETeXyfzN5LCth9XI0ilJPcZaD5O5Dej6cOsqLErsJlOD91KvgEv0UDhVS9F6kjQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHwO728yCGmDIgVbkVaT3lduYAzozTRRlnFHFp2rbpBIffHL+HhV/a14NyH09kQxWQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1aa8f41b-e751-473f-8c2c-14640fd7ad70",
+                            SecurityStamp = "8b1fa471-f5b1-4389-8980-174b7a97cf27",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         });
@@ -943,11 +943,13 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("SelectedTimeSlotIndex")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")

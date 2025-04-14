@@ -53,11 +53,11 @@ public class Program
             options.AddPolicy("AllowLocalhost", policyBuilder =>
             {
                 policyBuilder
-                    .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost") // Allow any localhost origin
+                    .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials()
-                    .WithExposedHeaders("*"); // Allow all exposed headers
+                    .WithExposedHeaders("*");
             });
         });
 
@@ -66,14 +66,18 @@ public class Program
         {
             options.CheckConsentNeeded = context => true;
             options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            options.Secure = CookieSecurePolicy.Always; // Enforce cookies over HTTPS only
+            options.Secure = CookieSecurePolicy.Always;
         });
 
-        // Configure Identity cookies to require HTTPS
+        // Configure Identity cookies to require HTTPS and set login path
         builder.Services.ConfigureApplicationCookie(options =>
         {
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Cookies only sent over HTTPS
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
+            options.LoginPath = "/Account/Login"; // Redirect to login if user is not authenticated
+            options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect if user lacks permission
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Session timeout after 30 minutes
+            options.SlidingExpiration = true; // Reset the expiration time if the user is active
         });
 
         // Add SignalR
@@ -114,7 +118,7 @@ public class Program
         // Apply cookie policy
         app.UseCookiePolicy();
 
-        // Map endpoints AFTER authentication and authorization middleware are in place.
+        // Map endpoints AFTER authentication and authorization middleware are in place
         app.MapHub<ChatHub>("/chatHub");
         app.MapHub<NotificationHub>("/notificationHub");
         app.MapControllerRoute(

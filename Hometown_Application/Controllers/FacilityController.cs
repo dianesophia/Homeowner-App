@@ -30,6 +30,7 @@ namespace Hometown_Application.Controllers
         }
 
         // GET: Facility/CreateOrEditFacility
+        [Authorize]
         public async Task<IActionResult> CreateOrEditFacility(int? id)
         {
             if (id == null)
@@ -46,9 +47,6 @@ namespace Hometown_Application.Controllers
             return View(facility); // Edit existing facility
         }
 
-        // POST: Facility/CreateOrEditFacility
-        // POST: Facility/CreateOrEditFacility
-        // POST: Facility/CreateOrEditFacility
         // POST: Facility/CreateOrEditFacility
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -70,10 +68,9 @@ namespace Hometown_Application.Controllers
                 {
                     facility.AddedBy = user.Id;
                     facility.AddedOn = DateTime.UtcNow;
-                    facility.IsAvailable = facility.IsAvailable; // Use the form value
+                    facility.IsDeleted = false;
 
-                    // Debug: Log the IsAvailable value
-                    Console.WriteLine($"Creating new facility: Name: {facility.Name}, IsAvailable: {facility.IsAvailable}, File Uploaded: {(file != null ? file.FileName : "None")}");
+                    Console.WriteLine($"Creating new facility: Name: {facility.Name}, IsAvailable: {facility.IsAvailable}, IsDeleted: {facility.IsDeleted}, File Uploaded: {(file != null ? file.FileName : "None")}");
 
                     if (file != null && file.Length > 0)
                     {
@@ -94,19 +91,17 @@ namespace Hometown_Application.Controllers
                         return NotFound();
                     }
 
-                    // Log the original IsAvailable value
-                    Console.WriteLine($"Before Update: Facility: {existingFacility.Name}, IsAvailable: {existingFacility.IsAvailable}");
+                    Console.WriteLine($"Before Update: Facility: {existingFacility.Name}, IsAvailable: {existingFacility.IsAvailable}, IsDeleted: {existingFacility.IsDeleted}");
 
                     existingFacility.Name = facility.Name;
                     existingFacility.Type = facility.Type;
                     existingFacility.Capacity = facility.Capacity;
                     existingFacility.Description = facility.Description;
-                    existingFacility.IsAvailable = facility.IsAvailable; // Use the form value
+                    existingFacility.IsAvailable = facility.IsAvailable; // Use the manually set value
                     existingFacility.UpdatedBy = user.Id;
                     existingFacility.UpdatedOn = DateTime.UtcNow;
 
-                    // Debug: Log the updated IsAvailable value
-                    Console.WriteLine($"After Update (Before Save): Facility: {existingFacility.Name}, IsAvailable: {existingFacility.IsAvailable}, File Uploaded: {(file != null ? file.FileName : "None")}");
+                    Console.WriteLine($"After Update (Before Save): Facility: {existingFacility.Name}, IsAvailable: {existingFacility.IsAvailable}, IsDeleted: {existingFacility.IsDeleted}, File Uploaded: {(file != null ? file.FileName : "None")}");
 
                     if (file != null && file.Length > 0)
                     {
@@ -118,7 +113,6 @@ namespace Hometown_Application.Controllers
                     }
                     else
                     {
-                        // Retain the existing image if no new file is uploaded
                         var originalFacility = await _context.Facility.AsNoTracking().FirstOrDefaultAsync(f => f.FacilityId == facility.FacilityId);
                         if (originalFacility != null)
                         {
@@ -131,18 +125,15 @@ namespace Hometown_Application.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Debug: Confirm the value in the database after saving
                 var savedFacility = await _context.Facility.FindAsync(facility.FacilityId);
                 if (savedFacility != null)
                 {
-                    Console.WriteLine($"After Save (Database): Facility: {savedFacility.Name}, IsAvailable: {savedFacility.IsAvailable}");
+                    Console.WriteLine($"After Save (Database): Facility: {savedFacility.Name}, IsAvailable: {savedFacility.IsAvailable}, IsDeleted: {savedFacility.IsDeleted}");
                 }
 
-                // Redirect to AvailableFacilities in ReservationController
                 return RedirectToAction("AvailableFacilities", "Reservation");
             }
 
-            // Debug: Log validation errors
             foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
             {
                 Console.WriteLine($"Validation Error: {error.ErrorMessage}");
@@ -152,6 +143,7 @@ namespace Hometown_Application.Controllers
         }
 
         // GET: Facility/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -171,6 +163,7 @@ namespace Hometown_Application.Controllers
         // POST: Facility/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var facility = await _context.Facility.FindAsync(id);
