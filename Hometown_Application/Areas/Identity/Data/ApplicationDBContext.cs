@@ -293,6 +293,14 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(sr => sr.HomeownerId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        //ServiceStaffAssignment
+        builder.Entity<ServiceStaffAssignmentModel>()
+            .HasOne(a => a.Staff)
+            .WithMany()
+            .HasForeignKey(a => a.StaffId)
+            .OnDelete(DeleteBehavior.Restrict); // or NoAction to avoid cascade conflicts
+
+
         // Poll-related relationships
         builder.Entity<PollModel>()
             .HasOne(p => p.Creator)
