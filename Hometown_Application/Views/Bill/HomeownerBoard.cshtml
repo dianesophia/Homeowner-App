@@ -1,4 +1,4 @@
-﻿@model List<Hometown_Application.Models.BillModel>
+﻿@model List<Hometown_Application.ViewModel.HomeownerBoardViewModel>
 
 @{
     ViewData["Title"] = "Homeowner Dashboard";
@@ -14,24 +14,45 @@
 }
 
 <div class="row">
-    @foreach (var bill in Model.Where(b => b.RemainingBalance > 0))
+    @foreach (var item in Model.Where(b => b.RemainingBalance > 0))
     {
         <div class="col-md-4 mb-4">
+            <!-- Card for Bill ID and Remaining Balance -->
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5>Bill ID: @bill.BillId</h5>
+                    <h5>Bill ID: @item.BillId</h5>
                 </div>
                 <div class="card-body">
                     <p class="card-text">
-                        <strong>Remaining Balance:</strong> @bill.RemainingBalance.ToString("C")
+                        <strong>Remaining Balance:</strong> @item.RemainingBalance.ToString("C")
                     </p>
                     <p class="card-text">
-                        <strong>Status:</strong> @bill.Status
+                        <strong>Status:</strong> @item.Status
                     </p>
 
-                    <a asp-action="PayBill" asp-controller="Bill" asp-route-billId="@bill.BillId" class="btn btn-success">
+                    <a asp-action="PayBill" asp-controller="Bill" asp-route-billId="@item.BillId" class="btn btn-success">
                         Pay Now
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Card for Bill Name and Amount -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5>@item.BillName</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>Amount:</strong> @item.Amount.ToString("C")
+                    </p>
+                    <p class="card-text">
+                        <strong>Description:</strong> @item.Description
+                    </p>
+                    <p class="card-text">
+                        <strong>Due Date:</strong> @item.DueDate.ToString("MM/dd/yyyy")
+                    </p>
                 </div>
             </div>
         </div>

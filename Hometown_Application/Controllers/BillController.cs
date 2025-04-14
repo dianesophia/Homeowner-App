@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
+using Hometown_Application.ViewModel;
 
 namespace Hometown_Application.Controllers
 {
@@ -75,30 +76,23 @@ namespace Hometown_Application.Controllers
             var users = await _userManager.GetUserAsync(User);
             if (users == null) return RedirectToAction("Index");
 
-          /*  var bill = await _context.Bills.FindAsync(model.BillId);
-            if (bill == null)
+            // Ensure model has BillId and UserId populated
+            if (model.BillId == 0 || model.UserId == null)
             {
-                return NotFound("Bill not found");
-            }*/
+                return NotFound("Bill or User not found.");
+            }
 
             model.IssuedDate = DateTime.UtcNow;
             model.IsPaid = false;
             model.AddedOn = DateTime.UtcNow;
             model.AddedBy = users.UserName;
-           // model.DueDate = bill.DueDate;  // Assuming Bill has a DueDate property
 
+            // Save the assignment to the database
             _context.BillAssignment.Add(model);
-            await _context.SaveChangesAsync();
-
-
-            // Update the remaining balance of the bill
-            /*bill.RemainingBalance += model.Amount; // Add assigned amount to remaining balance
-            _context.Update(bill);*/
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(BillAssignmentList));
         }
-
 
 
 
@@ -149,29 +143,36 @@ namespace Hometown_Application.Controllers
 
         public async Task<IActionResult> HomeownerBoard()
         {
-            // Get the currently logged-in user
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound("User not found");
 
-            // Check if the user is null (just in case)
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
+            // Get the bills for the user
+            var bills = await _context.Bills.Where(b => b.UserId == user.Id).ToListAsync();
 
-            // Get the bills associated with the logged-in user
-            var bills = await _context.Bills
-                .Where(b => b.UserId == user.Id) // Filter bills for the logged-in user
+            // Get BillAssignments for the logged-in user
+            var billAssignments = await _context.BillAssignment
+                .Where(ba => ba.UserId == user.Id)
+                .Include(ba => ba.Bill)
                 .ToListAsync();
 
-            // Check if no bills are found for the user
-            if (bills == null || !bills.Any())
+            // Create the ViewModel
+            var viewModel = bills.Select(b => new HomeownerBoardViewModel
             {
-                ViewData["Message"] = "No bills found for this homeowner.";
-            }
+                BillId = b.BillId,
+                RemainingBalance = b.RemainingBalance,
+                Status = b.Status,
+                //BillName = b.BillName,
+                BillName = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.BillName,
+                Amount = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.Amount ?? 0,
+                Description = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.Description,
+                DueDate = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.DueDate ?? DateTime.MinValue
+            }).ToList();
 
-            // Pass the bills to the view
-            return View(bills);
+            // Pass the ViewModel to the view
+            return View(viewModel);
         }
+
+
         public async Task<IActionResult> CreateBill(List<BillItemsModel> billItems)
         {
             // Retrieve all homeowners
@@ -356,6 +357,24 @@ namespace Hometown_Application.Controllers
 
             return RedirectToAction(nameof(PendingPayments));
         }
+
+
+        public async Task<IActionResult> MarkAsPaid(int id)
+        {
+            var billAssignment = await _context.BillAssignment.FindAsync(id);
+            if (billAssignment == null)
+            {
+                return NotFound();  
+            }
+
+            billAssignment.IsPaid = true;
+            billAssignment.PaidDate = DateTime.UtcNow;
+            _context.Update(billAssignment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(HomeownerBoard));
+        }
+
 
     }
 }
