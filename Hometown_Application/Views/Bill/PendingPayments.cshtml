@@ -1,0 +1,38 @@
+﻿@model List<Hometown_Application.Models.BillPaymentModel>
+
+@{
+    ViewData["Title"] = "Pending Payments";
+}
+
+<h2>Pending Payments</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Bill ID</th>
+            <th>Amount Paid</th>
+            <th>Payment Method</th>
+            <th>Reference Number</th>
+            <th>Payment Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var payment in Model)
+        {
+            <tr>
+                <td>@payment.BillId</td>
+                <td>@payment.AmountPaid.ToString("C")</td>
+                <td>@payment.PaymentMethod</td>
+                <td>@payment.ReferenceNumber</td>
+                <td>@payment.PaymentDate.ToString("g")</td>
+                <td>
+                    <form asp-action="ApprovePayment" method="post">
+                        <input type="hidden" name="paymentId" value="@payment.PaymentId" />
+                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

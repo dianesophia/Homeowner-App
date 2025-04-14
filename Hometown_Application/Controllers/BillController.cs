@@ -118,7 +118,7 @@ namespace Hometown_Application.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> PayBill(int billId, decimal amountPaid)
+        public async Task<IActionResult> PayBill(int billId, decimal amountPaid,string paymentMethod, string referenceNumber)
         {
             var bill = await _context.Bills.FindAsync(billId);
             if (bill == null)
@@ -135,8 +135,9 @@ namespace Hometown_Application.Controllers
             {
                 BillId = billId,
                 AmountPaid = amountPaid,
-                PaymentMethod = "Cash", // Replace with the actual method
-                PaymentDate = DateTime.UtcNow
+                PaymentMethod = paymentMethod, // Replace with the actual method
+                PaymentDate = DateTime.UtcNow,
+                ReferenceNumber = referenceNumber,  
             };
 
             _context.Add(payment);
@@ -286,10 +287,9 @@ namespace Hometown_Application.Controllers
             return View();
         }
 
-        [HttpPost]
         public async Task<IActionResult> ProcessPayment(int billId, decimal amountPaid, string paymentMethod, string referenceNumber)
         {
-           
+
 
             var bill = await _context.Bills.FindAsync(billId);
             if (bill == null)
@@ -298,8 +298,8 @@ namespace Hometown_Application.Controllers
             }
 
             // Update remaining balance
-            bill.UpdateRemainingBalance(amountPaid);
-            _context.Update(bill);
+         //   bill.UpdateRemainingBalance(amountPaid);
+           // _context.Update(bill);
 
             // Add payment record
             var payment = new BillPaymentModel
@@ -308,7 +308,8 @@ namespace Hometown_Application.Controllers
                 AmountPaid = amountPaid,
                 PaymentMethod = paymentMethod,
                 PaymentDate = DateTime.UtcNow,
-                ReferenceNumber = referenceNumber
+                ReferenceNumber = referenceNumber,
+                IsApproved = false
             };
 
             _context.Add(payment);
@@ -319,6 +320,42 @@ namespace Hometown_Application.Controllers
 
 
 
+
+        public async Task<IActionResult> PendingPayments()
+        {
+            var pendingPayments = await _context.BillPayment
+                .Include(p => p.Bill)
+                .Where(p => !p.IsApproved)
+                .ToListAsync();
+
+            return View(pendingPayments);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApprovePayment(int paymentId)
+        {
+            var payment = await _context.BillPayment.FindAsync(paymentId);
+            if (payment == null || payment.IsApproved)
+            {
+                return NotFound();
+            }
+
+            var bill = await _context.Bills.FindAsync(payment.BillId);
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            // Update
+            bill.UpdateRemainingBalance(payment.AmountPaid);
+            payment.IsApproved = true;
+
+            _context.Update(bill);
+            _context.Update(payment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(PendingPayments));
+        }
 
     }
 }

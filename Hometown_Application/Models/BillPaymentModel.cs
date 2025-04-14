@@ -19,5 +19,7 @@ namespace Hometown_Application.Models
         public decimal AmountPaid { get; set; }
 
         public string? ReferenceNumber { get; set; } // For GCash/Bank transfer ref no.
+
+        public bool IsApproved { get; set; } = false;
     }
 }
