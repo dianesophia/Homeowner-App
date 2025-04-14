@@ -85,6 +85,8 @@ namespace Hometown_Application.Controllers
             model.IsPaid = false;
             model.AddedOn = DateTime.UtcNow;
             model.AddedBy = users.UserName;
+           // model.DueDate = bill.DueDate;  // Assuming Bill has a DueDate property
+
             _context.BillAssignment.Add(model);
             await _context.SaveChangesAsync();
 
@@ -146,27 +148,177 @@ namespace Hometown_Application.Controllers
 
         public async Task<IActionResult> HomeownerBoard()
         {
-            // Get the current user (homeowner)
+            // Get the currently logged-in user
             var user = await _userManager.GetUserAsync(User);
+
+            // Check if the user is null (just in case)
             if (user == null)
             {
-                return RedirectToAction("Index", "Home"); // Redirect to home if user is not found
+                return NotFound("User not found");
             }
 
-            // Fetch unpaid bills and only select the RemainingBalance
-            var homeownerBills = await _context.Bills
-                .Where(b => b.UserId == user.Id && !b.IsPaid) // Only unpaid bills
+            // Get the bills associated with the logged-in user
+            var bills = await _context.Bills
+                .Where(b => b.UserId == user.Id) // Filter bills for the logged-in user
                 .ToListAsync();
 
-            // Check if there are no bills
-            if (homeownerBills == null || !homeownerBills.Any())
+            // Check if no bills are found for the user
+            if (bills == null || !bills.Any())
             {
-                return View(new List<BillModel>());
+                ViewData["Message"] = "No bills found for this homeowner.";
             }
 
             // Pass the bills to the view
-            return View(homeownerBills);
+            return View(bills);
         }
+        public async Task<IActionResult> CreateBill(List<BillItemsModel> billItems)
+        {
+            // Retrieve all homeowners
+            var homeowners = await _userManager.GetUsersInRoleAsync("HomeOwner");
+
+            if (homeowners == null || !homeowners.Any())
+            {
+                return NotFound("No homeowners found.");
+            }
+
+            // Calculate total amount for all the bill items
+            decimal totalAmount = billItems.Sum(item => item.Amount ?? 0);
+
+            // Create a bill for each homeowner
+            foreach (var homeowner in homeowners)
+            {
+                var bill = new BillModel
+                {
+                    UserId = homeowner.Id,
+                    DueDate = DateTime.UtcNow.AddDays(30), // For example, set a due date of 30 days from now
+                    Status = "Pending",
+                    TotalAmount = totalAmount,
+                    RemainingBalance = totalAmount // Initially, the remaining balance is the same as the total amount
+                };
+
+                // Save the bill to the database
+                _context.Bills.Add(bill);
+                await _context.SaveChangesAsync();
+
+                // Associate bill items with the newly created bill
+            }
+
+            // Redirect to Admin Board or a relevant page
+            return RedirectToAction("AdminBoard");
+        }
+
+        public async Task<IActionResult> AssignAutomaticBills()
+        {
+            // Retrieve all users with the "HomeOwner" role
+            var homeowners = await _userManager.GetUsersInRoleAsync("HomeOwner");
+
+            if (homeowners == null || !homeowners.Any())
+            {
+                return NotFound("No homeowners found.");
+            }
+            var totalAmount = _context.BillItems
+                             .Where(b => !b.IsDeleted)
+                             .Sum(b => b.Amount) ?? 0;
+
+            // Loop through each user and assign a bill automatically
+            foreach (var homeowner in homeowners)
+            {
+                // Set the total amount and remaining balance (can be dynamic or constant)
+                decimal remainingBalance = totalAmount; // Initially, Remaining Balance is equal to Total Amount
+
+                // Create a new BillModel for each homeowner
+                var newBill = new BillModel
+                {
+                    UserId = homeowner.Id,
+                    IssueDate = DateTime.UtcNow,  // Current date as the issue date
+                    DueDate = DateTime.UtcNow.AddDays(30),  // Due date set to 30 days from the current date
+                    TotalAmount = totalAmount,
+                    RemainingBalance = remainingBalance,
+                    Status = "Pending",  // Default status
+                    Remarks = "Automatic Bill Assignment"  // Optional remarks
+                };
+
+                // Add the new bill to the Bills table
+                _context.Bills.Add(newBill);
+            }
+
+            // Save all the changes to the database
+            await _context.SaveChangesAsync();
+
+            // Optionally, redirect or display a success message
+            return RedirectToAction("AdminBoard"); // Adjust to your specific admin dashboard page
+        }
+
+        public async Task<IActionResult> UserBillingHistory()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Get all payments related to the user's bills
+            var payments = await _context.BillPayment
+                                          .Include(p => p.Bill)
+                                          .Where(p => p.Bill.UserId == user.Id) // Filter payments by the logged-in user's bills
+                                          .ToListAsync();
+
+            // Pass the payment records to the view
+            return View(payments);
+        }
+
+
+        public async Task<IActionResult> PayBill(int billId)
+        {
+            // Fetch the bill details based on the bill ID
+            var bill = await _context.Bills.FindAsync(billId);
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            // Pass the bill details to the view
+            ViewBag.BillId = bill.BillId;
+            ViewBag.RemainingBalance = bill.RemainingBalance;
+
+            // Return the payment form view
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProcessPayment(int billId, decimal amountPaid, string paymentMethod, string referenceNumber)
+        {
+           
+
+            var bill = await _context.Bills.FindAsync(billId);
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            // Update remaining balance
+            bill.UpdateRemainingBalance(amountPaid);
+            _context.Update(bill);
+
+            // Add payment record
+            var payment = new BillPaymentModel
+            {
+                BillId = billId,
+                AmountPaid = amountPaid,
+                PaymentMethod = paymentMethod,
+                PaymentDate = DateTime.UtcNow,
+                ReferenceNumber = referenceNumber
+            };
+
+            _context.Add(payment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(HomeownerBoard));
+        }
+
+
+
 
     }
 }

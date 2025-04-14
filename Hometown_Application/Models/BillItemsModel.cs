@@ -25,6 +25,6 @@ namespace Hometown_Application.Models
 
         public bool IsDeleted { get; set; } = false;
 
-        public ICollection<BillDetailModel> BillDetails { get; set; }
+        public ICollection<BillItemsModel> BillItems { get; set; }
     }
 }

@@ -6,18 +6,32 @@
 
 <h2>Homeowner Dashboard</h2>
 
+@if (ViewData["Message"] != null)
+{
+    <div class="alert alert-warning">
+        @ViewData["Message"]
+    </div>
+}
+
 <div class="row">
-    @foreach (var bill in Model)
+    @foreach (var bill in Model.Where(b => b.RemainingBalance > 0))
     {
         <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Remaining Balance</h5>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5>Bill ID: @bill.BillId</h5>
                 </div>
                 <div class="card-body">
                     <p class="card-text">
                         <strong>Remaining Balance:</strong> @bill.RemainingBalance.ToString("C")
                     </p>
+                    <p class="card-text">
+                        <strong>Status:</strong> @bill.Status
+                    </p>
+
+                    <a asp-action="PayBill" asp-controller="Bill" asp-route-billId="@bill.BillId" class="btn btn-success">
+                        Pay Now
+                    </a>
                 </div>
             </div>
         </div>

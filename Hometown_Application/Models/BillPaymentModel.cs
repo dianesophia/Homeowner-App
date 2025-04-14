@@ -12,7 +12,7 @@ namespace Hometown_Application.Models
         [ForeignKey("BillId")]
         public BillModel Bill { get; set; }
 
-        public string PaymentMethod { get; set; }  // e.g., Cash, GCash, PayPal
+        public string? PaymentMethod { get; set; }  // e.g., Cash, GCash, PayPal
 
         public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
 
