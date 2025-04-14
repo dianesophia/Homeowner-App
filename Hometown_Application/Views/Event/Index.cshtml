@@ -555,7 +555,6 @@
 </div>
 </div>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
@@ -573,16 +572,15 @@
             initialView: 'dayGridMonth',
             locale: 'en',
             selectable: true,
-            editable: true, // Enable drag and drop
+            editable: true,
             fixedWeekCount: false,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,listMonth'
             },
-            events: "/Event/GetEvents", // Your API endpoint
+            events: "/Event/GetEvents",
 
-            // Event rendering with improved design
             eventContent: function (arg) {
                 let timeText = "";
                 if (arg.timeText) {
@@ -604,37 +602,28 @@
                 };
             },
 
-            // Date click event - create new event
             dateClick: function (info) {
                 resetModalForm();
                 $("#eventStart").val(info.dateStr + "T00:00");
                 $("#eventEnd").val(info.dateStr + "T23:59");
 
-                // Set modal title to Add New Event
                 $(".modal-title").text("Add New Event");
-
-                // Show add button, hide update/delete
                 $("#saveEvent").show();
                 $("#UpdateEvent, #DeleteEvent").hide();
-
                 $("#eventModal").modal("show");
             },
 
-            // Event click event - edit existing event
             eventClick: function (info) {
-
                 if (info.event.classNames.includes("holiday-event")) {
-        toastr.info("Public holidays cannot be edited.");
-        return;
-    }
+                    toastr.info("Public holidays cannot be edited.");
+                    return;
+                }
 
                 currentEventId = info.event.id;
 
-                // Populate form with event data
                 $("#eventId").val(currentEventId);
                 $("#eventTitle").val(info.event.title);
 
-                // Set category if available
                 if (info.event.classNames.includes('event-personal')) {
                     $("input[name='eventCategory'][value='personal']").prop('checked', true);
                 } else if (info.event.classNames.includes('event-work')) {
@@ -643,96 +632,69 @@
                     $("input[name='eventCategory'][value='other']").prop('checked', true);
                 }
 
-                // Set description if available
                 $("#eventDescription").val(info.event.extendedProps?.description || "");
-
-                // Format start date
                 const startDate = info.event.start;
-                const formattedStart = formatDateForInput(startDate);
-                $("#eventStart").val(formattedStart);
+                $("#eventStart").val(formatDateForInput(startDate));
 
-                // Format end date if available
                 if (info.event.end) {
                     const endDate = info.event.end;
-                    const formattedEnd = formatDateForInput(endDate);
-                    $("#eventEnd").val(formattedEnd);
+                    $("#eventEnd").val(formatDateForInput(endDate));
                 } else {
-                    $("#eventEnd").val(formattedStart);
+                    $("#eventEnd").val(formatDateForInput(startDate));
                 }
 
-                // Set location if available
                 $("#eventLocation").val(info.event.extendedProps?.location || "");
-
-                // Set all day checkbox
                 $("#allDayEvent").prop('checked', info.event.allDay);
 
-                // Update modal title and buttons
                 $(".modal-title").text("Edit Event");
                 $("#saveEvent").hide();
                 $("#UpdateEvent, #DeleteEvent").show();
-
                 $("#eventModal").modal("show");
             },
 
-            // Enable event drag and drop
-            eventDrop: function(info) {
-                updateEventTime(info.event);
-            },
-
-            // Enable event resize
-            eventResize: function(info) {
-                updateEventTime(info.event);
-            }
+            eventDrop: handleEventChange,
+            eventResize: handleEventChange
         });
 
         calendar.render();
 
-        // Helper function to format date for datetime-local input
-        function formatDateForInput(date) {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
-
-        // Helper function to update event time after drag or resize
-        function updateEventTime(event) {
-            const eventData = {
-                id: event.id,
-                start: event.start,
-                end: event.end || event.start,
-                allDay: event.allDay
+        function handleEventChange(info) {
+            const updatedEvent = {
+                id: parseInt(info.event.id),
+                title: info.event.title,
+                description: info.event.extendedProps.description || '',
+                dateTimeStart: info.event.start.toISOString(),
+                dateTimeEnd: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString(),
+                location: info.event.extendedProps.location || '',
+                category: info.event.extendedProps.category || '',
+                allDay: info.event.allDay,
+                updatedBy: document.getElementById("username")?.value || "Admin"
             };
 
-            $.ajax({
-                url: "/Event/UpdateEventTime",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(eventData),
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                    } else {
-                        toastr.error(response.message);
-                        // Revert the change if failed
-                        calendar.refetchEvents();
-                    }
+            fetch('/Event/UpdateEvent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                error: function() {
-                    toastr.error("Failed to update event time");
-                    // Revert the change if failed
-                    calendar.refetchEvents();
+                body: JSON.stringify(updatedEvent)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    toastr.error(data.message || 'Failed to update event.');
+                } else {
+                    toastr.success("Event updated.");
                 }
+            })
+            .catch(error => {
+                console.error('Error updating event:', error);
+                toastr.error('An error occurred while updating the event.');
             });
         }
 
         // Fetch Public Holidays
-          const currentYear = new Date().getFullYear();
-    fetch(`https://date.nager.at/api/v3/PublicHolidays/${currentYear}/PH`)
-    
+        const currentYear = new Date().getFullYear();
+        fetch(`https://date.nager.at/api/v3/PublicHolidays/${currentYear}/PH`)
             .then(response => response.json())
             .then(holidays => {
                 holidays.forEach(holiday => {
@@ -740,31 +702,25 @@
                         title: holiday.name,
                         start: holiday.date,
                         classNames: ['holiday-event'],
-                        editable: false // Public holidays shouldn't be editable
+                        editable: false
                     });
                 });
             })
             .catch(error => console.error('Error fetching holidays:', error));
 
-        // Floating Add Button
-        $("#addEventBtn").click(function() {
+        $("#addEventBtn").click(function () {
             resetModalForm();
             const today = new Date();
             const formattedDate = today.toISOString().split('T')[0];
             $("#eventStart").val(formattedDate + "T00:00");
             $("#eventEnd").val(formattedDate + "T23:59");
 
-            // Set modal title to Add New Event
             $(".modal-title").text("Add New Event");
-
-            // Show add button, hide update/delete
             $("#saveEvent").show();
             $("#updateEvent, #deleteEvent").hide();
-
             $("#eventModal").modal("show");
         });
 
-        // Reset Modal Form
         function resetModalForm() {
             $("#eventForm")[0].reset();
             $("#eventId").val("");
@@ -773,24 +729,21 @@
             currentEventId = null;
         }
 
-        // Add event listener for All-day checkbox
-        $("#allDayEvent").change(function() {
+        $("#allDayEvent").change(function () {
             if ($(this).is(":checked")) {
                 const startDate = $("#eventStart").val().split("T")[0];
                 const endDate = $("#eventEnd").val().split("T")[0];
-
                 $("#eventStart").val(startDate + "T00:00");
                 $("#eventEnd").val(endDate + "T23:59");
             }
         });
 
-        // Save Event
         $("#saveEvent").click(function () {
             if (!validateForm()) return;
 
             const category = $("input[name='eventCategory']:checked").val();
 
-            var newEvent = {
+            const newEvent = {
                 Title: $("#eventTitle").val(),
                 Description: $("#eventDescription").val(),
                 DateTimeStart: $("#eventStart").val(),
@@ -822,67 +775,64 @@
             });
         });
 
-        // Update Event
-        $("#UpdateEvent").click(function() {
-        console.log("Update button clicked"); // Add this
-        if (!validateForm()) return;
+        $("#UpdateEvent").click(function () {
+            if (!validateForm()) return;
 
-        const category = $("input[name='eventCategory']:checked").val();
+            const category = $("input[name='eventCategory']:checked").val();
 
-        var updatedEvent = {
-            Id: $("#eventId").val(),
-            Title: $("#eventTitle").val(),
-            Description: $("#eventDescription").val(),
-            DateTimeStart: $("#eventStart").val(),
-            DateTimeEnd: $("#eventEnd").val() || null,
-            Location: $("#eventLocation").val(),
-            Category: category,
-            AllDay: $("#allDayEvent").is(":checked"),
-            UpdatedBy: "Admin"
-        };
+            const updatedEvent = {
+                Id: $("#eventId").val(),
+                Title: $("#eventTitle").val(),
+                Description: $("#eventDescription").val(),
+                DateTimeStart: $("#eventStart").val(),
+                DateTimeEnd: $("#eventEnd").val() || null,
+                Location: $("#eventLocation").val(),
+                Category: category,
+                AllDay: $("#allDayEvent").is(":checked"),
+                UpdatedBy: "Admin"
+            };
 
-        $.ajax({
-            url: "/Event/UpdateEvent",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(updatedEvent),
-            success: function(response) {
-                if (response.success) {
-                    toastr.success(response.message);
-                    $("#eventModal").modal("hide");
-                    calendar.refetchEvents();
-                } else {
-                    toastr.error("Failed: " + response.message);
+            $.ajax({
+                url: "/Event/UpdateEvent",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(updatedEvent),
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $("#eventModal").modal("hide");
+                        calendar.refetchEvents();
+                    } else {
+                        toastr.error("Failed: " + response.message);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error("Error: " + (xhr.responseText || "Unknown error"));
                 }
-            },
-            error: function(xhr) {
-                toastr.error("Error: " + (xhr.responseText || "Unknown error"));
-            }
+            });
         });
-    });
-        // Delete Event
-        $("#DeleteEvent").click(function() {
+
+        $("#DeleteEvent").click(function () {
             if (confirm("Are you sure you want to delete this event?")) {
                 $.ajax({
                     url: "/Event/DeleteEvent?id=" + $("#eventId").val(),
                     type: "DELETE",
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             toastr.success(response.message);
                             $("#eventModal").modal("hide");
-                            calendar.refetchEvents(); // Refresh calendar
+                            calendar.refetchEvents();
                         } else {
                             toastr.error("Error: " + response.message);
                         }
                     },
-                    error: function() {
+                    error: function () {
                         toastr.error("Failed to delete event");
                     }
                 });
             }
         });
 
-        // Form Validation
         function validateForm() {
             const title = $("#eventTitle").val();
             const start = $("#eventStart").val();
@@ -897,7 +847,6 @@
                 return false;
             }
 
-            // Validate end date is after start date
             const startDate = new Date($("#eventStart").val());
             const endDate = new Date($("#eventEnd").val());
 
@@ -909,14 +858,16 @@
             return true;
         }
 
-        // Close Modal
         $(".close, .btn-secondary").click(function () {
             $("#eventModal").modal("hide");
         });
 
-        // Handle modal hidden event to reset form
-        $("#eventModal").on("hidden.bs.modal", function() {
+        $("#eventModal").on("hidden.bs.modal", function () {
             resetModalForm();
         });
+
+        function formatDateForInput(date) {
+            return date.toISOString().slice(0, 16);
+        }
     });
 </script>

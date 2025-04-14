@@ -1,102 +1,59 @@
-﻿    using Microsoft.AspNetCore.Mvc;
-    using Hometown_Application.Data;
-    using Hometown_Application.Models;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Identity;
-    using System.Linq;
-    using Hometown_Application.Areas.Identity.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
+using Hometown_Application.Data;
+using Hometown_Application.Models;
+using Hometown_Application.Areas.Identity.Data;
+using Hometown_Application.Hubs;
+using Microsoft.EntityFrameworkCore;
 
-    [Authorize]
+[Authorize]
+public class EventController : Controller
+{
+    private readonly ApplicationDBContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IHubContext<NotificationHub> _notificationHubContext;
 
-    public class EventController : Controller
+    public EventController(
+        ApplicationDBContext context,
+        UserManager<ApplicationUser> userManager,
+        IHubContext<NotificationHub> notificationHubContext)
     {
-        private readonly ApplicationDBContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        _context = context;
+        _userManager = userManager;
+        _notificationHubContext = notificationHubContext;
+    }
 
-        public EventController(ApplicationDBContext context, UserManager<ApplicationUser> userManager)
-        {
-            _context = context;
-            _userManager = userManager;
-        }
+    public IActionResult Index()
+    {
+        return View();
+    }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public JsonResult GetEvents()
-        {
-            var events = _context.Events
-                .Where(e => !e.IsDeleted)
-                .Select(e => new
-                {
-                    id = e.Id,
-                    title = e.Title,
-                    start = e.DateTimeStart,
-                    end = e.DateTimeEnd,
-                    location = e.Location
-                }).ToList();
-
-            return Json(events);
-        }
-
-        [HttpPost]
-        [Route("Event/AddEvent")]
-    [Authorize(Roles = "Admin")]
-    public IActionResult AddEvent([FromBody] EventModel newEvent)
-        {
-            try
+    [HttpGet]
+    public JsonResult GetEvents()
+    {
+        var events = _context.Events
+            .Where(e => !e.IsDeleted)
+            .Select(e => new
             {
-                if (!ModelState.IsValid)
-                {
-                    var errors = ModelState.Values.SelectMany(v => v.Errors)
-                                                  .Select(e => e.ErrorMessage);
-                    return BadRequest(new { success = false, message = "Invalid event data.", errors });
-                }
+                id = e.Id,
+                title = e.Title,
+                start = e.DateTimeStart,
+                end = e.DateTimeEnd,
+                location = e.Location
+            }).ToList();
 
-                var adminUser = _userManager.GetUserAsync(User).Result;
-                if (adminUser != null)
-                {
-                    newEvent.AddedBy = adminUser.Id;
-                }
-                else
-                {
-                    return Unauthorized(new { success = false, message = "Unauthorized request." });
-                }
-
-                if (newEvent == null || string.IsNullOrEmpty(newEvent.Title) || string.IsNullOrEmpty(newEvent.AddedBy))
-                {
-                    return BadRequest(new { success = false, message = "Invalid event data." });
-                }
-
-                if (string.IsNullOrEmpty(newEvent.UpdatedBy))
-                {
-                  //  newEvent.UpdatedBy = null;
-                    //newEvent.UpdatedOn = null;
-                }
-                else
-                {
-                    // If UpdatedBy is provided, update the UpdatedOn timestamp
-                    newEvent.UpdatedOn = DateTime.UtcNow;
-                }
-
-                _context.Events.Add(newEvent);
-                _context.SaveChanges();
-
-                return Json(new { success = true, message = "Event added successfully!" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = "Error saving event.", error = ex.Message });
-            }
-        }
-
+        return Json(events);
+    }
 
     [HttpPost]
-    [Route("Event/UpdateEvent")]
+    [Route("Event/AddEvent")]
     [Authorize(Roles = "Admin")]
-    public IActionResult UpdateEvent([FromBody] EventModel updatedEvent)
+    public async Task<IActionResult> AddEvent([FromBody] EventModel newEvent)
     {
         try
         {
@@ -107,52 +64,86 @@
                 return BadRequest(new { success = false, message = "Invalid event data.", errors });
             }
 
-            var existingEvent = _context.Events.FirstOrDefault(e => e.Id == updatedEvent.Id && !e.IsDeleted);
-            if (existingEvent == null)
-            {
-                return NotFound(new { success = false, message = "Event not found." });
-            }
-
-            var adminUser = _userManager.GetUserAsync(User).Result;
+            var adminUser = await _userManager.GetUserAsync(User);
             if (adminUser == null)
             {
                 return Unauthorized(new { success = false, message = "Unauthorized request." });
             }
 
-            // Update fields
-            existingEvent.Title = updatedEvent.Title;
-            existingEvent.Description = updatedEvent.Description;
-            existingEvent.DateTimeStart = updatedEvent.DateTimeStart;
-            existingEvent.DateTimeEnd = updatedEvent.DateTimeEnd;
-            existingEvent.Location = updatedEvent.Location;
-            existingEvent.Category = updatedEvent.Category;
-            existingEvent.isAllDay = updatedEvent.isAllDay;
-            existingEvent.UpdatedBy = adminUser.Id;
-            existingEvent.UpdatedOn = DateTime.UtcNow;
+            newEvent.AddedBy = adminUser.Id;
 
-            _context.SaveChanges();
+            if (!string.IsNullOrEmpty(newEvent.UpdatedBy))
+            {
+                newEvent.UpdatedOn = DateTime.UtcNow;
+            }
 
-            return Json(new { success = true, message = "Event updated successfully!" });
+            _context.Events.Add(newEvent);
+            await _context.SaveChangesAsync();
+
+            // TODO: Replace "targetUserId" with actual recipient ID logic
+            string targetUserId = adminUser.Id; // Replace with intended recipient if different
+            await _notificationHubContext.Clients.User(targetUserId).SendAsync("ReceiveNotification", "A new event has been added.");
+
+            return Json(new { success = true, message = "Event added successfully!" });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { success = false, message = "Error updating event.", error = ex.Message });
+            return StatusCode(500, new { success = false, message = "Error saving event.", error = ex.Message });
         }
     }
+    [HttpPost]
+    [Route("Event/UpdateEvent")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateEvent([FromBody] EventModel updatedEvent)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage);
+                return BadRequest(new { success = false, message = "Invalid event data.", errors });
+            }
+
+            var existingEvent = await _context.Events.FirstOrDefaultAsync(e => e.Id == updatedEvent.Id);
 
 
+            if (existingEvent == null)
+            {
+                return NotFound(new { success = false, message = "Event not found." });
+            }
+
+            // Update properties
+            existingEvent.Title = updatedEvent.Title;
+            existingEvent.Description = updatedEvent.Description;
+            existingEvent.DateTimeStart = updatedEvent.DateTimeStart;
+            existingEvent.DateTimeEnd = updatedEvent.DateTimeEnd ?? updatedEvent.DateTimeStart;
+            existingEvent.Location = updatedEvent.Location;
+            existingEvent.Category = updatedEvent.Category;
+            existingEvent.UpdatedBy = updatedEvent.UpdatedBy;
+           // existingEvent.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Event updated successfully." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { success = false, message = "An error occurred while updating the event.", error = ex.Message });
+        }
+    }
 
     [HttpDelete]
     [Authorize(Roles = "Admin")]
     public IActionResult DeleteEvent(int id)
-        {
-            var eventToDelete = _context.Events.Find(id);
-            if (eventToDelete == null)
-                return NotFound();
+    {
+        var eventToDelete = _context.Events.Find(id);
+        if (eventToDelete == null)
+            return NotFound();
 
-            eventToDelete.IsDeleted = true;
-            _context.SaveChanges();
+        eventToDelete.IsDeleted = true;
+        _context.SaveChanges();
 
-            return Json(new { success = true, message = "Event deleted successfully!" });
-        }
+        return Json(new { success = true, message = "Event deleted successfully!" });
     }
+}
