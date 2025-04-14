@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Hometown_Application.Areas.Identity.Data;
 
 namespace Hometown_Application.Models
 {
@@ -10,19 +11,23 @@ namespace Hometown_Application.Models
         public int Id { get; set; }
 
         [Required]
-        public int ServiceRequestId { get; set; } // Foreign key to ServiceRequest
+        public int ServiceRequestId { get; set; } // FK to ServiceRequest
 
         [Required]
         [StringLength(450)]
-        public string StaffId { get; set; } // Foreign key to Staff
+        public string StaffId { get; set; } // FK to ApplicationUser
 
-        public bool IsAccepted { get; set; } = false; // Default: Not accepted
+        [ForeignKey("StaffId")]
+        public ApplicationUser Staff { get; set; }
 
-        public bool IsUnavailable { get; set; } = false; // Default: Available
+        public bool IsAccepted { get; set; } = false;
+
+        public bool IsUnavailable { get; set; } = false;
 
         [Required]
         public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? AcceptedAt { get; set; }
     }
+
 }

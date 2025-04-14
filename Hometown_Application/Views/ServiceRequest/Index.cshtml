@@ -1,49 +1,113 @@
-﻿@model IEnumerable<Hometown_Application.Models.ServiceRequestModel>
+﻿@model Hometown_Application.ViewModels.ServiceRequestListViewModel
+
+@{
+    ViewData["Title"] = "Service Requests";
+}
 
 <h2>Service Requests</h2>
 
-<!-- Admin and Homeowner View Buttons -->
-<div class="mb-3">
-    <a href="@Url.Action("AdminView", "ServiceRequest")" class="btn btn-primary">Admin View</a>
-    <a href="@Url.Action("HomeownerView", "ServiceRequest")" class="btn btn-secondary">Homeowner View</a>
-</div>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Category</th>
-            <th>Description</th>
-            <th>Urgency</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var request in Model)
-        {
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (Model.Requests != null && Model.Requests.Any())
+{
+    <table class="table table-striped">
+        <thead>
             <tr>
-                d>
-                <td>@request.Urgency</td>
-                <td>@request.Email</td>
-                <td>@request.Status</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning">Edit</a>
-
-                    <!-- Delete Button (Triggers Modal) -->
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                            onclick="setDeleteId(@request.ServiceRequestId)">
-                        Delete
-                    </button>
-                </td>
+                <th>
+                    <a asp-action="Index" asp-route-page="@Model.CurrentPage" asp-route-sortBy="RequestType" asp-route-ascending="@(Model.SortBy == "RequestType" && Model.Ascending ? "false" : "true")">
+                        Category
+                    </a>
+                </th>
+                <th>Description</th>
+                <th>
+                    <a asp-action="Index" asp-route-page="@Model.CurrentPage" asp-route-sortBy="Urgency" asp-route-ascending="@(Model.SortBy == "Urgency" && Model.Ascending ? "false" : "true")">
+                        Urgency
+                    </a>
+                </th>
+                <th>Email</th>
+                <th>
+                    <a asp-action="Index" asp-route-page="@Model.CurrentPage" asp-route-sortBy="Status" asp-route-ascending="@(Model.SortBy == "Status" && Model.Ascending ? "false" : "true")">
+                        Status
+                    </a>
+                </th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var request in Model.Requests)
+            {
+                <tr>
+                    <td>@request.RequestType?.Name</td>
+                    <td>@request.Details</td>
+                    <td>@request.Urgency</td>
+                    <td>@request.Email</td>
+                    <td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <form asp-action="UpdateServiceRequestStatus" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@request.ServiceRequestId" />
+                                <select name="newStatusId" onchange="this.form.submit()">
+                                    @foreach (var status in Model.Statuses)
+                                    {
+                                        if (request.StatusId.ToString() == status.Value)
+                                        {
+                                            <option value="@status.Value" selected>@status.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@status.Value">@status.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="badge @(request.Status?.StatusName == "Completed" ? "bg-success" : "bg-warning")">
+                                @request.Status?.StatusName
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning btn-sm">Edit</a>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                onclick="setDeleteId(@request.ServiceRequestId, '@request.RequestType?.Name')">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = i, sortBy = Model.SortBy, ascending = Model.Ascending })">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+else if (TempData["Error"] == null)
+{
+    <p class="text-center">No service requests found. <a asp-action="Create">Create a new request</a>.</p>
+}
 
 <a asp-action="Create" class="btn btn-success">New Request</a>
 
-<!-- 🔴 DELETE CONFIRMATION MODAL -->
+<!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -52,7 +116,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this service request?</p>
+                <p>Are you sure you want to delete the request for "<span id="deleteRequestName"></span>"?</p>
             </div>
             <div class="modal-footer">
                 <form id="deleteForm" asp-action="Delete" method="post">
@@ -66,9 +130,9 @@
     </div>
 </div>
 
-<!-- 🔹 JavaScript to Set ID in Modal -->
 <script>
-    function setDeleteId(id) {
+    function setDeleteId(id, name) {
         document.getElementById("deleteRequestId").value = id;
+        document.getElementById("deleteRequestName").innerText = name;
     }
 </script>

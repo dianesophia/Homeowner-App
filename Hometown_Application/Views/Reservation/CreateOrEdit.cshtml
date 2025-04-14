@@ -211,9 +211,7 @@
         margin-top: 1.5rem;
     }
 
-        .reservation-form-container
-
-    {
+    .reservation-form-container {
         padding: 15px;
     }
 
@@ -227,7 +225,6 @@
         margin-right: 0;
         margin-bottom: 10px;
     }
-    
 </style>
 
 <div class="content">
@@ -251,7 +248,6 @@
             <input type="hidden" name="ReservationId" value="@Model?.ReservationId" />
             <input type="hidden" name="UserId" value="@user?.Id" />
             <input type="hidden" name="AddedBy" value="@user?.Id" />
-            <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(Model?.RowVersion ?? Array.Empty<byte>())" />
 
             <div class="form-group">
                 <label class="form-label" for="FacilityId">Facility</label>

@@ -1,116 +1,177 @@
-﻿@model Hometown_Application.Models.ServiceRequestModel
+﻿@model Hometown_Application.ViewModels.CreateServiceRequestViewModel
 
 @{
     ViewData["Title"] = "Request a Service";
 }
-@Html.AntiForgeryToken()
 
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Request a Service</h2>
 
-<h2>Request a Service</h2>
-
-<!-- Search for a service -->
-<form method="get" asp-action="Create" class="mb-3">
-    <div class="input-group">
-        <input type="text" name="searchQuery" class="form-control" placeholder="Search by Service Name" value="@Context.Request.Query["searchQuery"]">
-        <button type="submit" class="btn btn-primary">Search</button>
-    </div>
-</form>
-
-<!-- Display Service Types -->
-<div class="row">
-    @foreach (var type in ViewBag.RequestTypes)
+    @if (TempData["Error"] != null)
     {
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm service-card" data-id="@type.RequestTypeId" data-name="@type.Name">
-                <div class="card-body">
-                    <h5 class="card-title">@type.Name</h5>
-                    <p class="card-text">@type.Description</p>
-                    <p><strong>Department:</strong> @type.AssignedDepartment</p>
-                    <p>
-                        <strong>Status:</strong>
-                        <span class="badge @(type.IsActive ? "bg-success" : "bg-danger")">
-                            @(type.IsActive ? "Available" : "Unavailable")
-                        </span>
-                    </p>
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- Display Service Types -->
+    <div class="row">
+        @if (Model.RequestTypes != null && Model.RequestTypes.Any())
+        {
+            @foreach (var type in Model.RequestTypes)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm service-card @(type.IsActive ? "" : "disabled")" data-id="@type.RequestTypeId" data-name="@type.Name">
+                        <div class="card-body">
+                            <h5 class="card-title">@type.Name</h5>
+                            <p class="card-text">@type.Description</p>
+                            <p><strong>Department:</strong> @type.AssignedDepartment</p>
+                            <p>
+                                <strong>Status:</strong>
+                                <span class="badge @(type.IsActive ? "bg-success" : "bg-danger")">
+                                    @(type.IsActive ? "Available" : "Unavailable")
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center">No request types available.</p>
+        }
+    </div>
+
+    <!-- Modal for Service Request Details -->
+    <div class="modal fade" id="serviceRequestModal" tabindex="-1" aria-labelledby="serviceRequestModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="serviceRequestModalLabel">Request a Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="CreateRequest" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" id="selectedRequestTypeId" name="ServiceRequest.RequestTypeId" required>
+
+                        <div class="mb-3">
+                            <label class="form-label">Service Name</label>
+                            <input type="text" id="selectedServiceName" class="form-control" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Details</label>
+                            <textarea name="ServiceRequest.Details" class="form-control" required></textarea>
+                            <span asp-validation-for="ServiceRequest.Details" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input name="ServiceRequest.Location" class="form-control" required />
+                            <span asp-validation-for="ServiceRequest.Location" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Schedule</label>
+                            <input name="ServiceRequest.Schedule" type="datetime-local" class="form-control" required />
+                            <span asp-validation-for="ServiceRequest.Schedule" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Urgency Level</label>
+                            <select name="ServiceRequest.Urgency" class="form-control" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                            <span asp-validation-for="ServiceRequest.Urgency" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Your Email</label>
+                            <input name="ServiceRequest.Email" type="email" class="form-control" required />
+                            <span asp-validation-for="ServiceRequest.Email" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+                    </form>
                 </div>
             </div>
         </div>
-    }
-</div>
+    </div>
 
-<!-- Modal for Service Request Details -->
-<div class="modal fade" id="serviceRequestModal" tabindex="-1" aria-labelledby="serviceRequestModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="serviceRequestModalLabel">Request a Service</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form asp-action="CreateRequest" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" id="selectedRequestTypeId" name="RequestTypeId" required>
-
-                    <div class="mb-3">
-                        <label class="form-label">Service Name</label>
-                         <input type="text" id="selectedServiceName" class="form-control" readonly />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Details</label>
-                        <textarea class="form-control" id="Details" name="Details" required></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Location</label>
-                        <input asp-for="Location" class="form-control" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Schedule</label>
-                        <input asp-for="Schedule" type="datetime-local" class="form-control" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Urgency Level</label>
-                        <select asp-for="Urgency" class="form-control" required>
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Your Email</label>
-                        <input asp-for="Email" class="form-control" required />
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
-                </form>
-            </div>
-        </div>
+    <div class="text-center mt-3">
+        <a class="btn btn-secondary" asp-controller="ServiceRequest" asp-action="RequestConfirmation">
+            <i class="fas fa-users-cog me-2"></i>View Requests
+        </a>
     </div>
 </div>
-<a class="nav-link" asp-controller="ServiceRequest" asp-action="RequestConfirmation"><i class="fas fa-users-cog me-2"></i>View Requests</a>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".service-card").forEach(card => {
-            card.addEventListener("click", function () {
-                let requestId = this.getAttribute("data-id");
-                let serviceName = this.getAttribute("data-name");
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".service-card").forEach(card => {
+                card.addEventListener("click", function () {
+                    if (card.classList.contains("disabled")) return;
 
-                // Set values in the modal
-                document.getElementById("selectedRequestTypeId").value = requestId;
-                document.getElementById("selectedServiceName").value = serviceName;
+                    let requestId = this.getAttribute("data-id");
+                    let serviceName = this.getAttribute("data-name");
 
-                // Show the modal
-                var modal = new bootstrap.Modal(document.getElementById("serviceRequestModal"));
-                modal.show();
+                    // Set values in the modal
+                    document.getElementById("selectedRequestTypeId").value = requestId;
+                    document.getElementById("selectedServiceName").value = serviceName;
+
+                    // Show the modal
+                    var modal = new bootstrap.Modal(document.getElementById("serviceRequestModal"));
+                    modal.show();
+                });
+            });
+
+            // Handle form submission
+            document.querySelector("#serviceRequestModal form").addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent default form submission
+                console.log("Form submitted");
+
+                var form = this;
+                if (!form.checkValidity()) {
+                    console.log("Form validation failed");
+                    form.reportValidity();
+                    return;
+                }
+
+                fetch(form.action, {
+                    method: form.method,
+                    body: new FormData(form),
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        console.log("Redirecting to: " + response.url);
+                        window.location.href = response.url; // Follow the redirect
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(data => {
+                    if (data) {
+                        console.log("Form submission failed, reloading modal with errors");
+                        document.querySelector("#serviceRequestModal .modal-body").innerHTML = data;
+                        var modal = new bootstrap.Modal(document.getElementById("serviceRequestModal"));
+                        modal.show();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error submitting form:", error);
+                });
             });
         });
-    });
-</script>
+    </script>
+}
 
 <style>
     .service-card {
@@ -122,4 +183,9 @@
             border: 2px solid #007bff;
             background-color: #f8f9fa;
         }
-2\;</style>
+
+        .service-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+</style>

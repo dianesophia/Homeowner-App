@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hometown_Application.Models
 {
@@ -22,7 +21,6 @@ namespace Hometown_Application.Models
         [Required]
         public int Capacity { get; set; }
 
-
         [StringLength(252)]
         public string Description { get; set; }
 
@@ -40,6 +38,8 @@ namespace Hometown_Application.Models
         public string? ApprovedBy { get; set; }
 
         public bool IsDeleted { get; set; } = false;
+
+        public bool IsAvailable { get; set; } = true; // New availability status
 
         public byte[]? Image { get; set; }
 

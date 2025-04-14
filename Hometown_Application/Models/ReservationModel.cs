@@ -35,12 +35,8 @@ namespace Hometown_Application.Models
         [DataType(DataType.Time)]
         public DateTime EndTime { get; set; }
 
-        [Required]
-        public string Status { get; set; } = "Pending"; // Default status
-
         public DateTime AddedOn { get; set; } = DateTime.UtcNow;
 
-        
         [StringLength(50)]
         public string? AddedBy { get; set; }
 
@@ -51,8 +47,6 @@ namespace Hometown_Application.Models
 
         public bool IsDeleted { get; set; } = false;
 
-        [Timestamp]
-        public byte[]? RowVersion { get; set; }
+        public string Status { get; set; } // Ensure this property exists
     }
-
 }
