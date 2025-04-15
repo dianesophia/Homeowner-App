@@ -1,17 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Hometown_Application.Areas.Identity.Data;
 using Hometown_Application.Data;
 using Hometown_Application.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hometown_Application.Controllers
 {
-    [Authorize]
     public class ReservationController : Controller
     {
         private readonly ApplicationDBContext _context;
@@ -23,278 +23,314 @@ namespace Hometown_Application.Controllers
             _userManager = userManager;
         }
 
-        // User View: List Reservations for Current User
-        [Authorize(Roles = "HomeOwner")]
-        public async Task<IActionResult> ReservationStatusReport()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return View();
-
-            var reservations = await _context.Reservation
-                .Where(r => r.UserId == user.Id && !r.IsDeleted)
-                .Include(r => r.Facility)
-                .ToListAsync();
-
-            return View(reservations);
-        }
-
         // GET: Reservation/AvailableFacilities
+        [Authorize]
         public async Task<IActionResult> AvailableFacilities()
         {
-            // Get facilities that are not deleted
             var facilities = await _context.Facility
                 .Where(f => !f.IsDeleted)
                 .ToListAsync();
 
-            // Debug: Log all facilities before filtering
-            Console.WriteLine($"Before Filtering: Found {facilities.Count} facilities (IsDeleted = false)");
+            Console.WriteLine($"Found {facilities.Count} facilities (IsDeleted = false)");
             foreach (var facility in facilities)
             {
-                Console.WriteLine($"Facility: {facility.Name}, IsAvailable: {facility.IsAvailable}, IsDeleted: {facility.IsDeleted}");
+                Console.WriteLine($"- {facility.Name}: IsAvailable = {facility.IsAvailable}, IsDeleted = {facility.IsDeleted}");
             }
 
-            // Create a list of FacilityViewModel objects
             var facilityViewModels = new List<FacilityViewModel>();
             foreach (var facility in facilities)
             {
-                // Check if the facility has any active reservations
                 var hasActiveReservations = await _context.Reservation
                     .AnyAsync(r => r.FacilityId == facility.FacilityId && !r.IsDeleted);
 
-                // Only include facilities that are marked as available and have no active reservations
-                if (facility.IsAvailable && !hasActiveReservations)
+                // We no longer modify IsAvailable based on active reservations
+                facilityViewModels.Add(new FacilityViewModel
                 {
-                    facilityViewModels.Add(new FacilityViewModel
-                    {
-                        Facility = facility,
-                        HasActiveReservations = hasActiveReservations
-                    });
-                }
-                else
-                {
-                    // If the facility has active reservations but IsAvailable is true, correct the status
-                    if (hasActiveReservations && facility.IsAvailable)
-                    {
-                        Console.WriteLine($"Correcting IsAvailable for {facility.Name}: Has active reservations, setting IsAvailable to false");
-                        facility.IsAvailable = false;
-                        _context.Update(facility);
-                    }
-                    else if (!facility.IsAvailable)
-                    {
-                        Console.WriteLine($"Excluding {facility.Name}: IsAvailable is false");
-                    }
-                }
-            }
-
-            await _context.SaveChangesAsync();
-
-            // Debug: Log the facilities after filtering
-            Console.WriteLine($"After Filtering: Found {facilityViewModels.Count} facilities");
-            foreach (var vm in facilityViewModels)
-            {
-                Console.WriteLine($"Facility: {vm.Facility.Name}, IsAvailable: {vm.Facility.IsAvailable}, IsDeleted: {vm.Facility.IsDeleted}, HasActiveReservations: {vm.HasActiveReservations}");
+                    Facility = facility,
+                    HasActiveReservations = hasActiveReservations
+                });
             }
 
             return View(facilityViewModels);
         }
 
-        // Create/Edit Reservation (User Action)
+        // GET: Reservation/CreateOrEdit
+        [Authorize]
         public async Task<IActionResult> CreateOrEdit(int? id, int? facilityId)
         {
-            ViewBag.Facilities = new SelectList(await _context.Facility
-                .Where(f => !f.IsDeleted && f.IsAvailable)
-                .ToListAsync(), "FacilityId", "Name");
-
             var user = await _userManager.GetUserAsync(User);
-            if (id == null)
+            if (user == null)
             {
-                return View(new ReservationModel
+                return RedirectToAction("Login", "Account");
+            }
+
+            var facilities = await _context.Facility
+                .Where(f => !f.IsDeleted)
+                .Select(f => new { f.FacilityId, f.Name })
+                .ToListAsync();
+            ViewBag.Facilities = facilities.Select(f => new { Value = f.FacilityId.ToString(), Text = f.Name });
+
+            // Pass the time slots to the view
+            ViewBag.TimeSlots = TimeSlot.AvailableTimeSlots.Select((slot, index) => new
+            {
+                Index = index,
+                DisplayText = slot.DisplayText
+            }).ToList();
+
+            // Pass the UserId to the view
+            ViewBag.UserId = user.Id;
+
+            ReservationModel model;
+            if (id == null) // Create new reservation
+            {
+                model = new ReservationModel
                 {
                     FacilityId = facilityId ?? 0,
-                    UserId = user?.Id
-                });
+                    UserId = user.Id
+                };
             }
-
-            var reservation = await _context.Reservation
-                .Include(r => r.Facility)
-                .FirstOrDefaultAsync(r => r.ReservationId == id && !r.IsDeleted);
-
-            if (reservation == null)
+            else // Edit existing reservation
             {
-                return NotFound();
+                model = await _context.Reservation
+                    .Include(r => r.Facility)
+                    .FirstOrDefaultAsync(r => r.ReservationId == id && !r.IsDeleted);
+                if (model == null)
+                {
+                    return NotFound();
+                }
+
+                // Find the matching time slot index for editing
+                var matchingSlotIndex = TimeSlot.AvailableTimeSlots.FindIndex(slot =>
+                    slot.StartTime == model.StartTime.TimeOfDay &&
+                    slot.EndTime == model.EndTime.TimeOfDay);
+                model.SelectedTimeSlotIndex = matchingSlotIndex >= 0 ? matchingSlotIndex : 0;
             }
 
-            return View(reservation);
+            return View(model);
         }
 
+        // POST: Reservation/CreateOrEdit
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> CreateOrEdit(ReservationModel reservation)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Account");
             }
 
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Facilities = new SelectList(await _context.Facility
-                    .Where(f => !f.IsDeleted && f.IsAvailable)
-                    .ToListAsync(), "FacilityId", "Name");
-                return View(reservation);
-            }
+            // Remove system-managed fields from ModelState validation
+            ModelState.Remove("AddedBy");
+            ModelState.Remove("AddedOn");
+            ModelState.Remove("UpdatedBy");
+            ModelState.Remove("UpdatedOn");
+            ModelState.Remove("Facility");
+            ModelState.Remove("ApplicationUser");
+            ModelState.Remove("StartTime");
+            ModelState.Remove("EndTime");
 
-            // Check for time conflicts and facility availability
-            var facility = await _context.Facility.FindAsync(reservation.FacilityId);
-            if (facility == null || !facility.IsAvailable)
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Selected facility is not available.");
-                ViewBag.Facilities = new SelectList(await _context.Facility
-                    .Where(f => !f.IsDeleted && f.IsAvailable)
-                    .ToListAsync(), "FacilityId", "Name");
-                return View(reservation);
-            }
-
-            var hasConflict = await _context.Reservation
-                .AnyAsync(r => r.FacilityId == reservation.FacilityId
-                    && !r.IsDeleted
-                    && r.ReservationId != reservation.ReservationId
-                    && r.ReservationDate == reservation.ReservationDate
-                    && ((r.StartTime < reservation.EndTime && r.EndTime > reservation.StartTime)));
-
-            if (hasConflict)
-            {
-                ModelState.AddModelError("", "This time slot is already booked.");
-                ViewBag.Facilities = new SelectList(await _context.Facility
-                    .Where(f => !f.IsDeleted && f.IsAvailable)
-                    .ToListAsync(), "FacilityId", "Name");
-                return View(reservation);
-            }
-
-            try
-            {
-                if (reservation.ReservationId == 0) // Create
+                // Validate the selected time slot
+                if (reservation.SelectedTimeSlotIndex < 0 || reservation.SelectedTimeSlotIndex >= TimeSlot.AvailableTimeSlots.Count)
                 {
-                    reservation.AddedBy = user.Id;
-                    reservation.UserId = user.Id;
-                    reservation.AddedOn = DateTime.UtcNow;
-                    _context.Reservation.Add(reservation);
-
-                    // Mark facility as Not Available after successful reservation
-                    facility.IsAvailable = false;
-                    _context.Update(facility);
+                    ModelState.AddModelError("SelectedTimeSlotIndex", "Please select a valid time slot.");
+                    await PopulateViewBagFacilities();
+                    ViewBag.TimeSlots = TimeSlot.AvailableTimeSlots.Select((slot, index) => new
+                    {
+                        Index = index,
+                        DisplayText = slot.DisplayText
+                    }).ToList();
+                    ViewBag.UserId = user.Id;
+                    return View(reservation);
                 }
-                else // Update
-                {
-                    var existing = await _context.Reservation
-                        .FirstOrDefaultAsync(r => r.ReservationId == reservation.ReservationId && !r.IsDeleted);
 
-                    if (existing == null)
+                // Set StartTime and EndTime based on the selected time slot
+                var selectedTimeSlot = TimeSlot.AvailableTimeSlots[reservation.SelectedTimeSlotIndex];
+                reservation.StartTime = reservation.ReservationDate.Date.Add(selectedTimeSlot.StartTime);
+                reservation.EndTime = reservation.ReservationDate.Date.Add(selectedTimeSlot.EndTime);
+
+                // Validate date and time
+                var reservationDateTime = reservation.ReservationDate.Date.Add(reservation.StartTime.TimeOfDay);
+                var reservationEndDateTime = reservation.ReservationDate.Date.Add(reservation.EndTime.TimeOfDay);
+
+                if (reservationEndDateTime <= reservationDateTime)
+                {
+                    ModelState.AddModelError("EndTime", "End time must be later than start time.");
+                    await PopulateViewBagFacilities();
+                    ViewBag.TimeSlots = TimeSlot.AvailableTimeSlots.Select((slot, index) => new
+                    {
+                        Index = index,
+                        DisplayText = slot.DisplayText
+                    }).ToList();
+                    ViewBag.UserId = user.Id;
+                    return View(reservation);
+                }
+
+                // Check for overlapping reservations
+                var overlappingReservations = await _context.Reservation
+                    .Where(r => r.FacilityId == reservation.FacilityId
+                        && !r.IsDeleted
+                        && r.ReservationId != reservation.ReservationId
+                        && r.ReservationDate.Date == reservation.ReservationDate.Date
+                        && ((r.StartTime.TimeOfDay <= reservation.StartTime.TimeOfDay && r.EndTime.TimeOfDay > reservation.StartTime.TimeOfDay)
+                            || (r.StartTime.TimeOfDay < reservation.EndTime.TimeOfDay && r.EndTime.TimeOfDay >= reservation.EndTime.TimeOfDay)
+                            || (r.StartTime.TimeOfDay >= reservation.StartTime.TimeOfDay && r.EndTime.TimeOfDay <= reservation.EndTime.TimeOfDay)))
+                    .AnyAsync();
+
+                if (overlappingReservations)
+                {
+                    ModelState.AddModelError("", "The selected time slot is already reserved for this facility.");
+                    await PopulateViewBagFacilities();
+                    ViewBag.TimeSlots = TimeSlot.AvailableTimeSlots.Select((slot, index) => new
+                    {
+                        Index = index,
+                        DisplayText = slot.DisplayText
+                    }).ToList();
+                    ViewBag.UserId = user.Id;
+                    return View(reservation);
+                }
+
+                if (reservation.ReservationId == 0) // Create new reservation
+                {
+                    reservation.UserId = user.Id;
+                    reservation.AddedBy = user.Id;
+                    reservation.AddedOn = DateTime.UtcNow;
+                    reservation.IsDeleted = false;
+
+                    Console.WriteLine($"Creating new reservation: FacilityId: {reservation.FacilityId}, Date: {reservation.ReservationDate}, StartTime: {reservation.StartTime}, EndTime: {reservation.EndTime}, Status: {reservation.Status ?? "null"}, UserId: {reservation.UserId}");
+
+                    _context.Reservation.Add(reservation);
+                }
+                else // Edit existing reservation
+                {
+                    var existingReservation = await _context.Reservation.FindAsync(reservation.ReservationId);
+                    if (existingReservation == null)
                     {
                         return NotFound();
                     }
 
-                    // If the facility has changed, mark the old facility as available if no other reservations exist
-                    if (existing.FacilityId != reservation.FacilityId)
-                    {
-                        var oldFacility = await _context.Facility.FindAsync(existing.FacilityId);
-                        if (oldFacility != null)
-                        {
-                            var hasOtherReservations = await _context.Reservation
-                                .AnyAsync(r => r.FacilityId == existing.FacilityId && !r.IsDeleted && r.ReservationId != existing.ReservationId);
-                            if (!hasOtherReservations)
-                            {
-                                oldFacility.IsAvailable = true;
-                                _context.Update(oldFacility);
-                            }
-                        }
+                    Console.WriteLine($"Before Update: ReservationId: {existingReservation.ReservationId}, FacilityId: {existingReservation.FacilityId}, Status: {existingReservation.Status ?? "null"}");
 
-                        // Mark the new facility as not available
-                        facility.IsAvailable = false;
-                        _context.Update(facility);
-                    }
+                    existingReservation.FacilityId = reservation.FacilityId;
+                    existingReservation.ReservationDate = reservation.ReservationDate;
+                    existingReservation.StartTime = reservation.StartTime;
+                    existingReservation.EndTime = reservation.EndTime;
+                    existingReservation.Status = reservation.Status;
+                    existingReservation.UpdatedBy = user.Id;
+                    existingReservation.UpdatedOn = DateTime.UtcNow;
 
-                    existing.FacilityId = reservation.FacilityId;
-                    existing.ReservationDate = reservation.ReservationDate;
-                    existing.StartTime = reservation.StartTime;
-                    existing.EndTime = reservation.EndTime;
-                    existing.UpdatedBy = user.Id;
-                    existing.UpdatedOn = DateTime.UtcNow;
-                    _context.Update(existing);
+                    Console.WriteLine($"After Update (Before Save): ReservationId: {existingReservation.ReservationId}, FacilityId: {existingReservation.FacilityId}, Status: {existingReservation.Status ?? "null"}");
+
+                    _context.Update(existingReservation);
                 }
 
                 await _context.SaveChangesAsync();
+
+                var savedReservation = await _context.Reservation.FindAsync(reservation.ReservationId);
+                if (savedReservation != null)
+                {
+                    Console.WriteLine($"After Save (Database): ReservationId: {savedReservation.ReservationId}, FacilityId: {savedReservation.FacilityId}, Status: {savedReservation.Status ?? "null"}, IsDeleted: {savedReservation.IsDeleted}");
+                }
+
                 return RedirectToAction("ReservationStatusReport");
             }
-            catch (Exception ex)
+
+            // Debug: Log validation errors
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
             {
-                ModelState.AddModelError("", "An error occurred while saving the reservation: " + ex.Message);
+                Console.WriteLine($"Validation Error: {error.ErrorMessage}");
             }
 
-            ViewBag.Facilities = new SelectList(await _context.Facility
-                .Where(f => !f.IsDeleted && f.IsAvailable)
-                .ToListAsync(), "FacilityId", "Name");
-            return View(reservation);
-        }
-        // GET: Reservation/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
+            await PopulateViewBagFacilities();
+            ViewBag.TimeSlots = TimeSlot.AvailableTimeSlots.Select((slot, index) => new
             {
-                return NotFound();
-            }
-
-            var reservation = await _context.Reservation
-                .Include(r => r.Facility)
-                .FirstOrDefaultAsync(r => r.ReservationId == id && !r.IsDeleted);
-
-            if (reservation == null)
-            {
-                return NotFound();
-            }
-
+                Index = index,
+                DisplayText = slot.DisplayText
+            }).ToList();
+            ViewBag.UserId = user.Id;
             return View(reservation);
         }
 
-        // POST: Reservation/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // GET: Reservation/ReservationStatusReport
+        [Authorize]
+        public async Task<IActionResult> ReservationStatusReport()
         {
-            var reservation = await _context.Reservation
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var reservations = await _context.Reservation
                 .Include(r => r.Facility)
-                .FirstOrDefaultAsync(r => r.ReservationId == id);
+                .Where(r => r.UserId == user.Id && !r.IsDeleted)
+                .ToListAsync();
 
-            if (reservation != null)
+            Console.WriteLine($"Retrieved {reservations.Count} reservations for user {user.Id}");
+            foreach (var reservation in reservations)
             {
-                reservation.IsDeleted = true;
-                _context.Update(reservation);
-
-                // Check if there are any other active reservations for this facility
-                var hasActiveReservations = await _context.Reservation
-                    .AnyAsync(r => r.FacilityId == reservation.FacilityId && !r.IsDeleted);
-
-                if (!hasActiveReservations)
-                {
-                    // If no active reservations, mark the facility as available
-                    var facility = await _context.Facility.FindAsync(reservation.FacilityId);
-                    if (facility != null)
-                    {
-                        facility.IsAvailable = true;
-                        _context.Update(facility);
-                    }
-                }
-
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Reservation has been deleted, and the facility is now available if no other reservations exist.";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Reservation not found.";
+                Console.WriteLine($"ReservationId: {reservation.ReservationId}, Facility: {reservation.Facility?.Name ?? "N/A"}, Date: {reservation.ReservationDate}, Status: {reservation.Status ?? "null"}");
             }
 
-            return RedirectToAction(nameof(ReservationStatusReport));
+            return View(reservations);
+        }
+
+        // API: Check if a time slot is available
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> CheckTimeSlotAvailability(int facilityId, string reservationDate, int timeSlotIndex)
+        {
+            // Validate inputs
+            if (facilityId <= 0 || string.IsNullOrEmpty(reservationDate) || timeSlotIndex < 0 || timeSlotIndex >= TimeSlot.AvailableTimeSlots.Count)
+            {
+                return Json(new { isAvailable = false, message = "Invalid input parameters." });
+            }
+
+            // Parse the reservation date
+            if (!DateTime.TryParse(reservationDate, out var parsedDate))
+            {
+                return Json(new { isAvailable = false, message = "Invalid reservation date format." });
+            }
+
+            // Get the selected time slot
+            var selectedTimeSlot = TimeSlot.AvailableTimeSlots[timeSlotIndex];
+            var startTime = parsedDate.Date.Add(selectedTimeSlot.StartTime);
+            var endTime = parsedDate.Date.Add(selectedTimeSlot.EndTime);
+
+            // Check for existing reservations
+            var hasReservation = await _context.Reservation
+                .Where(r => r.FacilityId == facilityId
+                    && !r.IsDeleted
+                    && r.ReservationDate.Date == parsedDate.Date
+                    && ((r.StartTime.TimeOfDay <= startTime.TimeOfDay && r.EndTime.TimeOfDay > startTime.TimeOfDay)
+                        || (r.StartTime.TimeOfDay < endTime.TimeOfDay && r.EndTime.TimeOfDay >= endTime.TimeOfDay)
+                        || (r.StartTime.TimeOfDay >= startTime.TimeOfDay && r.EndTime.TimeOfDay <= endTime.TimeOfDay)))
+                .AnyAsync();
+
+            if (hasReservation)
+            {
+                return Json(new { isAvailable = false, message = $"The time slot {selectedTimeSlot.DisplayText} is already reserved for this facility on {parsedDate.ToString("yyyy-MM-dd")}." });
+            }
+
+            return Json(new { isAvailable = true, message = "The time slot is available." });
+        }
+
+        private async Task PopulateViewBagFacilities()
+        {
+            var facilities = await _context.Facility
+                .Where(f => !f.IsDeleted)
+                .Select(f => new { f.FacilityId, f.Name })
+                .ToListAsync();
+            ViewBag.Facilities = facilities.Select(f => new { Value = f.FacilityId.ToString(), Text = f.Name });
+
+            Console.WriteLine($"Loaded {facilities.Count} facilities into ViewBag");
+            foreach (var facility in facilities)
+            {
+                Console.WriteLine($"FacilityId: {facility.FacilityId}, Name: {facility.Name}");
+            }
         }
     }
 }
