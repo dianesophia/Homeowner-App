@@ -41,7 +41,7 @@ namespace Hometown_Application.Controllers
             // Step 2: Get total number of homeowners
             var totalHomeowners = await _userManager.GetUsersInRoleAsync("HomeOwner");
 
-           
+
 
             // Step 4: Pass all the results to the view
             ViewBag.TotalMonthlyBills = totalMonthlyBills * totalHomeowners.Count;
@@ -51,7 +51,7 @@ namespace Hometown_Application.Controllers
             var bills = await _context.Bills.Include(b => b.ApplicationUser).ToListAsync();
 
             ViewBag.BillList = bills;
-         
+
 
             return View();
         }
@@ -102,7 +102,7 @@ namespace Hometown_Application.Controllers
             // Fetching all BillAssignmentModel records from the database
             var billAssignments = _context.BillAssignment
                                           .Include(b => b.ApplicationUser)
-                                         // .Include(b => b.Bill)
+                                          // .Include(b => b.Bill)
                                           .Include(b => b.Users) // Include users associated with the bill
                                           .ToList();  // Fetch all BillAssignmentModel records as a list
 
@@ -112,7 +112,7 @@ namespace Hometown_Application.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> PayBill(int billId, decimal amountPaid,string paymentMethod, string referenceNumber)
+        public async Task<IActionResult> PayBill(int billId, decimal amountPaid, string paymentMethod, string referenceNumber)
         {
             var bill = await _context.Bills.FindAsync(billId);
             if (bill == null)
@@ -131,13 +131,13 @@ namespace Hometown_Application.Controllers
                 AmountPaid = amountPaid,
                 PaymentMethod = paymentMethod, // Replace with the actual method
                 PaymentDate = DateTime.UtcNow,
-                ReferenceNumber = referenceNumber,  
+                ReferenceNumber = referenceNumber,
             };
 
             _context.Add(payment);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index)); 
+            return RedirectToAction(nameof(Index));
         }
 
 
@@ -152,20 +152,25 @@ namespace Hometown_Application.Controllers
             // Get BillAssignments for the logged-in user
             var billAssignments = await _context.BillAssignment
                 .Where(ba => ba.UserId == user.Id)
-                .Include(ba => ba.Bill)
+                .Include(ba => ba.Bill) // Ensure Bill details are included
                 .ToListAsync();
 
             // Create the ViewModel
-            var viewModel = bills.Select(b => new HomeownerBoardViewModel
+            var viewModel = bills.Select(b =>
             {
-                BillId = b.BillId,
-                RemainingBalance = b.RemainingBalance,
-                Status = b.Status,
-                //BillName = b.BillName,
-                BillName = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.BillName,
-                Amount = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.Amount ?? 0,
-                Description = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.Description,
-                DueDate = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.DueDate ?? DateTime.MinValue
+                // Find the matching BillAssignment
+                var billAssignment = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId);
+
+                return new HomeownerBoardViewModel
+                {
+                    BillId = b.BillId,
+                    RemainingBalance = b.RemainingBalance,
+                    Status = b.Status,
+                    BillName = billAssignment?.BillName, // Use BillName from BillAssignment, fallback to Bill from Bills
+                    Amount = billAssignment?.Amount ?? 0,
+                    Description = billAssignment?.Description,
+                    DueDate = billAssignment?.DueDate ?? DateTime.MinValue // Use DateTime.MinValue if DueDate is not available
+                };
             }).ToList();
 
             // Pass the ViewModel to the view
@@ -299,8 +304,8 @@ namespace Hometown_Application.Controllers
             }
 
             // Update remaining balance
-         //   bill.UpdateRemainingBalance(amountPaid);
-           // _context.Update(bill);
+            //   bill.UpdateRemainingBalance(amountPaid);
+            // _context.Update(bill);
 
             // Add payment record
             var payment = new BillPaymentModel
@@ -364,7 +369,7 @@ namespace Hometown_Application.Controllers
             var billAssignment = await _context.BillAssignment.FindAsync(id);
             if (billAssignment == null)
             {
-                return NotFound();  
+                return NotFound();
             }
 
             billAssignment.IsPaid = true;
