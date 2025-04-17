@@ -10,6 +10,7 @@
     <thead>
         <tr>
             <th>Bill ID</th>
+            <th>Payer Name</th> <!-- Updated column header -->
             <th>Amount Paid</th>
             <th>Payment Method</th>
             <th>Reference Number</th>
@@ -22,6 +23,13 @@
         {
             <tr>
                 <td>@payment.BillId</td>
+                <td>
+                    @{
+                        var user = payment.Bill?.ApplicationUser;
+                        var fullName = user != null ? $"{user.FirstName} {user.LastName}" : "";
+                    }
+                    @fullName
+                </td>
                 <td>@payment.AmountPaid.ToString("C")</td>
                 <td>@payment.PaymentMethod</td>
                 <td>@payment.ReferenceNumber</td>

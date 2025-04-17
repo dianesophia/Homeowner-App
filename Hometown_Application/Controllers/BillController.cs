@@ -7,6 +7,11 @@ using System;
 using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Hometown_Application.ViewModel;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using System.IO;
+
 
 namespace Hometown_Application.Controllers
 {
@@ -146,35 +151,68 @@ namespace Hometown_Application.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound("User not found");
 
-            // Get the bills for the user
-            var bills = await _context.Bills.Where(b => b.UserId == user.Id).ToListAsync();
-
-            // Get BillAssignments for the logged-in user
-            var billAssignments = await _context.BillAssignment
-                .Where(ba => ba.UserId == user.Id)
-                .Include(ba => ba.Bill) // Ensure Bill details are included
+            var bills = await _context.Bills
+                .Where(b => b.UserId == user.Id)
                 .ToListAsync();
 
-            // Create the ViewModel
-            var viewModel = bills.Select(b =>
+            var billAssignments = await _context.BillAssignment
+                .Where(ba => ba.UserId == user.Id)
+                .Include(ba => ba.Bill)
+                .ToListAsync();
+
+            var payments = await _context.BillPayment
+                .Where(p => p.Bill.UserId == user.Id)
+                .Include(p => p.Bill)
+                .ToListAsync();
+
+            var viewModel = new List<HomeownerBoardViewModel>();
+
+            foreach (var b in bills)
             {
-                // Find the matching BillAssignment
                 var billAssignment = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId);
+                var relatedPayments = payments.Where(p => p.BillId == b.BillId).ToList();
 
-                return new HomeownerBoardViewModel
+                if (relatedPayments.Count == 0)
                 {
-                    BillId = b.BillId,
-                    RemainingBalance = b.RemainingBalance,
-                    Status = b.Status,
-                    BillName = billAssignment?.BillName, // Use BillName from BillAssignment, fallback to Bill from Bills
-                    Amount = billAssignment?.Amount ?? 0,
-                    Description = billAssignment?.Description,
-                    DueDate = billAssignment?.DueDate ?? DateTime.MinValue // Use DateTime.MinValue if DueDate is not available
-                };
-            }).ToList();
+                    viewModel.Add(new HomeownerBoardViewModel
+                    {
+                        BillId = b.BillId,
+                        RemainingBalance = b.RemainingBalance,
+                        Status = b.Status,
+                        BillName = billAssignment?.BillName,
+                        Amount = billAssignment?.Amount ?? 0,
+                        Description = billAssignment?.Description,
+                        DueDate = billAssignment?.DueDate ?? DateTime.MinValue,
+                    });
+                }
+                else
+                {
+                    foreach (var p in relatedPayments)
+                    {
+                        viewModel.Add(new HomeownerBoardViewModel
+                        {
+                            BillId = b.BillId,
+                            RemainingBalance = b.RemainingBalance,
+                            Status = b.Status,
+                            BillName = billAssignment?.BillName,
+                            Amount = billAssignment?.Amount ?? 0,
+                            Description = billAssignment?.Description,
+                            DueDate = billAssignment?.DueDate ?? DateTime.MinValue,
+                            PaymentId = p.PaymentId,
+                            PaymentDate = p.PaymentDate,
+                            AmountPaid = p.AmountPaid,
+                            PaymentMethod = p.PaymentMethod,
+                            ReferenceNumber = p.ReferenceNumber,
+                            IsApproved = p.IsApproved,
+                        });
+                    }
+                }
+            }
+            var filteredViewModel = viewModel
+       .Where(b => b.RemainingBalance > 0 && b.PaymentId != 0)
+       .ToList();
 
-            // Pass the ViewModel to the view
-            return View(viewModel);
+            return View(viewModel);  // return list of HomeownerBoardViewModel
         }
 
 
@@ -331,6 +369,7 @@ namespace Hometown_Application.Controllers
         {
             var pendingPayments = await _context.BillPayment
                 .Include(p => p.Bill)
+                     .ThenInclude(b => b.ApplicationUser)
                 .Where(p => !p.IsApproved)
                 .ToListAsync();
 
@@ -362,6 +401,104 @@ namespace Hometown_Application.Controllers
 
             return RedirectToAction(nameof(PendingPayments));
         }
+
+
+        [HttpGet]
+        public IActionResult DownloadConfirmationSlip(int paymentId)
+        {
+            var payment = _context.BillPayment
+                .Include(p => p.Bill)
+                .ThenInclude(b => b.ApplicationUser)
+                .FirstOrDefault(p => p.PaymentId == paymentId && p.IsApproved);
+
+            if (payment == null)
+            {
+                return NotFound("Approved payment not found.");
+            }
+
+            // Load logo image from wwwroot or elsewhere (adjust the path as needed)
+            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "logo.png");
+            var logoImage = System.IO.File.Exists(logoPath) ? System.IO.File.ReadAllBytes(logoPath) : null;
+
+            var pdfBytes = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(40);
+                    page.DefaultTextStyle(x => x.FontSize(12).FontFamily("Georgia"));
+
+                    // Header with logo and title
+                    page.Header().Row(row =>
+                    {
+                        row.RelativeItem(1).Height(80).AlignMiddle().AlignLeft().Image(logoImage, ImageScaling.FitHeight);
+                        row.RelativeItem(3).Column(col =>
+                        {
+                            col.Item().Text("HOMETOWN COMMUNITY ASSOCIATION")
+                                .FontSize(18).Bold().AlignRight().FontColor(Colors.Blue.Darken3);
+                            col.Item().Text("Payment Confirmation Slip")
+                                .FontSize(16).SemiBold().AlignRight().FontColor(Colors.Grey.Darken1);
+                            col.Item().Text($"Date Issued: {DateTime.Now:MMMM dd, yyyy}")
+                                .FontSize(12).AlignRight().FontColor(Colors.Grey.Lighten1);
+                        });
+                    });
+
+                    page.Content().Column(col =>
+                    {
+                        col.Item().PaddingVertical(15).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+
+                        col.Item().PaddingBottom(12).Text("Payment Details")
+                            .FontSize(14).Bold().Underline().FontColor(Colors.Blue.Darken1);
+
+                        col.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(160);
+                                columns.RelativeColumn();
+                            });
+
+                            void AddRow(string label, string value)
+                            {
+                                table.Cell().PaddingVertical(6).PaddingHorizontal(8).Text(label).SemiBold().FontColor(Colors.Grey.Darken2);
+                                table.Cell().PaddingVertical(6).PaddingHorizontal(8).Text(value).FontColor(Colors.Black);
+                            }
+
+                            AddRow("Homeowner Name:", $"{payment.Bill.ApplicationUser.FirstName} {payment.Bill.ApplicationUser.LastName}");
+                            AddRow("Bill ID:", payment.BillId.ToString());
+                            AddRow("Payment Date:", payment.PaymentDate.ToString("MMMM dd, yyyy"));
+                            AddRow("Amount Paid:", payment.AmountPaid.ToString("C"));
+                            AddRow("Payment Method:", payment.PaymentMethod);
+                            AddRow("Reference Number:", payment.ReferenceNumber);
+                            AddRow("Payment Status:", "Approved");
+                        });
+
+                        col.Item().PaddingTop(20).Text("This slip serves as formal confirmation of your successful payment to the Hometown Community Association. Please keep this document for your records.")
+                            .FontSize(12).FontColor(Colors.Grey.Darken1);
+
+                        col.Item().PaddingTop(25).Text("For any concerns or inquiries, you may reach out to our office through the contact information provided below.")
+                            .FontSize(11).Italic().FontColor(Colors.Grey.Darken2);
+                    });
+
+                    page.Footer().AlignCenter().Text(text =>
+                    {
+                        text.Span("Hometown Community Association")
+                            .SemiBold()
+                            .FontSize(10)
+                            .FontColor(Colors.Grey.Darken1);
+                        text.Span(" | ");
+                        text.Span("Contact: (123) 456-7890 | Email: info@hometownhoa.org")
+                            .Italic()
+                            .FontSize(10)
+                            .FontColor(Colors.Grey.Darken1);
+                    });
+
+                });
+            }).GeneratePdf();
+
+            return File(pdfBytes, "application/pdf", $"ConfirmationSlip_Payment_{payment.PaymentId}.pdf");
+        }
+
 
 
         public async Task<IActionResult> MarkAsPaid(int id)
