@@ -1,4 +1,6 @@
-﻿namespace Hometown_Application.ViewModel
+﻿using Hometown_Application.Models;
+
+namespace Hometown_Application.ViewModel
 {
     public class HomeownerBoardViewModel
     {
@@ -19,6 +21,9 @@
         public string ReferenceNumber { get; set; }
 
         public bool IsApproved { get; set; }
+
+        public List<BillAssignmentModel> BillAssignments { get; set; }
+
     }
 }
     

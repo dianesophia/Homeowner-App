@@ -1,53 +1,60 @@
-﻿<h1>Admin Billing Dashboard</h1>
+﻿<h1 class="mb-4 fw-bold">Admin Billing Dashboard</h1>
 
-<div class="accordion-button mb-4">
-    <a asp-controller="Bill" asp-action="AssignAutomaticBills" class="action-button">
-        <i class="fas fa-user-cog"></i> Assign Custom Bill to User
+<div class="d-flex flex-column flex-md-row gap-3 mb-4">
+    <a asp-controller="Bill" asp-action="AssignAutomaticBills" class="btn btn-primary d-flex align-items-center gap-2">
+        <i class="fas fa-tasks"></i> Assign Automatic Bills
+    </a>
+    <a asp-controller="Bill" asp-action="AssignUserBill" class="btn btn-outline-primary d-flex align-items-center gap-2">
+        <i class="fas fa-plus-circle"></i> Create Custom Bill
     </a>
 </div>
 
-<div class="container mt-5">
-    <!-- Flex row for cards -->
-    <div class="d-flex flex-wrap gap-4 mb-5">
-        <!-- Card for Total Monthly Bills -->
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">Total Monthly Bills</h5>
-                <p class="card-text">
-                    @ViewBag.TotalMonthlyBills.ToString("C")
-                </p>
+<div class="container">
+    <!-- Row for the summary card -->
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Estimated Monthly Collection</h5>
+                    <p class="card-text fs-4 fw-semibold">
+                        @ViewBag.TotalMonthlyBills.ToString("C")
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- Card for Total Yearly Bills -->
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">Total Yearly Bills</h5>
-                <p class="card-text">
-                    @ViewBag.TotalYearlyBills.ToString("C")
-                </p>
+        <!-- 🔹 Fully Paid Users Card -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Fully Paid Users (This Month)</h5>
+                    <p class="card-text fs-4 fw-semibold">
+                        @ViewBag.FullyPaidUserCount users
+                    </p>
+                </div>
             </div>
         </div>
-
-        <!-- Card for Total Quarterly Bills -->
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">Total Quarterly Bills</h5>
-                <p class="card-text">
-                    @ViewBag.TotalQuarterlyBills.ToString("C")
-                </p>
+        <!-- 🔹 Total Collected This Month Card -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Total Collected (This Month)</h5>
+                    <p class="card-text fs-4 fw-semibold">
+                        @ViewBag.TotalCollectedThisMonth.ToString("C")
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Table for BillModel -->
+    <!-- Bill Table -->
     <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
+        <table class="table table-hover table-bordered">
+            <thead class="table-primary">
+                <tr class="text-center">
                     <th>Bill ID</th>
                     <th>User</th>
-                    <th>Issued Date</th>
+                    <th>Issue Date</th>
                     <th>Due Date</th>
                     <th>Total Amount</th>
                     <th>Remaining Balance</th>
@@ -57,7 +64,7 @@
             <tbody>
                 @foreach (var bill in ViewBag.BillList as List<Hometown_Application.Models.BillModel>)
                 {
-                    <tr>
+                    <tr class="text-center align-middle">
                         <td>@bill.BillId</td>
                         <td>@bill.ApplicationUser?.UserName</td>
                         <td>@bill.IssueDate.ToString("MM/dd/yyyy")</td>

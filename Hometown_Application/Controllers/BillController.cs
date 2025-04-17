@@ -31,35 +31,60 @@ namespace Hometown_Application.Controllers
         public async Task<IActionResult> AdminBoard()
         {
             // Step 1: Get the total amount of each PaymentDuration
-            var totalMonthlyBills = await _context.BillItems
-                .Where(bi => !bi.IsDeleted && bi.PaymentDuration == "Monthly")
-                .SumAsync(bi => bi.Amount ?? 0);
+            var totalBillsByDuration = await _context.BillItems
+                .Where(bi => !bi.IsDeleted)
+                .GroupBy(bi => bi.PaymentDuration)
+                .Select(g => new
+                {
+                    PaymentDuration = g.Key,
+                    TotalAmount = g.Sum(bi => bi.Amount ?? 0)
+                })
+                .ToListAsync();
 
-            var totalYearlyBills = await _context.BillItems
-                .Where(bi => !bi.IsDeleted && bi.PaymentDuration == "Yearly")
-                .SumAsync(bi => bi.Amount ?? 0);
-
-            var totalQuarterlyBills = await _context.BillItems
-                .Where(bi => !bi.IsDeleted && bi.PaymentDuration == "Quarterly")
-                .SumAsync(bi => bi.Amount ?? 0);
+            // Extract totals for each payment duration
+            var totalMonthlyBills = totalBillsByDuration.FirstOrDefault(b => b.PaymentDuration == "Monthly")?.TotalAmount ?? 0;
+            var totalYearlyBills = totalBillsByDuration.FirstOrDefault(b => b.PaymentDuration == "Yearly")?.TotalAmount ?? 0;
+            var totalQuarterlyBills = totalBillsByDuration.FirstOrDefault(b => b.PaymentDuration == "Quarterly")?.TotalAmount ?? 0;
 
             // Step 2: Get total number of homeowners
             var totalHomeowners = await _userManager.GetUsersInRoleAsync("HomeOwner");
 
-
-
-            // Step 4: Pass all the results to the view
+            // Step 3: Set ViewBag for total bills by duration * number of homeowners
             ViewBag.TotalMonthlyBills = totalMonthlyBills * totalHomeowners.Count;
             ViewBag.TotalYearlyBills = totalYearlyBills * totalHomeowners.Count;
             ViewBag.TotalQuarterlyBills = totalQuarterlyBills * totalHomeowners.Count;
 
+            // Step 4: Get all bills including user info
             var bills = await _context.Bills.Include(b => b.ApplicationUser).ToListAsync();
 
-            ViewBag.BillList = bills;
+            // Get current month and year
+            var currentMonth = DateTime.UtcNow.Month;
+            var currentYear = DateTime.UtcNow.Year;
 
+            // Step 5: Count users who have fully paid in the current month
+            var fullyPaidUserCount = bills
+                .Where(b => b.IssueDate.Month == currentMonth &&
+                            b.IssueDate.Year == currentYear &&
+                            b.RemainingBalance <= 0)
+                .Select(b => b.UserId)
+                .Distinct()
+                .Count();
+
+            // Step 6: Calculate total collected this month
+            var totalCollectedThisMonth = bills
+                .Where(b => b.IssueDate.Month == currentMonth &&
+                            b.IssueDate.Year == currentYear)
+                .Sum(b => b.TotalAmount - b.RemainingBalance);
+
+            ViewBag.FullyPaidUserCount = fullyPaidUserCount;
+            ViewBag.TotalCollectedThisMonth = totalCollectedThisMonth;
+
+            // Step 7: Pass bills list to the view
+            ViewBag.BillList = bills;
 
             return View();
         }
+
 
         public async Task<IActionResult> AssignUserBill()
         {
@@ -151,14 +176,17 @@ namespace Hometown_Application.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound("User not found");
 
+            // Fetch bills for the logged-in user
             var bills = await _context.Bills
                 .Where(b => b.UserId == user.Id)
                 .ToListAsync();
 
-            var billAssignments = await _context.BillAssignment
-                .Where(ba => ba.UserId == user.Id)
-                .Include(ba => ba.Bill)
-                .ToListAsync();
+            // Fetch assignments and payments
+           var billAssignments = await _context.BillAssignment
+    .Where(ba => ba.UserId == user.Id)
+    .Include(ba => ba.Bill) // Make sure Bill is included if necessary
+    .ToListAsync();
+
 
             var payments = await _context.BillPayment
                 .Where(p => p.Bill.UserId == user.Id)
@@ -169,20 +197,27 @@ namespace Hometown_Application.Controllers
 
             foreach (var b in bills)
             {
-                var billAssignment = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId);
-                var relatedPayments = payments.Where(p => p.BillId == b.BillId).ToList();
+                var relatedAssignments = billAssignments
+                    .Where(ba => ba.BillId == b.BillId)
+                    .ToList();
 
-                if (relatedPayments.Count == 0)
+                var relatedPayments = payments
+                    .Where(p => p.BillId == b.BillId)
+                    .ToList();
+
+                // No payments
+                if (!relatedPayments.Any())
                 {
                     viewModel.Add(new HomeownerBoardViewModel
                     {
                         BillId = b.BillId,
                         RemainingBalance = b.RemainingBalance,
                         Status = b.Status,
-                        BillName = billAssignment?.BillName,
-                        Amount = billAssignment?.Amount ?? 0,
-                        Description = billAssignment?.Description,
-                        DueDate = billAssignment?.DueDate ?? DateTime.MinValue,
+                        BillName = relatedAssignments.FirstOrDefault()?.BillName,
+                        Amount = relatedAssignments.FirstOrDefault()?.Amount ?? 0,
+                        Description = relatedAssignments.FirstOrDefault()?.Description,
+                        DueDate = relatedAssignments.FirstOrDefault()?.DueDate ?? DateTime.MinValue,
+                        BillAssignments = relatedAssignments
                     });
                 }
                 else
@@ -194,25 +229,28 @@ namespace Hometown_Application.Controllers
                             BillId = b.BillId,
                             RemainingBalance = b.RemainingBalance,
                             Status = b.Status,
-                            BillName = billAssignment?.BillName,
-                            Amount = billAssignment?.Amount ?? 0,
-                            Description = billAssignment?.Description,
-                            DueDate = billAssignment?.DueDate ?? DateTime.MinValue,
+                            BillName = relatedAssignments.FirstOrDefault()?.BillName,
+                            Amount = relatedAssignments.FirstOrDefault()?.Amount ?? 0,
+                            Description = relatedAssignments.FirstOrDefault()?.Description,
+                            DueDate = relatedAssignments.FirstOrDefault()?.DueDate ?? DateTime.MinValue,
                             PaymentId = p.PaymentId,
                             PaymentDate = p.PaymentDate,
                             AmountPaid = p.AmountPaid,
                             PaymentMethod = p.PaymentMethod,
                             ReferenceNumber = p.ReferenceNumber,
                             IsApproved = p.IsApproved,
+                            BillAssignments = relatedAssignments
                         });
                     }
                 }
             }
-            var filteredViewModel = viewModel
-       .Where(b => b.RemainingBalance > 0 && b.PaymentId != 0)
-       .ToList();
 
-            return View(viewModel);  // return list of HomeownerBoardViewModel
+            // You can keep filtering if you need
+            var filteredViewModel = viewModel
+                .Where(b => b.RemainingBalance > 0 && b.PaymentId != 0)
+                .ToList();
+
+            return View(viewModel); // You can also return filteredViewModel if needed
         }
 
 
@@ -261,37 +299,46 @@ namespace Hometown_Application.Controllers
             {
                 return NotFound("No homeowners found.");
             }
-            var totalAmount = _context.BillItems
-                             .Where(b => !b.IsDeleted)
-                             .Sum(b => b.Amount) ?? 0;
 
-            // Loop through each user and assign a bill automatically
+            // Get the current month and year
+            var currentMonth = DateTime.UtcNow.Month;
+            var currentYear = DateTime.UtcNow.Year;
+
+            // Calculate total bill amount from active bill items
+            var totalAmount = _context.BillItems
+                              .Where(b => !b.IsDeleted)
+                              .Sum(b => b.Amount) ?? 0;
+
             foreach (var homeowner in homeowners)
             {
-                // Set the total amount and remaining balance (can be dynamic or constant)
-                decimal remainingBalance = totalAmount; // Initially, Remaining Balance is equal to Total Amount
+                // Check if a bill already exists for this user in the current month
+                bool billExists = _context.Bills.Any(b =>
+                    b.UserId == homeowner.Id &&
+                    b.IssueDate.Month == currentMonth &&
+                    b.IssueDate.Year == currentYear);
 
-                // Create a new BillModel for each homeowner
+                if (billExists)
+                {
+                    continue; // Skip this homeowner
+                }
+
+                // Create a new BillModel if no duplicate
                 var newBill = new BillModel
                 {
                     UserId = homeowner.Id,
-                    IssueDate = DateTime.UtcNow,  // Current date as the issue date
-                    DueDate = DateTime.UtcNow.AddDays(30),  // Due date set to 30 days from the current date
+                    IssueDate = DateTime.UtcNow,
+                    DueDate = DateTime.UtcNow.AddDays(30),
                     TotalAmount = totalAmount,
-                    RemainingBalance = remainingBalance,
-                    Status = "Pending",  // Default status
-                    Remarks = "Automatic Bill Assignment"  // Optional remarks
+                    RemainingBalance = totalAmount,
+                    Status = "Pending",
+                    Remarks = "Automatic Bill Assignment"
                 };
 
-                // Add the new bill to the Bills table
                 _context.Bills.Add(newBill);
             }
 
-            // Save all the changes to the database
             await _context.SaveChangesAsync();
-
-            // Optionally, redirect or display a success message
-            return RedirectToAction("AdminBoard"); // Adjust to your specific admin dashboard page
+            return RedirectToAction("AdminBoard");
         }
 
         public async Task<IActionResult> UserBillingHistory()
