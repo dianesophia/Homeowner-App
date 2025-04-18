@@ -54,8 +54,12 @@ namespace Hometown_Application.Controllers
             ViewBag.TotalYearlyBills = totalYearlyBills * totalHomeowners.Count;
             ViewBag.TotalQuarterlyBills = totalQuarterlyBills * totalHomeowners.Count;
 
-            // Step 4: Get all bills including user info
-            var bills = await _context.Bills.Include(b => b.ApplicationUser).ToListAsync();
+            // Step 4: Get all bills including user info, ordered by username
+            var bills = await _context.Bills
+                .Include(b => b.ApplicationUser)
+                .OrderBy(b => b.ApplicationUser.UserName)
+                .ToListAsync();
+
 
             // Get current month and year
             var currentMonth = DateTime.UtcNow.Month;
@@ -169,6 +173,46 @@ namespace Hometown_Application.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PayBillAssignment(int billAssignmentId, decimal amountPaid, string paymentMethod, string referenceNumber)
+        {
+            var billAssignment = await _context.BillAssignment
+                .Include(b => b.Bill) // Needed to access the related bill
+                .FirstOrDefaultAsync(b => b.BillAssignmentId == billAssignmentId);
+
+            if (billAssignment == null) return NotFound();
+            if (billAssignment.IsPaid) return BadRequest("This bill assignment is already paid.");
+
+            // Update assignment status
+            billAssignment.IsPaid = true;
+            billAssignment.PaidDate = DateTime.UtcNow;
+
+            // Optional: also update the parent bill's balance
+            if (billAssignment.Bill != null)
+            {
+                billAssignment.Bill.UpdateRemainingBalance(amountPaid);
+                _context.Update(billAssignment.Bill);
+            }
+
+            // Create payment record
+            var payment = new BillPaymentModel
+            {
+                BillAssignmentId = billAssignmentId,
+                BillId = billAssignment.BillId, // Optional: keep traceability to main Bill
+                AmountPaid = amountPaid,
+                PaymentMethod = paymentMethod,
+                PaymentDate = DateTime.UtcNow,
+                ReferenceNumber = referenceNumber,
+            };
+
+            _context.Add(payment);
+            _context.Update(billAssignment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
 
         public async Task<IActionResult> HomeownerBoard()

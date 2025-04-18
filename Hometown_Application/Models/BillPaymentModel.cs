@@ -8,9 +8,14 @@ namespace Hometown_Application.Models
         [Key]
         public int PaymentId { get; set; }
 
-        public int BillId { get; set; }
+        public int? BillId { get; set; }
         [ForeignKey("BillId")]
         public BillModel Bill { get; set; }
+
+        // NEW: Optional reference to BillAssignmentModel
+        public int? BillAssignmentId { get; set; }
+        [ForeignKey("BillAssignmentId")]
+        public BillAssignmentModel? BillAssignment { get; set; }
 
         public string? PaymentMethod { get; set; }  // e.g., Cash, GCash, PayPal
 

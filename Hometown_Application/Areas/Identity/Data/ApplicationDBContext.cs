@@ -40,14 +40,11 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     //Billing
     public DbSet<BillModel> Bills { get; set; }
     public DbSet<BillItemsModel> BillItems { get; set; }
-   
-    public DbSet<BillTransactionModel> BillTransactions { get; set; }
 
     public DbSet<BillPaymentModel> BillPayment { get; set; }
     public DbSet<BillAssignmentModel> BillAssignment { get; set; }
 
-    public DbSet<BillDetailModel> BillDetail { get; set; }
-
+  
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
     public DbSet<PollQuestionModel> PollQuestions { get; set; }
@@ -161,18 +158,17 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .HasForeignKey(c => c.BillId)  // BillAssignmentModel has a BillId to reference the Bill
         .OnDelete(DeleteBehavior.NoAction);  // Set the delete behavior (you can change this based on your requirements)
 
-
-        builder.Entity<BillTransactionModel>()
-         .HasOne(c => c.ApplicationUser)
-         .WithMany()
-         .HasForeignKey(c => c.UserId)
-         .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<BillTransactionModel>()
-        .HasOne(c => c.BillItemsModel)
-        .WithMany()
-        .HasForeignKey(c => c.BillItemsId)
+        builder.Entity<BillPaymentModel>()
+        .HasOne(c => c.Bill)  // Correct the navigation property to 'Bill' (not 'BillModel')
+        .WithMany()  // This means a Bill can be assigned to many BillAssignments
+        .HasForeignKey(c => c.BillId)  // BillAssignmentModel has a BillId to reference the Bill
         .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BillPaymentModel>()
+       .HasOne(c => c.BillAssignment)  // Correct the navigation property to 'Bill' (not 'BillModel')
+       .WithMany()  // This means a Bill can be assigned to many BillAssignments
+       .HasForeignKey(c => c.BillAssignmentId)  // BillAssignmentModel has a BillId to reference the Bill
+       .OnDelete(DeleteBehavior.NoAction);
 
         // Relationship for Recipient
         builder.Entity<ChatMessageModel>()

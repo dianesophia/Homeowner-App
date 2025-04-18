@@ -42,5 +42,8 @@ namespace Hometown_Application.Models
         public bool IsDeleted { get; set; } = false;
 
         public IEnumerable<ApplicationUser> Users { get; set; }
+
+
+        public ICollection<BillPaymentModel>? Payments { get; set; }
     }
 }

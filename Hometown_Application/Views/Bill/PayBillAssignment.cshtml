@@ -1,0 +1,30 @@
+﻿@model Hometown_Application.Models.BillPaymentModel
+
+<form asp-action="ProcessPayment" method="post">
+    <input type="hidden" asp-for="BillId" />
+
+    <div class="form-group">
+        <label asp-for="AmountPaid"></label>
+        <input asp-for="AmountPaid" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PaymentMethod"></label>
+        <select asp-for="PaymentMethod" class="form-control">
+            <option value="">-- Select Payment Method --</option>
+            <option value="Cash">Cash</option>
+            <option value="GCash">GCash</option>
+            <option value="BankTransfer">Bank Transfer</option>
+            <!-- Add other options if needed -->
+        </select>
+        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+    </div>
+
+
+    <div class="form-group">
+        <label asp-for="ReferenceNumber"></label>
+        <input asp-for="ReferenceNumber" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Payment</button>
+</form>
