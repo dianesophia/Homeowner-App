@@ -1,71 +1,238 @@
 @model Hometown_Application.Models.PollModel
-
 @{
     ViewData["Title"] = "Delete Poll";
 }
 
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --danger-dark: #bb2d3b;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .card-body {
+        padding: 25px;
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 10px 20px;
+        transition: var(--transition);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-danger {
+        background-color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+        .btn-danger:hover {
+            background-color: var(--danger-dark);
+            border-color: var(--danger-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.25);
+        }
+
+    .btn-secondary {
+        background-color: transparent;
+        border: 1px solid var(--secondary-color);
+        color: var(--secondary-color);
+    }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-left: 4px solid var(--danger-color);
+        color: var(--text-color);
+        border-radius: 8px;
+        padding: 15px 20px;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .bg-success {
+        background-color: var(--success-color) !important;
+    }
+
+    .bg-secondary {
+        background-color: var(--secondary-color) !important;
+    }
+
+    dl.row {
+        margin-bottom: 0;
+    }
+
+    dt {
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+
+    dd {
+        margin-bottom: 1rem;
+        color: var(--text-color);
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 1.5rem;
+    }
+
+    .btn-danger:active, .btn-secondary:active {
+        animation: pulse 0.3s;
+    }
+</style>
+
 <div class="container">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h1 class="display-4">@ViewData["Title"]</h1>
-            <p class="lead">Are you sure you want to delete this poll?</p>
-        </div>
+    <div class="page-header">
+        <h1 class="page-title">Delete Poll</h1>
     </div>
+    <p class="page-subtitle">Are you sure you want to delete this poll?</p>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="alert alert-danger mb-4">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>Warning:</strong> Deleting this poll will permanently remove all associated questions, options, and responses. This action cannot be undone.
-                    </div>
-
-                    <dl class="row">
-                        <dt class="col-sm-3">Title</dt>
-                        <dd class="col-sm-9">@Model.Title</dd>
-
-                        <dt class="col-sm-3">Description</dt>
-                        <dd class="col-sm-9">@Model.Description</dd>
-
-                        <dt class="col-sm-3">Created Date</dt>
-                        <dd class="col-sm-9">@Model.CreatedDate.ToString("MMM dd, yyyy")</dd>
-
-                        <dt class="col-sm-3">Expiry Date</dt>
-                        <dd class="col-sm-9">
-                            @(Model.ExpiryDate.HasValue ? Model.ExpiryDate.Value.ToString("MMM dd, yyyy") : "No expiry date")
-                        </dd>
-
-                        <dt class="col-sm-3">Status</dt>
-                        <dd class="col-sm-9">
-                            @if (Model.IsActive)
-                            {
-                                <span class="badge bg-success">Active</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Inactive</span>
-                            }
-                        </dd>
-
-                        <dt class="col-sm-3">Created By</dt>
-                        <dd class="col-sm-9">
-                            @(Model.Creator != null ? $"{Model.Creator.FirstName} {Model.Creator.LastName}" : "Unknown")
-                        </dd>
-                    </dl>
-
-                    <form asp-action="Delete" method="post" class="mt-4">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="PollId" />
-                        <button type="submit" class="btn btn-danger" aria-label="Delete poll" onclick="return confirm('Are you sure you want to delete this poll? This action cannot be undone.');">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                        <a asp-action="Index" class="btn btn-secondary" aria-label="Return to polls list">
-                            <i class="fas fa-arrow-left"></i> Back to List
-                        </a>
-                    </form>
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="alert alert-danger mb-4">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Warning:</strong> Deleting this poll will permanently remove all associated questions, options, and responses. This action cannot be undone.
             </div>
+
+            <dl class="row">
+                <dt class="col-sm-3">Title</dt>
+                <dd class="col-sm-9">@Model.Title</dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Description) ? "No description provided" : Model.Description)</dd>
+
+                <dt class="col-sm-3">Created Date</dt>
+                <dd class="col-sm-9">@Model.CreatedDate.ToString("MMM dd, yyyy")</dd>
+
+                <dt class="col-sm-3">Expiry Date</dt>
+                <dd class="col-sm-9">
+                    @(Model.ExpiryDate.HasValue ? Model.ExpiryDate.Value.ToString("MMM dd, yyyy") : "No expiry date")
+                </dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactive</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Created By</dt>
+                <dd class="col-sm-9">
+                    @(Model.Creator != null ? $"{Model.Creator.FirstName} {Model.Creator.LastName}" : "Unknown")
+                </dd>
+            </dl>
+
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="PollId" />
+                <div class="button-group">
+                    <button type="submit" class="btn btn-danger" onclick="return confirmDelete();">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm('Are you sure you want to delete this poll? This action cannot be undone.');
+        }
+
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Visual feedback when clicking buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = '';
+                });
+            });
+        });
+    </script>
+}

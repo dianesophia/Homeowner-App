@@ -5,70 +5,293 @@
     ViewData["Title"] = "Take Poll";
 }
 
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 30px;
+        margin-bottom: 3rem;
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 10px 20px;
+        transition: var(--transition);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary:active {
+            animation: pulse 0.3s;
+        }
+    .form-check {
+        padding-left: 2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin-top: 0.25rem;
+        margin-left: -2rem;
+        background-color: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        transition: var(--transition);
+    }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+    .form-check-label {
+        padding-left: 0.5rem;
+        cursor: pointer;
+        font-size: 1rem;
+        color: var(--text-color);
+    }
+
+    .question-container {
+        padding: 25px;
+        margin-bottom: 30px;
+        border-radius: var(--border-radius);
+        background-color: #FFFFFF;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid var(--primary-color);
+        transition: var(--transition);
+    }
+
+        .question-container:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .question-title {
+        font-size: 1.25rem;
+        color: var(--text-color);
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .required-badge {
+        background-color: var(--danger-color);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+    }
+
+    .optional-badge {
+        background-color: var(--secondary-color);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+    }
+
+    .text-danger-custom {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: block;
+    }
+
+    .is-invalid {
+        border-color: var(--danger-color) !important;
+    }
+
+    .validation-summary-errors {
+        color: var(--danger-color);
+        background-color: rgba(220, 53, 69, 0.1);
+        border-left: 4px solid var(--danger-color);
+        padding: 15px;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+    }
+
+        .validation-summary-errors ul {
+            margin-bottom: 0;
+            padding-left: 1rem;
+        }
+
+    .button-container {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .progress-container {
+        margin-bottom: 2rem;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        background-color: #e9ecef;
+    }
+
+    .progress-bar {
+        background-color: var(--primary-color);
+        transition: width 0.6s ease;
+    }
+</style>
+
 <div class="container">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h1 class="display-4">@Model.PollTitle</h1>
-            @if (!string.IsNullOrEmpty(Model.PollDescription))
-            {
-                <p class="lead">@Model.PollDescription</p>
-            }
+    <div class="page-header">
+        <h1 class="page-title">@Model.PollTitle</h1>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.PollDescription))
+    {
+        <p class="page-subtitle">@Model.PollDescription</p>
+    }
+
+    <div class="progress-container">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form asp-action="SubmitPoll" method="post">
-                        @Html.AntiForgeryToken()
+    <div class="form-container">
+        <form asp-action="SubmitPoll" method="post" id="pollForm">
+            @Html.AntiForgeryToken()
 
-                        <!-- Hidden fields for PollResponseViewModel properties -->
-                        @Html.HiddenFor(model => model.PollId)
-                        @Html.HiddenFor(model => model.PollTitle)
-                        @Html.HiddenFor(model => model.PollDescription)
+            <!-- Hidden fields for PollResponseViewModel properties -->
+            @Html.HiddenFor(model => model.PollId)
+            @Html.HiddenFor(model => model.PollTitle)
+            @Html.HiddenFor(model => model.PollDescription)
 
-                        <!-- Loop through each question -->
-                        @for (int i = 0; i < Model.Questions.Count; i++)
+            <!-- Loop through each question -->
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                <div class="question-container" data-question-index="@i" id="question_@Model.Questions[i].QuestionId">
+                    <h3 class="question-title">
+                        @Model.Questions[i].QuestionText
+                        @if (Model.Questions[i].IsRequired)
                         {
-                            <div class="form-group">
-                                <h4>@Model.Questions[i].QuestionText @(Model.Questions[i].IsRequired ? " (Required)" : "")</h4>
-
-                                <!-- Hidden fields for question properties -->
-                                @Html.HiddenFor(model => model.Questions[i].QuestionId)
-                                @Html.HiddenFor(model => model.Questions[i].QuestionText)
-                                @Html.HiddenFor(model => model.Questions[i].QuestionType)
-                                @Html.HiddenFor(model => model.Questions[i].IsRequired)
-                                @Html.HiddenFor(model => model.Questions[i].DisplayOrder)
-
-                                <!-- Render multiple-choice questions -->
-                                @if (Model.Questions[i].QuestionType == Hometown_Application.Data.QuestionType.MultipleChoice)
-                                {
-                                    @foreach (var option in Model.Questions[i].Options)
-                                    {
-                                        <div class="form-check">
-                                            <input type="radio"
-                                                   asp-for="@Model.Questions[i].SelectedOptionId"
-                                                   value="@option.OptionId"
-                                                   id="option_@option.OptionId"
-                                                   class="form-check-input" />
-                                            <label for="option_@option.OptionId" class="form-check-label">@option.OptionText</label>
-                                        </div>
-                                    }
-                                    @Html.ValidationMessageFor(model => model.Questions[i].SelectedOptionId, "", new { @class = "text-danger" })
-                                }
-                            </div>
+                            <span class="required-badge">Required</span>
                         }
+                        else
+                        {
+                            <span class="optional-badge">Optional</span>
+                        }
+                    </h3>
 
-                        <!-- Display validation summary for general errors -->
-                        <div asp-validation-summary="All" class="text-danger"></div>
+                    <!-- Hidden fields for question properties -->
+                    @Html.HiddenFor(model => model.Questions[i].QuestionId)
+                    @Html.HiddenFor(model => model.Questions[i].QuestionText)
+                    @Html.HiddenFor(model => model.Questions[i].QuestionType)
+                    @Html.HiddenFor(model => model.Questions[i].IsRequired)
+                    @Html.HiddenFor(model => model.Questions[i].DisplayOrder)
 
-                        <!-- Submit button -->
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+                    <!-- Render multiple-choice questions -->
+                    @if (Model.Questions[i].QuestionType == Hometown_Application.Data.QuestionType.MultipleChoice)
+                    {
+                        <div class="options-group">
+                            @foreach (var option in Model.Questions[i].Options)
+                            {
+                                <div class="form-check">
+                                    <input type="radio"
+                                           asp-for="@Model.Questions[i].SelectedOptionId"
+                                           value="@option.OptionId"
+                                           id="option_@option.OptionId"
+                                           class="form-check-input" />
+                                    <label for="option_@option.OptionId" class="form-check-label">@option.OptionText</label>
+                                </div>
+                            }
+                        </div>
+                        <div id="error_@Model.Questions[i].QuestionId" class="text-danger-custom"></div>
+                        @Html.ValidationMessageFor(model => model.Questions[i].SelectedOptionId, "", new { @class = "text-danger-custom" })
+                    }
                 </div>
+            }
+
+            <!-- Display validation summary for general errors -->
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <!-- Submit button -->
+            <div class="button-container">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Submit Responses
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -78,59 +301,89 @@
     }
     <script>
         $(document).ready(function () {
+            const totalQuestions = @Model.Questions.Count;
+            updateProgressBar(0);
+
             const QuestionType = {
                 MultipleChoice: @((int)Hometown_Application.Data.QuestionType.MultipleChoice)
             };
 
-            $("form").on("submit", function (e) {
-                let hasErrors = false;
-                $(".question-container.border-danger").each(function (index) {
-                    const $container = $(this);
-                    const questionType = parseInt($container.find("input[name$='.QuestionType']").val());
-                    const questionId = $container.find("input[name$='.QuestionId']").val();
+            // Function to update progress bar
+            function updateProgressBar(answeredCount) {
+                const progressPercentage = Math.round((answeredCount / totalQuestions) * 100);
+                $('.progress-bar').css('width', progressPercentage + '%').attr('aria-valuenow', progressPercentage);
+            }
 
-                    if (questionType === QuestionType.MultipleChoice) {
-                        const checked = $container.find(`input[name='Questions[${index}].SelectedOptionId']:checked`).length;
-                        const selectedValue = $container.find(`input[name='Questions[${index}].SelectedOptionId']:checked`).val() || 'none';
-                        console.log(`Question ${index}, Type: ${questionType}, Checked: ${checked}, Selected Value: ${selectedValue}, Name: Questions[${index}].SelectedOptionId`);
-
-                        if (checked === 0) {
-                            hasErrors = true;
-                            $container.append('<span class="text-danger-custom">Please select an option.</span>');
-                            $container.find("input[type='radio']").addClass("is-invalid");
-                            $("#error_" + questionId).text("Please select an option.");
-                        }
-                    }
+            // Count answered questions on load
+            function countAnsweredQuestions() {
+                let answered = 0;
+                $('.question-container').each(function() {
+                    const index = $(this).data('question-index');
+                    const isAnswered = $(`input[name='Questions[${index}].SelectedOptionId']:checked`).length > 0;
+                    if (isAnswered) answered++;
                 });
+                return answered;
+            }
+
+            // Update progress when an option is selected
+            $("input[type='radio']").on("change", function () {
+                const answeredCount = countAnsweredQuestions();
+                updateProgressBar(answeredCount);
+
+                // Clear any error messages
+                const $container = $(this).closest(".question-container");
+                $container.find(".text-danger-custom").text("");
+                $container.find("input").removeClass("is-invalid");
+                $container.removeClass('border-danger');
+            });
+
+            // Form validation
+            $("#pollForm").on("submit", function (e) {
+                let hasErrors = false;
+
+        @for (int i = 0; i < Model.Questions.Count; i++)
+        {
+            if (Model.Questions[i].IsRequired)
+            {
+                <text>
+                                const q@(i)Selected = $("input[name='Questions[@(i)].SelectedOptionId']:checked").length;
+                                const q@(i)Id = "@Model.Questions[i].QuestionId";
+
+                                if (q@(i)Selected === 0) {
+                                    hasErrors = true;
+                                    $("#error_" + q@(i)Id).text("Please select an option for this required question.");
+                                    $("input[name='Questions[@(i)].SelectedOptionId']").addClass("is-invalid");
+                                    $("#question_" + q@(i)Id).addClass("border-danger");
+                                }
+                </text>
+            }
+        }
 
                 if (hasErrors) {
                     e.preventDefault();
                     $('html, body').animate({
-                        scrollTop: $(".text-danger-custom").first().offset().top - 100
+                        scrollTop: $(".text-danger-custom:not(:empty)").first().closest('.question-container').offset().top - 100
                     }, 500);
                 }
             });
 
-            // Clear error on input change
-            $("input[type='radio']").on("change", function () {
-                const $container = $(this).closest(".question-container");
-                $container.find(".text-danger-custom").remove();
-                $container.find("input").removeClass("is-invalid");
-                const questionId = $container.find("input[name$='.QuestionId']").val();
-                $("#error_" + questionId).text("");
+            // Visual feedback for question containers
+            $(".question-container").hover(function() {
+                $(this).css("border-left-width", "6px");
+            }, function() {
+                $(this).css("border-left-width", "4px");
+            });
+
+            // Visual feedback when clicking buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = '';
+                });
             });
         });
     </script>
-    <style>
-        .text-danger-custom {
-            color: #dc3545;
-            font-size: 0.875em;
-            margin-top: 0.25rem;
-            display: block;
-        }
-
-        .is-invalid {
-            border-color: #dc3545 !important;
-        }
-    </style>
 }
