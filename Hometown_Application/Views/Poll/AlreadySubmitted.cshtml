@@ -3,27 +3,156 @@
     var pollTitle = ViewData["PollTitle"]?.ToString() ?? "the poll";
 }
 
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .already-submitted-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 40px 30px;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 10px 20px;
+        transition: var(--transition);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-lg {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+    }
+
+    .info-icon {
+        font-size: 5rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        display: inline-block;
+    }
+
+    .already-submitted-title {
+        font-size: 2.5rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    .poll-title {
+        font-weight: 500;
+        color: var(--primary-color);
+    }
+
+    .lead-text {
+        color: var(--secondary-color);
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .secondary-text {
+        color: var(--text-color);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary:active {
+        animation: pulse 0.3s;
+    }
+</style>
+
 <div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-8">
-            <div class="card shadow-sm text-center">
-                <div class="card-body py-5" aria-live="polite">
-                    <div class="mb-4">
-                        <style>
-                            .info-icon {
-                                font-size: 5rem;
-                            }
-                        </style>
-                        <i class="fas fa-info-circle text-primary info-icon"></i>
-                    </div>
-                    <h1 class="display-4 mb-4">Already Submitted</h1>
-                    <p class="lead mb-4">You have already submitted a response to "@pollTitle".</p>
-                    <p class="mb-5">Thank you for your participation!</p>
-                    <a asp-action="Index" class="btn btn-primary btn-lg" aria-label="Return to polls list">
-                        <i class="fas fa-home"></i> Back to Polls
-                    </a>
-                </div>
-            </div>
+    <div class="page-header">
+        <h1 class="page-title">Already Submitted</h1>
+    </div>
+
+    <div class="already-submitted-container">
+        <div aria-live="polite">
+            <i class="fas fa-info-circle info-icon"></i>
+            <h2 class="already-submitted-title">Already Submitted</h2>
+            <p class="lead-text">You have already submitted a response to "<span class="poll-title">@pollTitle</span>".</p>
+            <p class="secondary-text">Thank you for your participation!</p>
+            <a asp-action="Index" asp-controller="Poll" class="btn btn-primary btn-lg">
+                <i class="fas fa-home"></i> Back to Polls
+            </a>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Visual feedback when clicking buttons
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('mousedown', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            button.addEventListener('mouseup', function() {
+                this.style.transform = '';
+            });
+        });
+    });
+</script>
