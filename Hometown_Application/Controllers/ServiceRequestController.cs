@@ -116,55 +116,35 @@ namespace Hometown_Application.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRequest(CreateServiceRequestViewModel viewModel)
         {
-            if (!ModelState.IsValid)
-            {
-                viewModel.RequestTypes = await _context.RequestTypes
-                    .Where(rt => rt.IsActive)
-                    .OrderBy(rt => rt.Name)
-                    .ToListAsync();
-                return View("Create", viewModel);
-            }
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            _logger.LogInformation($"Creating service request for UserId: {userId}");
-
             if (string.IsNullOrEmpty(userId))
             {
-                _logger.LogWarning("UserId is null or empty during service request creation.");
-                ModelState.AddModelError("", "Unable to create the request because user authentication failed.");
-                viewModel.RequestTypes = await _context.RequestTypes
-                    .Where(rt => rt.IsActive)
-                    .OrderBy(rt => rt.Name)
-                    .ToListAsync();
-                return View("Create", viewModel);
+                _logger.LogError("UserId is missing.");
+                return Unauthorized("User not authenticated.");
             }
 
-            // Find the "Pending" status in the database
-            var pendingStatus = await _context.Status
-                .FirstOrDefaultAsync(s => s.StatusName == "Pending");
+            _logger.LogInformation("Received Service Request - UserId: {UserId}, RequestTypeId: {RequestTypeId}, Details: {Details}, Location: {Location}, Schedule: {Schedule}, Urgency: {Urgency}, Email: {Email}",
+                userId, viewModel.ServiceRequest.RequestTypeId, viewModel.ServiceRequest.Details, viewModel.ServiceRequest.Location,
+                viewModel.ServiceRequest.Schedule, viewModel.ServiceRequest.Urgency, viewModel.ServiceRequest.Email);
 
+            var pendingStatus = await _context.Status.FirstOrDefaultAsync(s => s.StatusName == "Pending");
             if (pendingStatus == null)
             {
-                _logger.LogError("Pending status not found in the database.");
-                ModelState.AddModelError("", "Unable to create the request because the default status is not configured.");
-                viewModel.RequestTypes = await _context.RequestTypes
-                    .Where(rt => rt.IsActive)
-                    .OrderBy(rt => rt.Name)
-                    .ToListAsync();
-                return View("Create", viewModel);
+                _logger.LogError("Pending status not found.");
+                return BadRequest("Pending status not found.");
             }
 
             var newRequest = new ServiceRequestModel
             {
-                RequestTypeId = viewModel.ServiceRequest.RequestTypeId,
-                StatusId = pendingStatus.StatusId, // Set default status to "Pending"
-                Details = viewModel.ServiceRequest.Details,
-                Location = viewModel.ServiceRequest.Location,
-                Urgency = viewModel.ServiceRequest.Urgency,
-                Email = viewModel.ServiceRequest.Email,
-                Schedule = viewModel.ServiceRequest.Schedule,
+                RequestTypeId = viewModel.ServiceRequest.RequestTypeId > 0 ? viewModel.ServiceRequest.RequestTypeId : 4,
+                StatusId = pendingStatus.StatusId,
+                Details = viewModel.ServiceRequest.Details ?? "Test",
+                Location = viewModel.ServiceRequest.Location ?? "Test Location",
+                Urgency = viewModel.ServiceRequest.Urgency != default ? viewModel.ServiceRequest.Urgency : UrgencyLevel.Medium,
+                Email = viewModel.ServiceRequest.Email ?? "yeah@yeah.com",
+                Schedule = viewModel.ServiceRequest.Schedule != default ? viewModel.ServiceRequest.Schedule : DateTime.UtcNow.AddDays(1),
                 AddedOn = DateTime.UtcNow,
-                AddedBy = User.Identity?.Name,
+                AddedBy = User.Identity.Name ?? userId,
                 UserId = userId,
                 IsDeleted = false
             };
@@ -172,57 +152,44 @@ namespace Hometown_Application.Controllers
             try
             {
                 _context.ServiceRequests.Add(newRequest);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Service request created successfully.";
+                var savedEntries = await _context.SaveChangesAsync();
+                if (savedEntries == 0)
+                {
+                    _logger.LogWarning("No entries were saved for UserId: {UserId}", userId);
+                    return BadRequest("Failed to save the request.");
+                }
+                _logger.LogInformation("Request created for UserId: {UserId}, ServiceRequestId: {ServiceRequestId}", userId, newRequest.ServiceRequestId);
                 return RedirectToAction("RequestConfirmation");
             }
-            catch (DbUpdateException ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving service request");
-                ModelState.AddModelError("", $"An error occurred while saving the request. Details: {ex.Message}");
-                viewModel.RequestTypes = await _context.RequestTypes
-                    .Where(rt => rt.IsActive)
-                    .OrderBy(rt => rt.Name)
-                    .ToListAsync();
-                return View("Create", viewModel);
+                _logger.LogError(ex, "Error creating request for UserId: {UserId}: {Message}", userId, ex.Message);
+                return BadRequest($"Error: {ex.Message}");
             }
         }
 
         // GET: Display user's submitted requests
+        [Authorize]
         public async Task<IActionResult> RequestConfirmation()
         {
-            if (!User.Identity.IsAuthenticated)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized();
-            }
-
-            try
-            {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                _logger.LogInformation($"Fetching requests for UserId: {userId}");
-
-                if (string.IsNullOrEmpty(userId))
-                {
-                    _logger.LogWarning("UserId is null or empty. User might not be properly authenticated.");
-                    TempData["Error"] = "Unable to fetch requests because user authentication failed.";
-                    return View(new List<ServiceRequestModel>());
-                }
-
-                var userRequests = await _context.ServiceRequests
-                    .Include(sr => sr.RequestType)
-                    .Include(sr => sr.Status)
-                    .Where(sr => sr.UserId == userId && sr.IsDeleted == false)
-                    .OrderByDescending(sr => sr.AddedOn)
-                    .ToListAsync();
-
-                return View(userRequests);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching user service requests");
-                TempData["Error"] = $"An error occurred while fetching your requests. Details: {ex.Message}";
+                _logger.LogWarning("UserId is null or empty in RequestConfirmation.");
+                TempData["Error"] = "Unable to fetch requests because user authentication failed.";
                 return View(new List<ServiceRequestModel>());
             }
+
+            _logger.LogInformation("Fetching requests for UserId: {UserId}", userId);
+            var userRequests = await _context.ServiceRequests
+                .Include(sr => sr.RequestType)
+                .Include(sr => sr.Status)
+                .Where(sr => sr.UserId == userId && sr.IsDeleted == false)
+                .OrderByDescending(sr => sr.AddedOn)
+                .ToListAsync();
+
+            _logger.LogInformation("Found {Count} requests for UserId: {UserId}", userRequests.Count, userId);
+            return View(userRequests);
         }
 
         // GET: Display all requests for Admin
@@ -551,6 +518,62 @@ namespace Hometown_Application.Controllers
                 _logger.LogError(ex, "Error deleting service request ID: {Id}", id);
                 TempData["Error"] = $"An error occurred while deleting the request. Details: {ex.Message}";
                 return RedirectToAction("HomeownerView");
+            }
+        }
+        // Add this new action to ServiceRequestController.cs
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmServiceRequest(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid service request ID.");
+            }
+
+            var serviceRequest = await _context.ServiceRequests
+                .FirstOrDefaultAsync(sr => sr.ServiceRequestId == id && !sr.IsDeleted);
+
+            if (serviceRequest == null)
+            {
+                return NotFound("Service request not found.");
+            }
+
+            // Ensure the request is in "Pending" status
+            if (serviceRequest.Status?.StatusName != "Pending")
+            {
+                TempData["Error"] = "Only pending requests can be confirmed.";
+                return RedirectToAction("RequestConfirmation");
+            }
+
+            // Find the "Confirmed" status in the database
+            var confirmedStatus = await _context.Status
+                .FirstOrDefaultAsync(s => s.StatusName == "Confirmed");
+
+            if (confirmedStatus == null)
+            {
+                _logger.LogError("Confirmed status not found in the database.");
+                TempData["Error"] = "Unable to confirm the request because the 'Confirmed' status is not configured.";
+                return RedirectToAction("RequestConfirmation");
+            }
+
+            try
+            {
+                serviceRequest.StatusId = confirmedStatus.StatusId;
+                serviceRequest.UpdatedOn = DateTime.UtcNow;
+                serviceRequest.UpdatedBy = User.Identity?.Name ?? "Admin";
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Service request {Id} confirmed by admin", id);
+                TempData["SuccessMessage"] = "Service request confirmed successfully.";
+                return RedirectToAction("RequestConfirmation");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error confirming service request ID: {Id}", id);
+                TempData["Error"] = $"An error occurred while confirming the request: {ex.Message}";
+                return RedirectToAction("RequestConfirmation");
             }
         }
     }

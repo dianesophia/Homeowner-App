@@ -58,7 +58,7 @@
     @Html.AntiForgeryToken()
 </form>
 
-@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+<!--@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
 {
     <div class="alert alert-danger mt-3">
         <strong>Validation Errors:</strong>
@@ -69,7 +69,7 @@
             }
         </ul>
     </div>
-}
+}-->
 
 @section Scripts {
     @{

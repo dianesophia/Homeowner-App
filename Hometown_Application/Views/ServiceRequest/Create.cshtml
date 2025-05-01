@@ -52,8 +52,8 @@
                 <div class="modal-body">
                     <form asp-action="CreateRequest" method="post">
                         @Html.AntiForgeryToken()
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" id="selectedRequestTypeId" name="ServiceRequest.RequestTypeId" required>
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input type="hidden" asp-for="ServiceRequest.RequestTypeId" id="selectedRequestTypeId" required />
 
                         <div class="mb-3">
                             <label class="form-label">Service Name</label>
@@ -61,36 +61,34 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Details</label>
-                            <textarea name="ServiceRequest.Details" class="form-control" required></textarea>
+                            <label asp-for="ServiceRequest.Details" class="form-label"></label>
+                            <textarea asp-for="ServiceRequest.Details" class="form-control" required></textarea>
                             <span asp-validation-for="ServiceRequest.Details" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Location</label>
-                            <input name="ServiceRequest.Location" class="form-control" required />
+                            <label asp-for="ServiceRequest.Location" class="form-label"></label>
+                            <input asp-for="ServiceRequest.Location" class="form-control" required />
                             <span asp-validation-for="ServiceRequest.Location" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Schedule</label>
-                            <input name="ServiceRequest.Schedule" type="datetime-local" class="form-control" required />
+                            <label asp-for="ServiceRequest.Schedule" class="form-label"></label>
+                            <input asp-for="ServiceRequest.Schedule" type="datetime-local" class="form-control" required />
                             <span asp-validation-for="ServiceRequest.Schedule" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Urgency Level</label>
-                            <select name="ServiceRequest.Urgency" class="form-control" required>
-                                <option value="Low">Low</option>
-                                <option value="Medium">Medium</option>
-                                <option value="High">High</option>
+                            <label asp-for="ServiceRequest.Urgency" class="form-label"></label>
+                            <select asp-for="ServiceRequest.Urgency" class="form-control" asp-items="Html.GetEnumSelectList<UrgencyLevel>()" required>
+                                <option value="">Select urgency</option>
                             </select>
                             <span asp-validation-for="ServiceRequest.Urgency" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Your Email</label>
-                            <input name="ServiceRequest.Email" type="email" class="form-control" required />
+                            <label asp-for="ServiceRequest.Email" class="form-label"></label>
+                            <input asp-for="ServiceRequest.Email" type="email" class="form-control" required />
                             <span asp-validation-for="ServiceRequest.Email" class="text-danger"></span>
                         </div>
 
@@ -109,8 +107,7 @@
 </div>
 
 @section Scripts {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".service-card").forEach(card => {
@@ -119,6 +116,9 @@
 
                     let requestId = this.getAttribute("data-id");
                     let serviceName = this.getAttribute("data-name");
+
+                    // Log for debugging
+                    console.log("Selected RequestTypeId:", requestId, "ServiceName:", serviceName);
 
                     // Set values in the modal
                     document.getElementById("selectedRequestTypeId").value = requestId;
@@ -130,44 +130,15 @@
                 });
             });
 
-            // Handle form submission
-            document.querySelector("#serviceRequestModal form").addEventListener("submit", function (event) {
-                event.preventDefault(); // Prevent default form submission
-                console.log("Form submitted");
-
-                var form = this;
-                if (!form.checkValidity()) {
-                    console.log("Form validation failed");
-                    form.reportValidity();
-                    return;
+            // Validate Schedule on change
+            document.getElementById("ServiceRequest_Schedule").addEventListener("change", function () {
+                let selectedDate = new Date(this.value);
+                let now = new Date();
+                now.setMinutes(now.getMinutes() + 5); // Add a 5-minute buffer
+                if (selectedDate <= now) {
+                    alert("Please select a date and time at least 5 minutes in the future.");
+                    this.value = "";
                 }
-
-                fetch(form.action, {
-                    method: form.method,
-                    body: new FormData(form),
-                    headers: {
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    }
-                })
-                .then(response => {
-                    if (response.redirected) {
-                        console.log("Redirecting to: " + response.url);
-                        window.location.href = response.url; // Follow the redirect
-                    } else {
-                        return response.text();
-                    }
-                })
-                .then(data => {
-                    if (data) {
-                        console.log("Form submission failed, reloading modal with errors");
-                        document.querySelector("#serviceRequestModal .modal-body").innerHTML = data;
-                        var modal = new bootstrap.Modal(document.getElementById("serviceRequestModal"));
-                        modal.show();
-                    }
-                })
-                .catch(error => {
-                    console.error("Error submitting form:", error);
-                });
             });
         });
     </script>
