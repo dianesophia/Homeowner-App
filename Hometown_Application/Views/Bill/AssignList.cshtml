@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Hometown_Application.Models.BillAssignModel>
+
+@{
+    ViewData["Title"] = "Bills List";
+}
+
+<h2>Bills</h2>
+
+<a asp-action="AssignBill">Create New</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Bill Name</th>
+            <th>Amount</th>
+            <th>Due Date</th>
+            <th>Is Paid</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ApplicationUser?.UserName</td>
+                <td>@item.BillName</td>
+                <td>@item.Amount</td>
+                <td>@item.DueDate.ToShortDateString()</td>
+                <td>@item.IsPaid</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.BillAssignId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.BillAssignId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

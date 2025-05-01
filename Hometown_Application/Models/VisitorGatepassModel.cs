@@ -15,41 +15,32 @@ namespace Hometown_Application.Models
         [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
 
-
         [StringLength(100)]
         public string? VisitorName { get; set; }
 
-        
         public string? Purpose { get; set; }
 
-       
         public DateTime VisitDate { get; set; }
 
-       
         public DateTime? ExpectedArrivalTime { get; set; }
 
-        
         public int? NumberOfVisitors { get; set; }
 
         [StringLength(50)]
-        public string? VehicleType { get; set; }  // Example: Car, Motorcycle, Truck
+        public string? VehicleType { get; set; }
 
         [StringLength(20)]
-        public string? VehiclePlateNumber { get; set; }  // License Plate Number
+        public string? VehiclePlateNumber { get; set; }
 
         [StringLength(20)]
-        public string? VehicleColor { get; set; }  // Example: Red, Blue, Black
-
-
+        public string? VehicleColor { get; set; }
 
         [StringLength(50)]
         public string? ContactNumber { get; set; }
 
         public DateTime? GatePassIssuedDate { get; set; }
 
-        // Expiry date of the gate pass (optional)
         public DateTime? GatePassExpiryDate { get; set; }
-
 
         public bool? IsApproved { get; set; }
 
@@ -59,10 +50,10 @@ namespace Hometown_Application.Models
         public string? AdminNotes { get; set; }
 
         [StringLength(50)]
-        public string? ApprovedBy { get; set; }  // Admin ID or Name
+        public string? ApprovedBy { get; set; }
 
         public DateTime? ApprovedDate { get; set; }
-      
+
         public DateTime? AddedOn { get; set; } = DateTime.UtcNow;
         public string AddedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
@@ -70,5 +61,13 @@ namespace Hometown_Application.Models
 
         public bool? IsDeleted { get; set; } = false;
 
+        public bool? IsArrived { get; set; } = false;
+
+        // New Arrival Date Property
+        public DateTime? ArrivalDate { get; set; }
+
+        // New IsExited Property
+        public bool? IsExited { get; set; } = false;
+        public DateTime? ExitDate { get; set; }
     }
 }

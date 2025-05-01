@@ -64,87 +64,85 @@
                 </div>
             </div>
         }
-
-        <!-- Display Bill Assignments -->
+        <!--
+            Display Bill Assignments
         @if (item.BillAssignments != null && item.BillAssignments.Any())
         {
-            <div class="col-md-12 mb-4">
-                <div class="card shadow border-secondary">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0">Bill Assignments for Bill ID: @item.BillId</h5>
-                    </div>
-                    <div class="card-body">
+                    <div class="col-md-12 mb-4">
+                        <div class="card shadow border-secondary">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">Bill Assignments for Bill ID: @item.BillId</h5>
+                            </div>
+                            <div class="card-body">
                         @foreach (var assignment in item.BillAssignments)
                         {
-                            <div class="card mb-3 border">
-                                <div class="card-body">
-                                    <div class="row mb-2">
-                                        <div class="col-md-3">
-                                            <strong>Assignment ID:</strong> @assignment.BillAssignmentId
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Bill Name:</strong> @assignment.BillName
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Amount:</strong> @assignment.Amount.ToString("C")
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Status:</strong>
+                                        <div class="card mb-3 border">
+                                            <div class="card-body">
+                                                <div class="row mb-2">
+                                                    <div class="col-md-3">
+                                                        <strong>Assignment ID:</strong> @assignment.BillAssignmentId
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Bill Name:</strong> @assignment.BillName
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Amount:</strong> @assignment.Amount.ToString("C")
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Status:</strong>
                                             @if (assignment.IsPaid)
                                             {
-                                                <span class="badge bg-success">Paid</span>
+                                                                <span class="badge bg-success">Paid</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-warning text-dark">Unpaid</span>
+                                                                <span class="badge bg-warning text-dark">Unpaid</span>
                                             }
-                                        </div>
-                                    </div>
+                                                    </div>
+                                                </div>
 
-                                    <div class="row mb-2">
-                                        <div class="col-md-6">
-                                            <strong>Description:</strong> @assignment.Description
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Issued Date:</strong> @assignment.IssuedDate.ToString("MM/dd/yyyy")
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Due Date:</strong> @assignment.DueDate.ToString("MM/dd/yyyy")
-                                        </div>
-                                    </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-md-6">
+                                                        <strong>Description:</strong> @assignment.Description
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Issued Date:</strong> @assignment.IssuedDate.ToString("MM/dd/yyyy")
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Due Date:</strong> @assignment.DueDate.ToString("MM/dd/yyyy")
+                                                    </div>
+                                                </div>
 
-                                    <div class="row align-items-center">
-                                        <div class="col-md-6">
-                                            <strong>Remarks:</strong> @assignment.Remarks
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Paid Date:</strong> @(assignment.PaidDate?.ToString("MM/dd/yyyy") ?? "N/A")
-                                        </div>
-                                        <div class="col-md-3 text-end">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-6">
+                                                        <strong>Remarks:</strong> @assignment.Remarks
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Paid Date:</strong> @(assignment.PaidDate?.ToString("MM/dd/yyyy") ?? "N/A")
+                                                    </div>
+                                                    <div class="col-md-3 text-end">
                                             @if (!assignment.IsPaid)
                                             {
-                                                <form asp-action="PayBillAssignment" method="post">
-                                                    <input type="hidden" name="assignmentId" value="@assignment.BillAssignmentId" />
-                                                    <button type="submit" class="btn btn-primary btn-sm">Pay Bill</button>
-                                                </form>
+                                                                <a href="@Url.Action("PayBillAssignment", "Bill", new { billAssignmentId = assignment.BillAssignmentId })" class="btn btn-primary btn-sm">
+                                                                    Pay Bill
+                                                                </a>
                                             }
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
                         }
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
         }
         else
         {
-            <div class="col-md-12 mb-4 text-center text-muted">
-                <p>No assignments available for this bill.</p>
-            </div>
+                    <div class="col-md-12 mb-4 text-center text-muted">
+                        <p>No assignments available for this bill.</p>
+                    </div>
         }
-
-
+        -->
     }
 </div>
 

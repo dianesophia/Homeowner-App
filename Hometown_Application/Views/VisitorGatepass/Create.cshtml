@@ -4,55 +4,79 @@
     ViewData["Title"] = "Create Visitor Gatepass";
 }
 
-<h2>Create Visitor Gatepass</h2>
+<h2 class="my-4">Create Visitor Gatepass</h2>
 
 <form asp-action="Create" method="post">
+    <div class="form-row">
+        <!-- Visitor Name -->
+        <div class="form-group col-md-6">
+            <label asp-for="VisitorName" class="control-label">Visitor Name</label>
+            <input asp-for="VisitorName" class="form-control" />
+        </div>
 
-    <div class="form-group">
-        <label asp-for="VisitorName" class="control-label"></label>
-        <input asp-for="VisitorName" class="form-control" />
+        <!-- Purpose -->
+        <div class="form-group col-md-6">
+            <label asp-for="Purpose" class="control-label">Purpose</label>
+            <textarea asp-for="Purpose" class="form-control" rows="3"></textarea>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Purpose" class="control-label"></label>
-        <textarea asp-for="Purpose" class="form-control"></textarea>
+
+    <div class="form-row">
+        <!-- Visit Date -->
+        <div class="form-group col-md-6">
+            <label asp-for="VisitDate" class="control-label">Visit Date</label>
+            <input asp-for="VisitDate" type="date" class="form-control" required />
+        </div>
+
+        <!-- Expected Arrival Time -->
+        <div class="form-group col-md-6">
+            <label asp-for="ExpectedArrivalTime" class="control-label">Expected Arrival Time</label>
+            <input asp-for="ExpectedArrivalTime" type="time" class="form-control" />
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="VisitDate" class="control-label"></label>
-        <input asp-for="VisitDate" type="date" class="form-control" required />
-    </div>
-    <div class="form-group">
-        <label asp-for="ExpectedArrivalTime" class="control-label"></label>
-        <input asp-for="ExpectedArrivalTime" type="time" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="NumberOfVisitors" class="control-label"></label>
-        <input asp-for="NumberOfVisitors" type="number" class="form-control" />
+
+    <div class="form-row">
+        <!-- Number of Visitors -->
+        <div class="form-group col-md-6">
+            <label asp-for="NumberOfVisitors" class="control-label">Number of Visitors</label>
+            <input asp-for="NumberOfVisitors" type="number" class="form-control" />
+        </div>
     </div>
 
     <!-- Vehicle Details Section -->
-    <h4>Vehicle Details</h4>
-    <div class="form-group">
-        <label asp-for="VehicleType" class="control-label">Vehicle Type</label>
-        <select asp-for="VehicleType" class="form-control">
-            <option value="">Select Vehicle Type</option>
-            <option value="Car">Car</option>
-            <option value="Motorcycle">Motorcycle</option>
-            <option value="Truck">Truck</option>
-            <option value="Other">Other</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label asp-for="VehiclePlateNumber" class="control-label">Vehicle Plate Number</label>
-        <input asp-for="VehiclePlateNumber" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="VehicleColor" class="control-label">Vehicle Color</label>
-        <input asp-for="VehicleColor" class="form-control" />
+    <h4 class="my-4">Vehicle Details</h4>
+    <div class="form-row">
+        <!-- Vehicle Type -->
+        <div class="form-group col-md-6">
+            <label asp-for="VehicleType" class="control-label">Vehicle Type</label>
+            <select asp-for="VehicleType" class="form-control">
+                <option value="">Select Vehicle Type</option>
+                <option value="Car">Car</option>
+                <option value="Motorcycle">Motorcycle</option>
+                <option value="Truck">Truck</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <!-- Vehicle Plate Number -->
+        <div class="form-group col-md-6">
+            <label asp-for="VehiclePlateNumber" class="control-label">Vehicle Plate Number</label>
+            <input asp-for="VehiclePlateNumber" class="form-control" />
+        </div>
     </div>
 
-    <div class="form-group">
-        <label asp-for="ContactNumber" class="control-label"></label>
-        <input asp-for="ContactNumber" class="form-control" />
+    <div class="form-row">
+        <!-- Vehicle Color -->
+        <div class="form-group col-md-6">
+            <label asp-for="VehicleColor" class="control-label">Vehicle Color</label>
+            <input asp-for="VehicleColor" class="form-control" />
+        </div>
+
+        <!-- Contact Number -->
+        <div class="form-group col-md-6">
+            <label asp-for="ContactNumber" class="control-label">Contact Number</label>
+            <input asp-for="ContactNumber" class="form-control" />
+        </div>
     </div>
 
     <div class="form-group">

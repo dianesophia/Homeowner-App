@@ -40,8 +40,9 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     //Billing
     public DbSet<BillModel> Bills { get; set; }
     public DbSet<BillItemsModel> BillItems { get; set; }
-
+    public DbSet<BillAssignModel> BillAssign { get; set; }
     public DbSet<BillPaymentModel> BillPayment { get; set; }
+    public DbSet<BillFeeModel> BillFee { get; set; }
     public DbSet<BillAssignmentModel> BillAssignment { get; set; }
 
   
@@ -145,6 +146,11 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .HasForeignKey(p => p.UserId)
            .OnDelete(DeleteBehavior.NoAction);
 
+        builder.Entity<BillAssignModel>()
+          .HasOne(c => c.ApplicationUser)
+          .WithMany()
+          .HasForeignKey(c => c.UserId)
+          .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<BillAssignmentModel>()
            .HasOne(c => c.ApplicationUser)
@@ -169,6 +175,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
        .WithMany()  // This means a Bill can be assigned to many BillAssignments
        .HasForeignKey(c => c.BillAssignmentId)  // BillAssignmentModel has a BillId to reference the Bill
        .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BillFeeModel>()
+     .HasOne(c => c.BillAssignment)  // Correct the navigation property to 'Bill' (not 'BillModel')
+     .WithMany()  // This means a Bill can be assigned to many BillAssignments
+     .HasForeignKey(c => c.BillAssignmentId)  // BillAssignmentModel has a BillId to reference the Bill
+     .OnDelete(DeleteBehavior.NoAction);
 
         // Relationship for Recipient
         builder.Entity<ChatMessageModel>()

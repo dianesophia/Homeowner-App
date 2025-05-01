@@ -11,10 +11,13 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.IO;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Hometown_Application.Controllers
 {
+    [Authorize]
     public class BillController : Controller
     {
         private readonly ApplicationDBContext _context;
@@ -174,45 +177,101 @@ namespace Hometown_Application.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> PayBillAssignment(int billAssignmentId, decimal amountPaid, string paymentMethod, string referenceNumber)
+
+        [HttpGet("PayBillAssignment/{billAssignmentId}")]
+        public async Task<IActionResult> PayBillAssignment(int billAssignmentId)
         {
             var billAssignment = await _context.BillAssignment
-                .Include(b => b.Bill) // Needed to access the related bill
+                .Include(b => b.Bill)
                 .FirstOrDefaultAsync(b => b.BillAssignmentId == billAssignmentId);
 
-            if (billAssignment == null) return NotFound();
-            if (billAssignment.IsPaid) return BadRequest("This bill assignment is already paid.");
+            if (billAssignment == null)
+                return NotFound();
 
-            // Update assignment status
-            billAssignment.IsPaid = true;
-            billAssignment.PaidDate = DateTime.UtcNow;
+            ViewBag.BillAssignmentId = billAssignment.BillAssignmentId;
+            ViewBag.BillId = billAssignment.BillId;
 
-            // Optional: also update the parent bill's balance
-            if (billAssignment.Bill != null)
-            {
-                billAssignment.Bill.UpdateRemainingBalance(amountPaid);
-                _context.Update(billAssignment.Bill);
-            }
-
-            // Create payment record
-            var payment = new BillPaymentModel
-            {
-                BillAssignmentId = billAssignmentId,
-                BillId = billAssignment.BillId, // Optional: keep traceability to main Bill
-                AmountPaid = amountPaid,
-                PaymentMethod = paymentMethod,
-                PaymentDate = DateTime.UtcNow,
-                ReferenceNumber = referenceNumber,
-            };
-
-            _context.Add(payment);
-            _context.Update(billAssignment);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
+            return View(new BillPaymentModel()); // pass empty model for the form
         }
 
+        // POST method for handling the payment
+        /* [HttpPost("PayBillAssignment")]
+         public async Task<IActionResult> PayBillAssignment(BillPaymentModel model)
+         {
+             var billAssignment = await _context.BillAssignment
+                 .Include(b => b.Bill)
+                 .FirstOrDefaultAsync(b => b.BillAssignmentId == model.BillAssignmentId);
+
+             if (billAssignment == null)
+                 return NotFound();
+
+             if (billAssignment.IsPaid)
+                 return BadRequest("This bill assignment is already paid.");
+
+             // Update data
+             billAssignment.IsPaid = true;
+             billAssignment.PaidDate = DateTime.UtcNow;
+
+             if (billAssignment.Bill != null)
+             {
+                 billAssignment.Bill.UpdateRemainingBalance(model.AmountPaid);
+                 _context.Update(billAssignment.Bill);
+             }
+
+             var payment = new BillPaymentModel
+             {
+                 BillAssignmentId = model.BillAssignmentId,
+                 BillId = billAssignment.BillId,
+                 AmountPaid = model.AmountPaid,
+                 PaymentMethod = model.PaymentMethod,
+                 ReferenceNumber = model.ReferenceNumber,
+                 PaymentDate = DateTime.UtcNow
+             };
+
+             _context.Add(payment);
+             _context.Update(billAssignment);
+             await _context.SaveChangesAsync();
+
+             return RedirectToAction("Index");
+         }*/
+
+        [HttpPost]
+        [HttpPost]
+        public async Task<IActionResult> PayBillAssignment(BillFeeModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Find the related BillAssignment
+            var billAssignment = await _context.BillAssignment.FindAsync(model.BillAssignmentId);
+            if (billAssignment == null)
+            {
+                return NotFound();
+            }
+
+            // Add a new record to the BillPayments table
+            var payment = new BillFeeModel
+            {
+                BillAssignmentId = model.BillAssignmentId,
+               // BillId = model.BillId,
+                AmountPaid = model.AmountPaid,
+                PaymentMethod = model.PaymentMethod,
+                ReferenceNumber = model.ReferenceNumber,
+                PaymentDate = DateTime.Now
+            };
+
+            _context.BillFee.Add(payment);
+
+            // Optional: update the assignment as paid
+            billAssignment.IsPaid = true;
+            _context.BillAssignment.Update(billAssignment);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
 
 
         public async Task<IActionResult> HomeownerBoard()
@@ -608,6 +667,100 @@ namespace Hometown_Application.Controllers
             return RedirectToAction(nameof(HomeownerBoard));
         }
 
+
+        public async Task<IActionResult> AssignList()
+        {
+            var bills = await _context.BillAssign
+                .Include(b => b.ApplicationUser)
+                .Where(b => !b.IsDeleted)
+                .ToListAsync();
+            return View(bills);
+        }
+
+        public IActionResult AssignBill()
+        {
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignBill(BillAssignModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Index");
+
+            if (ModelState.IsValid)
+            {
+                model.AddedOn = DateTime.UtcNow;
+                model.AddedBy = user.Id;
+                _context.BillAssign.Add(model);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(AssignList));
+            }
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", model.UserId);
+            return View(model);
+        }
+
+        public async Task<IActionResult> Create(VehicleGatepassModel model, IFormFile vehicleImage)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Index");
+
+            if (vehicleImage != null && vehicleImage.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await vehicleImage.CopyToAsync(memoryStream);
+                    model.VehicleImage = memoryStream.ToArray();
+                }
+            }
+            model.UserId = user.Id;
+            model.AddedOn = DateTime.UtcNow;
+            model.AddedBy = user.Id;
+            _context.VehicleGatepasses.Add(model);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: BillAssign/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var model = await _context.BillAssign.FindAsync(id);
+            if (model == null) return NotFound();
+
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", model.UserId);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, BillAssignModel model)
+        {
+            if (id != model.BillAssignId) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    model.UpdatedOn = DateTime.UtcNow;
+                    _context.Update(model);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.BillAssign.Any(e => e.BillAssignId == id))
+                        return NotFound();
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", model.UserId);
+            return View(model);
+        }
 
     }
 }

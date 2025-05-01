@@ -1,11 +1,20 @@
 ﻿@model Hometown_Application.Models.BillPaymentModel
 
-<form asp-action="ProcessPayment" method="post">
+@{
+    ViewData["Title"] = "Pay Bill";
+}
+
+<h2>Pay Bill</h2>
+
+<!-- Corrected form to target BillController's PayBillAssignment POST method -->
+<form asp-controller="Bill" asp-action="PayBillAssignment" method="post">
+    <input type="hidden" asp-for="BillAssignmentId" />
     <input type="hidden" asp-for="BillId" />
 
     <div class="form-group">
         <label asp-for="AmountPaid"></label>
         <input asp-for="AmountPaid" class="form-control" />
+        <span asp-validation-for="AmountPaid" class="text-danger"></span>
     </div>
 
     <div class="form-group">
@@ -15,16 +24,19 @@
             <option value="Cash">Cash</option>
             <option value="GCash">GCash</option>
             <option value="BankTransfer">Bank Transfer</option>
-            <!-- Add other options if needed -->
         </select>
         <span asp-validation-for="PaymentMethod" class="text-danger"></span>
     </div>
 
-
     <div class="form-group">
         <label asp-for="ReferenceNumber"></label>
         <input asp-for="ReferenceNumber" class="form-control" />
+        <span asp-validation-for="ReferenceNumber" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Submit Payment</button>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
