@@ -1,152 +1,456 @@
+@using Microsoft.AspNetCore.Identity
+@using Hometown_Application.Areas.Identity.Data
+@inject UserManager<ApplicationUser> UserManager
 @model Hometown_Application.ViewModel.PollViewModel
 
 @{
+    var user = await UserManager.GetUserAsync(User);
     ViewData["Title"] = "Edit Poll";
 }
 
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 30px;
+        margin-bottom: 3rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control {
+        border-radius: var(--border-radius);
+        border: 1px solid #ced4da;
+        padding: 12px 15px;
+        transition: var(--transition);
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 0.2rem rgba(111, 117, 78, 0.25);
+        }
+
+    textarea.form-control {
+        min-height: 120px;
+    }
+
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-check-label {
+        padding-left: 0.5rem;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-text {
+        color: var(--secondary-color);
+        font-size: 0.875rem;
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 10px 20px;
+        transition: var(--transition);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-secondary {
+        background-color: transparent;
+        border: 1px solid var(--secondary-color);
+        color: var(--secondary-color);
+    }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+        color: white;
+    }
+
+        .btn-success:hover {
+            background-color: #146c43;
+            border-color: #146c43;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+    .btn-outline-danger {
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+        .btn-outline-danger:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+    .badge {
+        padding: 0.5em 0.7em;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .bg-secondary {
+        background-color: var(--secondary-color) !important;
+    }
+
+    .bg-info {
+        background-color: var(--info-color) !important;
+    }
+
+    .bg-danger {
+        background-color: var(--danger-color) !important;
+    }
+
+    .bg-warning {
+        background-color: var(--warning-color) !important;
+    }
+
+    .alert {
+        border-radius: var(--border-radius);
+        padding: 15px 20px;
+    }
+
+    .alert-info {
+        background-color: rgba(13, 202, 240, 0.1);
+        border-left: 4px solid var(--info-color);
+        color: var(--text-color);
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-left: 4px solid var(--danger-color);
+        color: var(--text-color);
+    }
+
+    .validation-error {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 2rem;
+    }
+
+    .btn-primary:active {
+        animation: pulse 0.3s;
+    }
+
+    .card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        background-color: var(--card-bg);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+        border-top-left-radius: var(--border-radius) !important;
+        border-top-right-radius: var(--border-radius) !important;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-title {
+        color: var(--text-color);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .question-card {
+        transition: var(--transition);
+    }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .list-group-item {
+        border-radius: 8px !important;
+        margin-bottom: 0.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: var(--transition);
+    }
+
+        .list-group-item:hover {
+            background-color: rgba(111, 117, 78, 0.05);
+        }
+
+    .input-group {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .section-header {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-light);
+    }
+
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--shadow);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .modal-title {
+        color: var(--text-color);
+        font-weight: 600;
+    }
+</style>
+
 <div class="container">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h1 class="display-4">@ViewData["Title"]</h1>
-            <p class="lead">Edit poll details and manage questions</p>
-        </div>
+    <div class="page-header">
+        <h1 class="page-title">Edit Poll</h1>
+    </div>
+    <p class="page-subtitle">Edit poll details and manage questions</p>
+
+    <div class="form-container">
+        <form asp-action="Edit" onsubmit="return validatePollForm()">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="PollId" />
+            <input type="hidden" asp-for="CreatorId" />
+
+            <div class="form-group">
+                <label asp-for="Title" class="form-label">Poll Title <span class="text-danger">*</span></label>
+                <input asp-for="Title" class="form-control" aria-describedby="titleHelp" placeholder="Enter a concise title for your poll" required />
+                <span asp-validation-for="Title" class="validation-error"></span>
+                <small id="titleHelp" class="form-text">Enter a concise title for your poll.</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="3" aria-describedby="descriptionHelp" placeholder="Provide a brief description of the poll (optional)"></textarea>
+                <span asp-validation-for="Description" class="validation-error"></span>
+                <small id="descriptionHelp" class="form-text">Provide a brief description of the poll (optional).</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ExpiryDate" class="form-label">Expiry Date</label>
+                        <input asp-for="ExpiryDate" class="form-control" type="date" aria-describedby="expiryHelp" />
+                        <span asp-validation-for="ExpiryDate" class="validation-error"></span>
+                        <small id="expiryHelp" class="form-text">Leave blank for no expiry date.</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="IsActive" class="form-label">Poll Status</label>
+                        <div class="form-check">
+                            <input asp-for="IsActive" class="form-check-input" id="IsActive" />
+                            <label class="form-check-label" for="IsActive">
+                                Make this poll active and available to users
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary" aria-label="Save changes to poll">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a asp-action="Index" class="btn btn-secondary" aria-label="Return to polls list">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </form>
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Poll Details</h5>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Edit">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="PollId" />
-                        <input type="hidden" asp-for="CreatorId" />
+    <h2 class="section-header">Questions</h2>
+    <div class="form-container">
+        <div class="mb-4">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addQuestionModal" aria-label="Add a new question">
+                <i class="fas fa-plus-circle"></i> Add New Question
+            </button>
+        </div>
 
-                        <div class="form-group mb-3">
-                            <label asp-for="Title" class="control-label"></label>
-                            <input asp-for="Title" class="form-control" aria-describedby="titleHelp" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
-                            <small id="titleHelp" class="form-text text-muted">Enter a concise title for your poll.</small>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="Description" class="control-label"></label>
-                            <textarea asp-for="Description" class="form-control" rows="3" aria-describedby="descriptionHelp"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                            <small id="descriptionHelp" class="form-text text-muted">Provide a brief description of the poll (optional).</small>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="ExpiryDate" class="control-label"></label>
-                                    <input asp-for="ExpiryDate" class="form-control" type="date" aria-describedby="expiryHelp" />
-                                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
-                                    <small id="expiryHelp" class="form-text text-muted">Leave blank for no expiry date.</small>
-                                </div>
+        <div id="questionsContainer">
+            @if (Model.Questions.Any())
+            {
+                @foreach (var question in Model.Questions.OrderBy(q => q.DisplayOrder))
+                {
+                    <div class="card mb-3 question-card" data-question-id="@question.QuestionId">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-secondary me-2">Q@(question.DisplayOrder)</span>
+                                <span class="badge bg-info me-2" aria-label="Question type: Multiple Choice">
+                                    Multiple Choice
+                                </span>
+                                <span class="badge bg-@(question.IsRequired ? "danger" : "warning")" aria-label="Question status: @(question.IsRequired ? "Required" : "Optional")">
+                                    @(question.IsRequired ? "Required" : "Optional")
+                                </span>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="IsActive" class="control-label"></label>
-                                    <div class="form-check mt-2">
-                                        <input asp-for="IsActive" class="form-check-input" id="IsActive" />
-                                        <label class="form-check-label" for="IsActive">
-                                            Make this poll active and available to users
-                                        </label>
-                                    </div>
-                                </div>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-question-btn" data-question-id="@question.QuestionId" aria-label="Delete question">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
+                        <div class="card-body">
+                            <h5 class="card-title">@question.QuestionText</h5>
 
-                        <div class="form-group mt-3">
-                            <button type="submit" class="btn btn-primary" aria-label="Save changes to poll">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                            <a asp-action="Index" class="btn btn-secondary" aria-label="Return to polls list">
-                                <i class="fas fa-arrow-left"></i> Back to List
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Questions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-4">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addQuestionModal" aria-label="Add a new question">
-                            <i class="fas fa-plus-circle"></i> Add New Question
-                        </button>
-                    </div>
-
-                    <div id="questionsContainer">
-                        @if (Model.Questions.Any())
-                        {
-                            @foreach (var question in Model.Questions.OrderBy(q => q.DisplayOrder))
-                            {
-                                <div class="card mb-3 question-card" data-question-id="@question.QuestionId">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="badge bg-secondary me-2">Q@(question.DisplayOrder)</span>
-                                            <span class="badge bg-info me-2" aria-label="Question type: Multiple Choice">
-                                                Multiple Choice
-                                            </span>
-                                            <span class="badge bg-@(question.IsRequired ? "danger" : "warning")" aria-label="Question status: @(question.IsRequired ? "Required" : "Optional")">
-                                                @(question.IsRequired ? "Required" : "Optional")
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <button type="button" class="btn btn-sm btn-outline-danger delete-question-btn" data-question-id="@question.QuestionId" aria-label="Delete question">
-                                                <i class="fas fa-trash"></i>
+                            <div class="options-container mt-3">
+                                <h6>Options:</h6>
+                                <ul class="list-group">
+                                    @foreach (var option in question.Options.OrderBy(o => o.DisplayOrder))
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            @option.OptionText
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-option-btn"
+                                                    data-option-id="@option.OptionId" aria-label="Delete option">
+                                                <i class="fas fa-times"></i>
                                             </button>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <h5 class="card-title">@question.QuestionText</h5>
+                                        </li>
+                                    }
+                                </ul>
 
-                                        <div class="options-container mt-3">
-                                            <h6>Options:</h6>
-                                            <ul class="list-group">
-                                                @foreach (var option in question.Options.OrderBy(o => o.DisplayOrder))
-                                                {
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                        @option.OptionText
-                                                        <button type="button" class="btn btn-sm btn-outline-danger delete-option-btn"
-                                                                data-option-id="@option.OptionId" aria-label="Delete option">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    </li>
-                                                }
-                                            </ul>
-
-                                            <div class="mt-3">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control new-option-text"
-                                                           placeholder="Add new option..." aria-label="New option text" />
-                                                    <button type="button" class="btn btn-outline-primary add-option-btn"
-                                                            data-question-id="@question.QuestionId" aria-label="Add option">
-                                                        <i class="fas fa-plus"></i> Add
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="mt-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control new-option-text"
+                                               placeholder="Add new option..." aria-label="New option text" />
+                                        <button type="button" class="btn btn-outline-primary add-option-btn"
+                                                data-question-id="@question.QuestionId" aria-label="Add option">
+                                            <i class="fas fa-plus"></i> Add
+                                        </button>
                                     </div>
                                 </div>
-                            }
-                        }
-                        else
-                        {
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i> No questions added yet. Use the "Add New Question" button to add questions to your poll.
                             </div>
-                        }
+                        </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No questions added yet. Use the "Add New Question" button to add questions to your poll.
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>
@@ -163,7 +467,7 @@
                 <div class="form-group mb-3">
                     <label for="questionText" class="form-label">Question Text</label>
                     <textarea id="questionText" class="form-control" rows="3" required aria-describedby="questionTextHelp"></textarea>
-                    <small id="questionTextHelp" class="form-text text-muted">Enter the question you want to ask.</small>
+                    <small id="questionTextHelp" class="form-text">Enter the question you want to ask.</small>
                 </div>
                 <!-- Removed question type selection since only MultipleChoice is supported -->
                 <input type="hidden" id="questionType" value="@((int)Hometown_Application.Data.QuestionType.MultipleChoice)" />
@@ -234,6 +538,11 @@
                                         </div>
                                     </div>
                                 </div>`;
+
+                            if ($('#questionsContainer .alert').length) {
+                                $('#questionsContainer').empty();
+                            }
+
                             $('#questionsContainer').append(newQuestionHtml);
                             $('#addQuestionModal').modal('hide');
                             $('#questionText').val('');
@@ -261,6 +570,15 @@
                         success: function (response) {
                             if (response.success) {
                                 $(`div[data-question-id="${questionId}"]`).remove();
+
+                                // If no questions left, show the info alert
+                                if ($('#questionsContainer .question-card').length === 0) {
+                                    $('#questionsContainer').html(`
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i> No questions added yet. Use the "Add New Question" button to add questions to your poll.
+                                        </div>
+                                    `);
+                                }
                             } else {
                                 alert('An error occurred while deleting the question');
                             }
@@ -334,6 +652,26 @@
                     });
                 }
             });
+
+            // Visual feedback when clicking buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = '';
+                });
+            });
         });
+
+        function validatePollForm() {
+            var title = document.querySelector('input[name="Title"]').value;
+            if (!title || title.trim() === "") {
+                alert("Please fill in all required fields, including the poll title.");
+                return false;
+            }
+            return true;
+        }
     </script>
 }
