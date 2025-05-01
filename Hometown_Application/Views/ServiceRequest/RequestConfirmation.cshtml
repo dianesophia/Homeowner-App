@@ -14,7 +14,11 @@
             {
                 <div class="alert alert-danger">@TempData["Error"]</div>
             }
-            else if (Model != null && Model.Any())
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (Model != null && Model.Any())
             {
                 <p class="lead">Below are all the service requests you have submitted:</p>
 
@@ -22,7 +26,7 @@
                 {
                     <div class="card mb-4 shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title"><strong>Service Name:</strong> @request.RequestType?.Name</h5>
+                            <h5 class="card-title"><strong>Service Name:</strong> @(request.RequestType?.Name ?? "Unknown")</h5>
                             <p><strong>Request Details:</strong> @request.Details</p>
                             <p><strong>Location:</strong> @request.Location</p>
                             <p><strong>Urgency Level:</strong> @request.Urgency</p>
@@ -30,17 +34,25 @@
                             <p><strong>Requested On:</strong> @request.AddedOn.ToString("MMMM dd, yyyy hh:mm tt")</p>
                             <p>
                                 <strong>Status:</strong>
-                                <span class="badge @(request.Status?.StatusName == "Completed" ? "bg-success" : "bg-warning")">
-                                    @request.Status?.StatusName
+                                <span class="badge @(request.Status?.StatusName == "Completed" ? "bg-success" : (request.Status?.StatusName == "Confirmed" ? "bg-info" : "bg-warning"))">
+                                    @(request.Status?.StatusName ?? "Unknown")
                                 </span>
                             </p>
                         </div>
                         <div class="card-footer text-end">
                             <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning btn-sm">Edit</a>
                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                    onclick="setDeleteId(@request.ServiceRequestId, '@request.RequestType?.Name')">
+                                    onclick="setDeleteId(@request.ServiceRequestId, '@(request.RequestType?.Name?.Replace("'", "\\'") ?? "Unknown")')">
                                 Delete
                             </button>
+                            @if (User.IsInRole("Admin") && request.Status?.StatusName == "Pending")
+                            {
+                                <form asp-action="ConfirmServiceRequest" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@request.ServiceRequestId" />
+                                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to confirm this request?')">Confirm</button>
+                                </form>
+                            }
                         </div>
                     </div>
                 }

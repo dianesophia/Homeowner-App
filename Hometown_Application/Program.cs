@@ -2,15 +2,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Hometown_Application.Data;
 using Hometown_Application.Areas.Identity.Data;
-using System.ComponentModel;
 using Hometown_Application.Seed;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
-using Hometown_Application.Controllers;
-using QuestPDF;
 using Hometown_Application.Hubs;
-using Stripe;
-using Hometown_Application;
+using Hometown_Application.Controllers;
+
 public class Program
 {
     public static async Task Main(string[] args)
@@ -23,7 +20,7 @@ public class Program
 
         builder.Services.AddScoped<CustomValidateAntiForgeryTokenAttribute>();
 
-        // Add DbContext
+        // Add DbContext (remove duplicate registration)
         builder.Services.AddDbContext<ApplicationDBContext>(options =>
             options.UseSqlServer(connectionString));
 
@@ -70,26 +67,21 @@ public class Program
             options.Secure = CookieSecurePolicy.Always;
         });
 
-        // Configure Identity cookies to require HTTPS and set login path
+        // Configure Identity cookies to require HTTPS and set correct login path
         builder.Services.ConfigureApplicationCookie(options =>
         {
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
-            options.LoginPath = "/Account/Login"; // Redirect to login if user is not authenticated
-            options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect if user lacks permission
-            options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Session timeout after 30 minutes
-            options.SlidingExpiration = true; // Reset the expiration time if the user is active
+            options.LoginPath = "/Identity/Account/Login"; // Fix the path
+            options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            options.SlidingExpiration = true;
         });
 
         builder.Services.AddHostedService<MonthlyBillGeneratorService>();
 
-
-        // var stripeSettings = builder.Configuration.GetSection("StripeSettings").Get<StripeSettings>();
-        //builder.Services.AddSingleton(stripeSettings);
-
         // Add SignalR
         builder.Services.AddSignalR();
-        builder.Services.AddAuthentication();
         builder.Services.AddAuthorization();
 
         var app = builder.Build();
@@ -111,21 +103,20 @@ public class Program
             await next();
         });
 
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Home/Error");
+            app.UseHsts();
+        }
+
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-
         app.UseRouting();
-
-        // Enable CORS BEFORE Authentication and Authorization
         app.UseCors("AllowLocalhost");
-
+        app.UseCookiePolicy(); // Move before UseAuthentication
         app.UseAuthentication();
         app.UseAuthorization();
 
-        // Apply cookie policy
-        app.UseCookiePolicy();
-
-        // Map endpoints AFTER authentication and authorization middleware are in place
         app.MapHub<ChatHub>("/chatHub");
         app.MapHub<NotificationHub>("/notificationHub");
         app.MapControllerRoute(
@@ -133,46 +124,75 @@ public class Program
             pattern: "{controller=Home}/{action=Index}/{id?}");
         app.MapRazorPages();
 
-        // Seed roles
-       /* using (var scope = app.Services.CreateScope())
-        {
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var roles = new[] { "Admin", "HomeOwner", "Staff" };
-
-            foreach (var role in roles)
-            {
-                if (!await roleManager.RoleExistsAsync(role))
-                    await roleManager.CreateAsync(new IdentityRole(role));
-            }
-        }*/
-
-        // Seed an admin user
+        // Seed the database, roles, and admin user
         using (var scope = app.Services.CreateScope())
         {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-            string email = "admin@admin.com";
-            string password = "Admin1234*";
-
-            if (await userManager.FindByEmailAsync(email) == null)
+            var services = scope.ServiceProvider;
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            try
             {
-                var user = new ApplicationUser
-                {
-                    UserName = email,
-                    Email = email,
-                    FirstName = "Admin",
-                    LastName = "User"
-                };
+                var context = services.GetRequiredService<ApplicationDBContext>();
+                logger.LogInformation("Applying database migrations...");
+                await context.Database.MigrateAsync();
+                logger.LogInformation("Database migrations applied successfully.");
 
-                var result = await userManager.CreateAsync(user, password);
-
-                if (result.Succeeded)
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                var roles = new[] { "Admin", "HomeOwner", "Staff" };
+                foreach (var role in roles)
                 {
-                    await userManager.AddToRoleAsync(user, "Admin");
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                        logger.LogInformation("Role {Role} created successfully.", role);
+                    }
+                }
+
+                logger.LogInformation("Seeding admin user...");
+                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                string email = "admin@admin.com";
+                string password = "Admin1234*";
+
+                if (await userManager.FindByEmailAsync(email) == null)
+                {
+                    var user = new ApplicationUser
+                    {
+                        UserName = email,
+                        Email = email,
+                        FirstName = "Admin",
+                        LastName = "User"
+                    };
+
+                    var result = await userManager.CreateAsync(user, password);
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, "Admin");
+                        logger.LogInformation("Admin user created and assigned to Admin role.");
+                    }
+                    else
+                    {
+                        logger.LogError("Failed to create admin user: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+                    }
+                }
+
+                try
+                {
+                    logger.LogInformation("Seeding service request data...");
+                    var seeder = new ServiceRequestSeeder(context, services.GetRequiredService<ILogger<ServiceRequestSeeder>>());
+                    await seeder.SeedAsync();
+                    logger.LogInformation("Service request data seeded successfully.");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "An error occurred while seeding service request data.");
+                    throw;
                 }
             }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred while seeding the database (roles and admin user).");
+                throw;
+            }
         }
-    
 
         app.Run();
     }

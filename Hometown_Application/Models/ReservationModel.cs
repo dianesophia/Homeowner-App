@@ -47,6 +47,10 @@ namespace Hometown_Application.Models
 
         public bool IsDeleted { get; set; } = false;
 
-        public string Status { get; set; } // Ensure this property exists
+        public string? Status { get; set; }
+
+        // New property to hold the selected time slot index from the dropdown
+        [Required(ErrorMessage = "Please select a time slot")]
+        public int SelectedTimeSlotIndex { get; set; }
     }
 }
