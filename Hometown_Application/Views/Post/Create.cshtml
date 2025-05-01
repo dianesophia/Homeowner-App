@@ -1,39 +1,282 @@
 ﻿@model Hometown_Application.Models.PostModel
 
-<h2>Create a New Post</h2>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<form asp-action="Create" method="post" enctype="multipart/form-data">
-    <div>
-        <label>Title</label>
-        <input asp-for="Title" class="form-control" />
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .card-body {
+        padding: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control {
+        border-radius: var(--border-radius);
+        padding: 12px 15px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        width: 100%;
+        transition: var(--transition);
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 0.25rem rgba(111, 117, 78, 0.25);
+            outline: none;
+        }
+
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    .image-upload-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .image-preview-container {
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        display: inline-block;
+        position: relative;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #imagePreview {
+        border-radius: var(--border-radius);
+        max-width: 300px;
+        max-height: 200px;
+        object-fit: cover;
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 10px 20px;
+        transition: var(--transition);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-secondary {
+        background-color: transparent;
+        border: 1px solid var(--secondary-color);
+        color: var(--secondary-color);
+    }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 2rem;
+    }
+
+    .custom-file-upload {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+
+        .custom-file-upload input[type=file] {
+            opacity: 0;
+            position: absolute;
+            left: 0;
+            top: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+    .file-upload-label {
+        background-color: rgba(111, 117, 78, 0.1);
+        color: var(--primary-color);
+        border: 1px dashed var(--primary-color);
+        padding: 15px;
+        border-radius: var(--border-radius);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        cursor: pointer;
+        text-align: center;
+    }
+
+        .file-upload-label:hover {
+            background-color: rgba(111, 117, 78, 0.15);
+        }
+
+    .file-upload-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--secondary-color);
+        text-decoration: none;
+        transition: var(--transition);
+        margin-top: 20px;
+    }
+
+        .back-link:hover {
+            color: var(--secondary-light);
+            transform: translateX(-3px);
+        }
+</style>
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Create a New Post</h1>
+    </div>
+    <p class="page-subtitle">Share your thoughts, questions, or updates with the community</p>
+
+    <div class="card">
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label asp-for="Title" class="form-label">Title</label>
+                    <input asp-for="Title" class="form-control" placeholder="Enter a descriptive title" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Upload Image (Optional)</label>
+                    <div class="custom-file-upload">
+                        <label for="imageUpload" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                            <span>Click to select an image</span>
+                            <small>Supported formats: JPG, PNG, GIF (Max size: 5MB)</small>
+                        </label>
+                        <input type="file" id="imageUpload" name="imageFile" class="form-control" accept="image/*" onchange="previewImage(event)" />
+                    </div>
+                </div>
+
+                <!-- Image preview -->
+                <div class="image-preview-container" id="previewContainer" style="display:none;">
+                    <img id="imagePreview" src="#" alt="Image Preview" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Content" class="form-label">Content</label>
+                    <textarea asp-for="Content" class="form-control" placeholder="Write your post content here..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Submit Post
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label>Upload Image</label>
-        <input type="file" id="imageUpload" name="imageFile" class="form-control" accept="image/*" onchange="previewImage(event)" />
-    </div>
-
-    <!-- Image preview -->
-    <!-- Image Preview -->
-    <img id="imagePreview" style="display:none; max-width: 200px; margin-top: 10px;" />
-
-
-    <div>
-        <label>Content</label>
-        <textarea asp-for="Content" class="form-control"></textarea>
-    </div>
-    <button type="submit">Submit</button>
-</form>
-
-<a asp-action="Index">Back to Posts</a>
+    <a asp-action="Index" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Posts
+    </a>
+</div>
 
 <script>
     function previewImage(event) {
         var reader = new FileReader();
-        reader.onload = function () {
+        reader.onload = function() {
             var output = document.getElementById('imagePreview');
+            var container = document.getElementById('previewContainer');
             output.src = reader.result;
-            output.style.display = 'block';
+            container.style.display = 'block';
         };
         reader.readAsDataURL(event.target.files[0]);
     }
