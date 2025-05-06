@@ -793,11 +793,14 @@
                             </a>
                         </li>
 
-                        <li>
-                            <a href="/Bill/HomeownerBoard" data-page="billingHomeowner">
-                                <i class="fas fa-file-invoice"></i> <span>Billing Homeowner Board</span>
-                            </a>
-                        </li>
+                        @if (SignInManager.IsSignedIn(User) && !User.IsInRole("Admin"))
+                        {
+                            <li>
+                                <a href="/Bill/HomeownerBoard" data-page="billingHomeowner">
+                                    <i class="fas fa-file-invoice"></i> <span>Billing Homeowner Board</span>
+                                </a>
+                            </li>
+                        }
 
                 <!-- Common Tools -->
                 <div class="sidebar-category"><span>Tools</span></div>

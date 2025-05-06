@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hometown_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class buangko : Migration
+    public partial class AEEWRAWREAG : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -130,6 +130,7 @@ namespace Hometown_Application.Migrations
                     OtherType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(252)", maxLength: 252, nullable: false),
+                    RatePerHour = table.Column<int>(type: "int", nullable: true),
                     AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -280,6 +281,7 @@ namespace Hometown_Application.Migrations
                     AdminProfilesAdminId = table.Column<int>(type: "int", nullable: true),
                     HomeownerProfilesHomeownerId = table.Column<int>(type: "int", nullable: true),
                     StaffProfilesStaffId = table.Column<int>(type: "int", nullable: true),
+                    BillAssignModelBillAssignId = table.Column<int>(type: "int", nullable: true),
                     BillAssignmentModelBillAssignmentId = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -327,21 +329,31 @@ namespace Hometown_Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BillAccounts",
+                name: "BillAssign",
                 columns: table => new
                 {
-                    BillAccountId = table.Column<int>(type: "int", nullable: false)
+                    BillAssignId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    OutstandingBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BillName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IssuedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false),
+                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BillAccounts", x => x.BillAccountId);
+                    table.PrimaryKey("PK_BillAssign", x => x.BillAssignId);
                     table.ForeignKey(
-                        name: "FK_BillAccounts_AspNetUsers_UserId",
+                        name: "FK_BillAssign_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
@@ -370,36 +382,6 @@ namespace Hometown_Application.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BillTransactions",
-                columns: table => new
-                {
-                    BillTransactionId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BillItemsId = table.Column<int>(type: "int", nullable: false),
-                    AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PaidBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PaymentReference = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BillTransactions", x => x.BillTransactionId);
-                    table.ForeignKey(
-                        name: "FK_BillTransactions_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_BillTransactions_BillItems_BillItemsId",
-                        column: x => x.BillItemsId,
-                        principalTable: "BillItems",
-                        principalColumn: "BillItemsID");
                 });
 
             migrationBuilder.CreateTable(
@@ -563,7 +545,8 @@ namespace Hometown_Application.Migrations
                     UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SelectedTimeSlotIndex = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -705,7 +688,11 @@ namespace Hometown_Application.Migrations
                     AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    IsArrived = table.Column<bool>(type: "bit", nullable: true),
+                    ArrivalDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsExited = table.Column<bool>(type: "bit", nullable: true),
+                    ExitDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -753,60 +740,6 @@ namespace Hometown_Application.Migrations
                         column: x => x.BillId,
                         principalTable: "Bills",
                         principalColumn: "BillId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BillDetail",
-                columns: table => new
-                {
-                    BillDetailId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BillId = table.Column<int>(type: "int", nullable: false),
-                    BillItemsID = table.Column<int>(type: "int", nullable: false),
-                    CustomAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    ActualAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BillDetail", x => x.BillDetailId);
-                    table.ForeignKey(
-                        name: "FK_BillDetail_BillItems_BillItemsID",
-                        column: x => x.BillItemsID,
-                        principalTable: "BillItems",
-                        principalColumn: "BillItemsID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BillDetail_Bills_BillId",
-                        column: x => x.BillId,
-                        principalTable: "Bills",
-                        principalColumn: "BillId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BillPayment",
-                columns: table => new
-                {
-                    PaymentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BillId = table.Column<int>(type: "int", nullable: false),
-                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsApproved = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BillPayment", x => x.PaymentId);
-                    table.ForeignKey(
-                        name: "FK_BillPayment_Bills_BillId",
-                        column: x => x.BillId,
-                        principalTable: "Bills",
-                        principalColumn: "BillId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -915,6 +848,69 @@ namespace Hometown_Application.Migrations
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "PostId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BillFee",
+                columns: table => new
+                {
+                    BillFeeID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BillAssignmentId = table.Column<int>(type: "int", nullable: false),
+                    AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BillFee", x => x.BillFeeID);
+                    table.ForeignKey(
+                        name: "FK_BillFee_BillAssignment_BillAssignmentId",
+                        column: x => x.BillAssignmentId,
+                        principalTable: "BillAssignment",
+                        principalColumn: "BillAssignmentId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BillPayment",
+                columns: table => new
+                {
+                    PaymentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BillId = table.Column<int>(type: "int", nullable: true),
+                    BillAssignmentId = table.Column<int>(type: "int", nullable: true),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    BillAssignmentModelBillAssignmentId = table.Column<int>(type: "int", nullable: true),
+                    BillModelBillId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BillPayment", x => x.PaymentId);
+                    table.ForeignKey(
+                        name: "FK_BillPayment_BillAssignment_BillAssignmentId",
+                        column: x => x.BillAssignmentId,
+                        principalTable: "BillAssignment",
+                        principalColumn: "BillAssignmentId");
+                    table.ForeignKey(
+                        name: "FK_BillPayment_BillAssignment_BillAssignmentModelBillAssignmentId",
+                        column: x => x.BillAssignmentModelBillAssignmentId,
+                        principalTable: "BillAssignment",
+                        principalColumn: "BillAssignmentId");
+                    table.ForeignKey(
+                        name: "FK_BillPayment_Bills_BillId",
+                        column: x => x.BillId,
+                        principalTable: "Bills",
+                        principalColumn: "BillId");
+                    table.ForeignKey(
+                        name: "FK_BillPayment_Bills_BillModelBillId",
+                        column: x => x.BillModelBillId,
+                        principalTable: "Bills",
+                        principalColumn: "BillId");
                 });
 
             migrationBuilder.CreateTable(
@@ -1048,48 +1044,48 @@ namespace Hometown_Application.Migrations
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "AdminProfilesAdminId", "BillAssignmentModelBillAssignmentId", "Bio", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FacebookProfile", "FirstName", "Gender", "HomeownerProfilesHomeownerId", "IsActiveUser", "IsApproved", "IsBirthdayPublic", "IsGenderPublic", "LastName", "LinkedInProfile", "LockoutEnabled", "LockoutEnd", "MakeFacebookPublic", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "ProfilePicturePath", "SecurityStamp", "StaffProfilesStaffId", "TwitterProfile", "TwoFactorEnabled", "UserName" },
+                columns: new[] { "Id", "AccessFailedCount", "AdminProfilesAdminId", "BillAssignModelBillAssignId", "BillAssignmentModelBillAssignmentId", "Bio", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FacebookProfile", "FirstName", "Gender", "HomeownerProfilesHomeownerId", "IsActiveUser", "IsApproved", "IsBirthdayPublic", "IsGenderPublic", "LastName", "LinkedInProfile", "LockoutEnabled", "LockoutEnd", "MakeFacebookPublic", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "ProfilePicturePath", "SecurityStamp", "StaffProfilesStaffId", "TwitterProfile", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "100", 0, null, null, null, "ff15eb92-315c-4a2a-83ae-60847260b9ff", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEExDjoRzlcqZPPl0N7Our5IW46883rS2GS7rCmzCoTr7aqERb4ItRpEFWvSq4IAUeQ==", null, false, null, "wwwroot/images/picc.png", "177e1f7a-a763-4641-af29-7cd6da318e12", null, null, false, "elon.musk@example.com" },
-                    { "102", 0, null, null, null, "dcf473e4-3441-4761-ba00-4de605d58d2c", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "bill.gates@example.com", true, null, "Bill", null, null, true, false, false, false, "Gates", null, false, null, false, "BILL.GATES@EXAMPLE.COM", "BILL.GATES@EXAMPLE.COM", "AQAAAAIAAYagAAAAEKwzOK7V5QLLpTnjaEs83Z4QYFMDJ4PY23KGFi7JMmMR9W0qi1ExOlMNkZJ7AV0LsA==", null, false, null, null, "a3c1670e-8c14-4ec4-822d-88e71e8470d4", null, null, false, "bill.gates@example.com" },
-                    { "103", 0, null, null, null, "9ac25c22-bb9e-4dce-b9db-daec2f3fe91b", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "mark.zuckerberg@example.com", true, null, "Mark", null, null, true, false, false, false, "Zuckerberg", null, false, null, false, "MARK.ZUCKERBERG@EXAMPLE.COM", "MARK.ZUCKERBERG@EXAMPLE.COM", "AQAAAAIAAYagAAAAEDkNjHmjMazYv5KvSvLkYz/jfPoscwH985zDY95SPiPtHzl55YNaJmWlif7NLWBupA==", null, false, null, null, "c316bd23-519e-4184-9df1-94b503168445", null, null, false, "mark.zuckerberg@example.com" },
-                    { "104", 0, null, null, null, "7b2c4fa5-a595-416e-b973-a072a4cb8dcb", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sundar.pichai@example.com", true, null, "Sundar", null, null, true, false, false, false, "Pichai", null, false, null, false, "SUNDAR.PICHAI@EXAMPLE.COM", "SUNDAR.PICHAI@EXAMPLE.COM", "AQAAAAIAAYagAAAAEFz0P1BuSaVR38X39TZ4rPN23PiFDPS1OUdbg9CzVwD5tSy+Y7Fq17Aoymcd/RO9cQ==", null, false, null, null, "4859f0fa-2562-471e-8d68-d57ab321ab39", null, null, false, "sundar.pichai@example.com" },
-                    { "105", 0, null, null, null, "47017f48-b186-4a71-a030-5d6be8060f05", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "tim.cook@example.com", true, null, "Tim", null, null, true, false, false, false, "Cook", null, false, null, false, "TIM.COOK@EXAMPLE.COM", "TIM.COOK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEKS90dTXkueCSn8prIspxirf1nxDcz+RLTUuviI+LgNXa6YL3Ivd0WkPA/aOasbLeA==", null, false, null, null, "7339709b-5fb2-4169-8b93-fcc2d08a4617", null, null, false, "tim.cook@example.com" },
-                    { "106", 0, null, null, null, "bbf787c0-55ab-41bc-bf4e-9ab7c6eff8be", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "satya.nadella@example.com", true, null, "Satya", null, null, true, false, false, false, "Nadella", null, false, null, false, "SATYA.NADELLA@EXAMPLE.COM", "SATYA.NADELLA@EXAMPLE.COM", "AQAAAAIAAYagAAAAEC0p66ahRjrv4mEivwGi89r9ASnDxO764k0jODt2x1svjE0fyM4Sgkj5tQRm0Angiw==", null, false, null, null, "ad445a1e-692f-477c-969f-f00bb56a8494", null, null, false, "satya.nadella@example.com" },
-                    { "107", 0, null, null, null, "acc30ec7-3fce-4580-9b5f-1dc6d2a9394c", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "jack.dorsey@example.com", true, null, "Jack", null, null, true, false, false, false, "Dorsey", null, false, null, false, "JACK.DORSEY@EXAMPLE.COM", "JACK.DORSEY@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMrDu6mU4yS+Kg6eZ8nmVBeXx3MOeWnJJibxOHJ5CbJeSTlwtMcAaJzVLfQgDoGZwg==", null, false, null, null, "1d953b5f-6321-4e34-b43c-53a69ca14cef", null, null, false, "jack.dorsey@example.com" },
-                    { "108", 0, null, null, null, "badbea24-63f1-4e5f-b04b-2e6df95dcc82", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "larry.page@example.com", true, null, "Larry", null, null, true, false, false, false, "Page", null, false, null, false, "LARRY.PAGE@EXAMPLE.COM", "LARRY.PAGE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPCq1VSu27Qnm0oCU25bclk8ZyK/EbP8EeGfE3sGF4CUNFfJjIE3ON/uap23BQdscg==", null, false, null, null, "9cdd42ba-dd0f-4c62-be19-2acf32d74738", null, null, false, "larry.page@example.com" },
-                    { "109", 0, null, null, null, "86909720-9133-4508-9990-d21c0946be0d", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sergey.brin@example.com", true, null, "Sergey", null, null, true, false, false, false, "Brin", null, false, null, false, "SERGEY.BRIN@EXAMPLE.COM", "SERGEY.BRIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEF3hFrCzcXVQarFGKXybY7Z/oHBHjMNHcky+2pNt/PkLarqfwwUzHFQJil3o7s5hFQ==", null, false, null, null, "a268d890-f227-4743-a795-1e5e1ba9183d", null, null, false, "sergey.brin@example.com" },
-                    { "110", 0, null, null, null, "039b6823-c859-44cf-9af8-c0246a779b55", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "steve.jobs@example.com", true, null, "Steve", null, null, true, false, false, false, "Jobs", null, false, null, false, "STEVE.JOBS@EXAMPLE.COM", "STEVE.JOBS@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHuy7zdg5yAsE9G5ElUejkoS01y1TFtJpdLSRJddriO/GgFNq170EG1GcH2wM7MPOg==", null, false, null, null, "19bef4f4-e52a-4e1b-8ded-07daba03de53", null, null, false, "steve.jobs@example.com" },
-                    { "111", 0, null, null, null, "22c5a0fc-49b5-40ef-810a-2678a1da7fb6", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sheryl.sandberg@example.com", true, null, "Sheryl", null, null, true, false, false, false, "Sandberg", null, false, null, false, "SHERYL.SANDBERG@EXAMPLE.COM", "SHERYL.SANDBERG@EXAMPLE.COM", "AQAAAAIAAYagAAAAENgNI1epVsaHuqzz4aE/+ya7xcEaIR1R6lEJ4HBsajL0DGtS+UN0Dz8BNVwawMGYvQ==", null, false, null, null, "3121d716-27d8-41df-8030-a53addb51a58", null, null, false, "sheryl.sandberg@example.com" },
-                    { "112", 0, null, null, null, "d7dd369b-fd25-494d-b728-c47e884b7d08", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "reed.hastings@example.com", true, null, "Reed", null, null, true, false, false, false, "Hastings", null, false, null, false, "REED.HASTINGS@EXAMPLE.COM", "REED.HASTINGS@EXAMPLE.COM", "AQAAAAIAAYagAAAAEBQKXhU5BXoWPhRt+3Hx1KUVR78Z1Ms3wi0F9s9VmvQuCVDDIpqhzyCbLAHotWgPcw==", null, false, null, null, "5df9f640-ea71-4517-8745-95d59b0f7acb", null, null, false, "reed.hastings@example.com" },
-                    { "113", 0, null, null, null, "3f72c02f-8782-4fb8-98d0-82bcd491f757", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "marissa.mayer@example.com", true, null, "Marissa", null, null, true, false, false, false, "Mayer", null, false, null, false, "MARISSA.MAYER@EXAMPLE.COM", "MARISSA.MAYER@EXAMPLE.COM", "AQAAAAIAAYagAAAAEDX41aIGg4T5rrIw/3yE3RURQb2YRS3fu9J1WtCOHnDvgkBFWTwYTN1HohmA+2CrqQ==", null, false, null, null, "bf218cd4-166f-4017-8ff9-c57c61338e47", null, null, false, "marissa.mayer@example.com" },
-                    { "114", 0, null, null, null, "36f69531-52c9-4a37-9212-6cbe70caf540", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elizabeth.holmes@example.com", true, null, "Elizabeth", null, null, true, false, false, false, "Holmes", null, false, null, false, "ELIZABETH.HOLMES@EXAMPLE.COM", "ELIZABETH.HOLMES@EXAMPLE.COM", "AQAAAAIAAYagAAAAEAqhIjUmdHH0JYMbwWUs4AkhNd3JlgCCem00pOYEQNTv8S86JVIYjocrVPXOD5g2Wg==", null, false, null, null, "eaa45ccb-9e7c-49a2-9242-3ed0d1aea9cc", null, null, false, "elizabeth.holmes@example.com" },
-                    { "115", 0, null, null, null, "6a083b48-ddc5-4920-be54-55eb6376daf7", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "susan.wojcicki@example.com", true, null, "Susan", null, null, true, false, false, false, "Wojcicki", null, false, null, false, "SUSAN.WOJCICKI@EXAMPLE.COM", "SUSAN.WOJCICKI@EXAMPLE.COM", "AQAAAAIAAYagAAAAEIGyxCGIZizBdP+0AZDkqgVlgr5g2jAvaT3J4snpAUjA+MamK6fw1RUBqxtciWsL6A==", null, false, null, null, "0b889147-7f73-4227-9495-a90db08eceae", null, null, false, "susan.wojcicki@example.com" },
-                    { "116", 0, null, null, null, "133c4bd3-405d-450d-baa8-d71ea66f416b", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "tim.arnold@example.com", true, null, "Tim", null, null, true, false, false, false, "Arnold", null, false, null, false, "TIM.ARNOLD@EXAMPLE.COM", "TIM.ARNOLD@EXAMPLE.COM", "AQAAAAIAAYagAAAAEIKrPy890aynofqQd+RwZg0FwoKN4w3wg9WFB/9aneMwGyxh1hrqNFPqdx5bGwxufw==", null, false, null, null, "245419c1-d98e-402f-8d53-41d53aef84ac", null, null, false, "tim.arnold@example.com" },
-                    { "117", 0, null, null, null, "3786f064-a8d9-487c-a073-56fb40548e42", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "bob.iger@example.com", true, null, "Bob", null, null, true, false, false, false, "Iger", null, false, null, false, "BOB.IGER@EXAMPLE.COM", "BOB.IGER@EXAMPLE.COM", "AQAAAAIAAYagAAAAEELtZpArvRk8NIvVP5PxCq6Rznyxi0I8sd3NzfqRsxX34S0QQMTBZhuLv5OWG9wO/A==", null, false, null, null, "001cbf8c-1a48-4062-a418-468118b9a944", null, null, false, "bob.iger@example.com" },
-                    { "118", 0, null, null, null, "45f1a70b-cceb-4501-97bf-0b8a7725c078", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "larry.ellison@example.com", true, null, "Larry", null, null, true, false, false, false, "Ellison", null, false, null, false, "LARRY.ELLISON@EXAMPLE.COM", "LARRY.ELLISON@EXAMPLE.COM", "AQAAAAIAAYagAAAAEOvRwjATrzXYFIUck/mR2jAWVwi1WUfMqik2+4v5H9D0RjmTxL1zfSr3QMhx5rMHGA==", null, false, null, null, "bc6eddbc-fa2b-4cb7-83c2-19fc2ff1090d", null, null, false, "larry.ellison@example.com" },
-                    { "119", 0, null, null, null, "178ca54d-fc57-492e-bb2c-3c8f06836318", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "richard.branson@example.com", true, null, "Richard", null, null, true, false, false, false, "Branson", null, false, null, false, "RICHARD.BRANSON@EXAMPLE.COM", "RICHARD.BRANSON@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMWijk+THOz0heyCm9WnIwG8XDirY5YUtmdfEnjG1KALNPKyLuUovZFhkAIBbBMdeg==", null, false, null, null, "e9a2e184-7466-4ada-b1a2-92cf560c571a", null, null, false, "richard.branson@example.com" },
-                    { "120", 0, null, null, null, "7f1d05a4-6d2e-49ec-bdae-94833df8296d", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "jack.ma@example.com", true, null, "Jack", null, null, true, false, false, false, "Ma", null, false, null, false, "JACK.MA@EXAMPLE.COM", "JACK.MA@EXAMPLE.COM", "AQAAAAIAAYagAAAAEN+4Zu4G13m8aT5zPk8mEYeq+FPcKfrDjgUPiYmPP85fAF+y5c1yPTiSo1NgmYvRCA==", null, false, null, null, "765c7dff-3836-4629-83bf-b564c2077ca8", null, null, false, "jack.ma@example.com" },
-                    { "121", 0, null, null, null, "3faf018e-c242-4d7a-b297-ed71550014cf", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "warren.buffett@example.com", true, null, "Warren", null, null, true, false, false, false, "Buffett", null, false, null, false, "WARREN.BUFFETT@EXAMPLE.COM", "WARREN.BUFFETT@EXAMPLE.COM", "AQAAAAIAAYagAAAAELQySI84hD0OhJ+ENVHO20ziCeQByUXGmNB9Cv79ULV/JRbULkwlUZ0SuXHUY/jpLg==", null, false, null, null, "cd2683f2-2860-40f9-86ba-bd5e27b8daa8", null, null, false, "warren.buffett@example.com" },
-                    { "122", 0, null, null, null, "8c03ef90-d7f3-43b9-b3bf-1736e6c99640", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "mary.barrett@example.com", true, null, "Mary", null, null, true, false, false, false, "Barrett", null, false, null, false, "MARY.BARRETT@EXAMPLE.COM", "MARY.BARRETT@EXAMPLE.COM", "AQAAAAIAAYagAAAAELS2UWzxDsgF7VZKKaVdU0NJvpg3+FOJNRQC3T9tihPmJqutCZHVrJEDXpJ99CTJHA==", null, false, null, null, "60587ecd-1325-4014-af0d-09ee9a300a1a", null, null, false, "mary.barrett@example.com" },
-                    { "123", 0, null, null, null, "4dbc706f-1884-42b0-abef-0ab871f325f1", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "ginni.rometty@example.com", true, null, "Ginni", null, null, true, false, false, false, "Rometty", null, false, null, false, "GINNI.ROMETTY@EXAMPLE.COM", "GINNI.ROMETTY@EXAMPLE.COM", "AQAAAAIAAYagAAAAEM8FizrckQg1Ux0sbT121QqzbmqGy1ohjc/jX1gF+y6VV1n+sNogT8KnYyWU8TYzDg==", null, false, null, null, "d3491e3e-01ff-4e73-800e-f0aa39c2ff06", null, null, false, "ginni.rometty@example.com" },
-                    { "124", 0, null, null, null, "5e18820e-cc35-4b1c-b7d3-7a4ba4df880a", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "mark.benioff@example.com", true, null, "Mark", null, null, true, false, false, false, "Benioff", null, false, null, false, "MARK.BENIOFF@EXAMPLE.COM", "MARK.BENIOFF@EXAMPLE.COM", "AQAAAAIAAYagAAAAEI5Zl7kYkc5RfQfLKHOhH9CbZqtCa0QFDWAmTM3sz6HiQYvlr9iC3TkFWyNwwdh2Pg==", null, false, null, null, "6fc271e4-2d47-4971-a264-681eb5d277c8", null, null, false, "mark.benioff@example.com" },
-                    { "125", 0, null, null, null, "6ed5d2cc-eb84-44f3-b8d9-cb4564869d53", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "kevin.systrom@example.com", true, null, "Kevin", null, null, true, false, false, false, "Systrom", null, false, null, false, "KEVIN.SYSTROM@EXAMPLE.COM", "KEVIN.SYSTROM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHZ9DR1g35UVcqAySXI2Hjqo3M8wcHxUqjcvdyCA29++z5j6QjMev7xUgCt6RSOfiQ==", null, false, null, null, "45c9e8a7-a2d8-4d0e-bc9a-1c841aa42253", null, null, false, "kevin.systrom@example.com" },
-                    { "126", 0, null, null, null, "8978262f-197a-4f19-ac5a-9e89b875442d", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "evan.spiegel@example.com", true, null, "Evan", null, null, true, false, false, false, "Spiegel", null, false, null, false, "EVAN.SPIEGEL@EXAMPLE.COM", "EVAN.SPIEGEL@EXAMPLE.COM", "AQAAAAIAAYagAAAAEKEiqwdMrLmnpXBLTWIgV4PnOE2gTCrJ06caPA25SbswnTgPWSA0TFLG5oJbchkLTQ==", null, false, null, null, "cc598295-af80-4231-98d8-b576634167b3", null, null, false, "evan.spiegel@example.com" },
-                    { "127", 0, null, null, null, "3e7ee3e7-a7ea-4a6c-b448-e621a85382ed", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "jan.koum@example.com", true, null, "Jan", null, null, true, false, false, false, "Koum", null, false, null, false, "JAN.KOUM@EXAMPLE.COM", "JAN.KOUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMHlMgaPrEkIHeTojMO221BsU4c2Nc5ttQZGlyyAdyGmltMePyJCPKJhWkXHA3aMkA==", null, false, null, null, "b47c9b1c-6407-45e1-9d1b-389d93f8c21f", null, null, false, "jan.koum@example.com" },
-                    { "128", 0, null, null, null, "0d50a654-76f9-4f1e-bd22-9f1cf3998fd9", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "janice.fang@example.com", true, null, "Janice", null, null, true, false, false, false, "Fang", null, false, null, false, "JANICE.FANG@EXAMPLE.COM", "JANICE.FANG@EXAMPLE.COM", "AQAAAAIAAYagAAAAEBUniycYjWBg38yxyPcEwR71MPzewQONRV1bWEk8pI0Q6DrPWbHU6WhXTVFNXC3ZMg==", null, false, null, null, "e51d4764-a143-4cff-a946-dcfac0ed1225", null, null, false, "janice.fang@example.com" },
-                    { "129", 0, null, null, null, "7dc32e7a-d383-4d62-afee-d434099949d4", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sergey.gladkikh@example.com", true, null, "Sergey", null, null, true, false, false, false, "Gladkikh", null, false, null, false, "SERGEY.GLADKIKH@EXAMPLE.COM", "SERGEY.GLADKIKH@EXAMPLE.COM", "AQAAAAIAAYagAAAAEDK/u2CpaNdSAbgPzMEeQrH+DHY4HoDPjKEkMhJvWhIozQYVkc5Ce7LKhas0Oc9Ldw==", null, false, null, null, "f1e1ea8f-dba9-44ef-9202-38349979ef11", null, null, false, "sergey.gladkikh@example.com" },
-                    { "130", 0, null, null, null, "5a374375-1bec-4b5c-a16f-7ea0d9036aaa", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "tony.hsieh@example.com", true, null, "Tony", null, null, true, false, false, false, "Hsieh", null, false, null, false, "TONY.HSIEH@EXAMPLE.COM", "TONY.HSIEH@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMioge9QrCSmDlVArMhNW6E2GiBR185ulKo8H1wBeMgslklLfrl/7ja+54zFxBYgQQ==", null, false, null, null, "0065c16d-72ce-4648-af2d-c1e120b5a317", null, null, false, "tony.hsieh@example.com" },
-                    { "131", 0, null, null, null, "e63086c1-600a-4385-996b-240d4d286c49", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "richard.hyne@example.com", true, null, "Richard", null, null, true, false, false, false, "Hyne", null, false, null, false, "RICHARD.HYNE@EXAMPLE.COM", "RICHARD.HYNE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPWq8+pPbvfjGPsx13O4av1H6jKdObqZJYLmvDeviGtjnuSWq2yRgwhYzkgQBa/7ow==", null, false, null, null, "b72a04e8-652e-45dc-a103-dbf417dcb687", null, null, false, "richard.hyne@example.com" },
-                    { "132", 0, null, null, null, "8d56f316-f084-4092-a368-85cbc908f9b7", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "peter.thiel@example.com", true, null, "Peter", null, null, true, false, false, false, "Thiel", null, false, null, false, "PETER.THIEL@EXAMPLE.COM", "PETER.THIEL@EXAMPLE.COM", "AQAAAAIAAYagAAAAEIb6hihWs3ewvW6OIReth93ADH4QPtJZVJig1zaSkfR1o6I7oF2m4TIeAyz+W9YRdw==", null, false, null, null, "27ce4ca8-bc1f-4be9-9cb4-cf1f73802ce4", null, null, false, "peter.thiel@example.com" },
-                    { "133", 0, null, null, null, "815c094b-376f-4a0a-9313-1a9fe0c18bc1", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "steve.wozniak@example.com", true, null, "Steve", null, null, true, false, false, false, "Wozniak", null, false, null, false, "STEVE.WOZNIAK@EXAMPLE.COM", "STEVE.WOZNIAK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEM8sbRBGwrUfPQY5k8mP7bNVfsdo/sUXDL+G5i20W2ngiAXBapElWFRpkvlvWxnJ5Q==", null, false, null, null, "0fbb7cff-4f1b-4155-9258-7dfcce9f0b05", null, null, false, "steve.wozniak@example.com" },
-                    { "134", 0, null, null, null, "b26b3558-31c3-4efd-94b7-164697376f88", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "john.carmack@example.com", true, null, "John", null, null, true, false, false, false, "Carmack", null, false, null, false, "JOHN.CARMACK@EXAMPLE.COM", "JOHN.CARMACK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEKlT/VW4YgcwATnCl00KBXrXWRFcTQVS8YBVq1LogqTTGsbLYVQXdgEvn3dP1hGcjQ==", null, false, null, null, "6d8c212c-9507-499e-806b-6e6ae3028eae", null, null, false, "john.carmack@example.com" },
-                    { "135", 0, null, null, null, "80a1db44-b752-4203-8bad-0d01982860b1", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "mike.zyda@example.com", true, null, "Mike", null, null, true, false, false, false, "Zyda", null, false, null, false, "MIKE.ZYDA@EXAMPLE.COM", "MIKE.ZYDA@EXAMPLE.COM", "AQAAAAIAAYagAAAAEDqfvNxFpT0Ye5l2Kub/hiaIoXijlryr/04axIcEc8qBVQkpts4vjBUE9jt/6yQaYA==", null, false, null, null, "a08cf835-fc91-4a63-b0fe-f4032f55eed2", null, null, false, "mike.zyda@example.com" },
-                    { "136", 0, null, null, null, "a1ba78c4-32ee-4575-af16-d6ca74a482f6", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "cheryl.sandberg@example.com", true, null, "Cheryl", null, null, true, false, false, false, "Sandberg", null, false, null, false, "CHERYL.SANDBERG@EXAMPLE.COM", "CHERYL.SANDBERG@EXAMPLE.COM", "AQAAAAIAAYagAAAAEN+KnR3dw2Uuuh+sZoOK+Ny0sDCjw5DbWD72TuCIbzV6OGmPtgeWO5mSBu3hT6hlgA==", null, false, null, null, "17227e15-5270-47fc-98ac-dded40bba93b", null, null, false, "cheryl.sandberg@example.com" },
-                    { "137", 0, null, null, null, "905e014a-5608-44eb-8888-a48693d8c2b3", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "karen.smith@example.com", true, null, "Karen", null, null, true, false, false, false, "Smith", null, false, null, false, "KAREN.SMITH@EXAMPLE.COM", "KAREN.SMITH@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPpD/tB/Nvp74CU9KFEHVVLIXgIYkVTugmVpzgSLwhyDFYF6+fPZnG3bHU5g96v7rg==", null, false, null, null, "f413cf9e-3b56-4571-8855-3ffa7e6cbff0", null, null, false, "karen.smith@example.com" },
-                    { "138", 0, null, null, null, "89fb4998-4217-4a6d-8373-8e53c3d8047a", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "david.lee@example.com", true, null, "David", null, null, true, false, false, false, "Lee", null, false, null, false, "DAVID.LEE@EXAMPLE.COM", "DAVID.LEE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEKoJ0nuHMpVibA20v4AhAmvfDG6nzQ7Y7jFaXgOgjYwgjQ0yMZh71TxaTX2QjPPcSw==", null, false, null, null, "2dc2c96a-6af4-42ca-bfa8-eb1baa7fd99b", null, null, false, "david.lee@example.com" },
-                    { "139", 0, null, null, null, "1efa5726-7923-4d5a-aafb-6cc3bd5a9dfd", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "james.taylor@example.com", true, null, "James", null, null, true, false, false, false, "Taylor", null, false, null, false, "JAMES.TAYLOR@EXAMPLE.COM", "JAMES.TAYLOR@EXAMPLE.COM", "AQAAAAIAAYagAAAAEBpzWFx513mBu1pL2Ktg30GugjpBO9FsbRjC9xdO0kuPKhBaWzKZUfO6a6l4oE1LPA==", null, false, null, null, "aa0eba82-a4e1-4fe4-8171-f6a3a6029156", null, null, false, "james.taylor@example.com" }
+                    { "100", 0, null, null, null, null, "54e1d056-cf64-449a-966d-2708f6ea4900", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elon.musk@example.com", true, null, "Elon", null, null, true, false, false, false, "Musk", null, false, null, false, "ELON.MUSK@EXAMPLE.COM", "ELON.MUSK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPJjVLvLDaBhg56Bv5V0N7fsHLWYifv55dI7J1g42RrM36Xlpk4HyLOJSEuudGYbbA==", null, false, null, "wwwroot/images/picc.png", "c2815c4f-ffd6-42de-a897-8c582b651877", null, null, false, "elon.musk@example.com" },
+                    { "102", 0, null, null, null, null, "9f01029a-0b8a-4c03-9b90-e5cc67f1b888", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "bill.gates@example.com", true, null, "Bill", null, null, true, false, false, false, "Gates", null, false, null, false, "BILL.GATES@EXAMPLE.COM", "BILL.GATES@EXAMPLE.COM", "AQAAAAIAAYagAAAAEK4IJWF3K7yWmLIIIM82dbvUXshmzLErmzQeR5palwYYy43LZFLZuyDNpnJxfcSxaA==", null, false, null, null, "931c51fa-8932-4bd2-9781-2afb2f3630ef", null, null, false, "bill.gates@example.com" },
+                    { "103", 0, null, null, null, null, "ef3fef54-0b56-4f97-ae6e-8135f42b1b40", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "mark.zuckerberg@example.com", true, null, "Mark", null, null, true, false, false, false, "Zuckerberg", null, false, null, false, "MARK.ZUCKERBERG@EXAMPLE.COM", "MARK.ZUCKERBERG@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMC28px9Q22apVHkEuPAlxrkYmz9YrchqQ1T9UrcnpM93+m1jg5UtLBxtYrJLDdZNQ==", null, false, null, null, "45eab230-7986-4e70-9dda-a28fe5cfd70e", null, null, false, "mark.zuckerberg@example.com" },
+                    { "104", 0, null, null, null, null, "845a95b3-e724-4759-8514-4c24c72b69f4", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sundar.pichai@example.com", true, null, "Sundar", null, null, true, false, false, false, "Pichai", null, false, null, false, "SUNDAR.PICHAI@EXAMPLE.COM", "SUNDAR.PICHAI@EXAMPLE.COM", "AQAAAAIAAYagAAAAEOxN8Y62EaP4v6aaUrFdvHRcWaRocIjE6utOcq2bwYtON2+fV5QLKxge8YiSTsa4Nw==", null, false, null, null, "df4c1d94-d236-4ba7-b3c8-38cdebc03be8", null, null, false, "sundar.pichai@example.com" },
+                    { "105", 0, null, null, null, null, "73fc9466-b9f8-4abf-a38e-db0192e52261", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "tim.cook@example.com", true, null, "Tim", null, null, true, false, false, false, "Cook", null, false, null, false, "TIM.COOK@EXAMPLE.COM", "TIM.COOK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEEDhxJUuJGgmWTWEj5ffEnto9dmHUD0mYnJ5iMVDCPbSyOD5mdO3tHnaLeqQjCPNkw==", null, false, null, null, "967344bf-5f16-472d-a5bd-cba8cc6d9317", null, null, false, "tim.cook@example.com" },
+                    { "106", 0, null, null, null, null, "c72e172d-f9af-45d1-9375-74803ed6ff34", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "satya.nadella@example.com", true, null, "Satya", null, null, true, false, false, false, "Nadella", null, false, null, false, "SATYA.NADELLA@EXAMPLE.COM", "SATYA.NADELLA@EXAMPLE.COM", "AQAAAAIAAYagAAAAEDq9SH6Gj3/crd0hCuPVifWWc0uWa9tmYvPMfst29e5PicrsHq4K4MFrrfuakReg3A==", null, false, null, null, "7a565f88-8990-41a8-abf8-d7d2395e91dd", null, null, false, "satya.nadella@example.com" },
+                    { "107", 0, null, null, null, null, "5e6dba81-7fc5-4128-8273-cb68e0ae0506", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "jack.dorsey@example.com", true, null, "Jack", null, null, true, false, false, false, "Dorsey", null, false, null, false, "JACK.DORSEY@EXAMPLE.COM", "JACK.DORSEY@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPdPIfcwnXFAGiKA+UF8lkObHbxbeboDFPgITIY/eIwnHJlz45RBSZLF/9PnUvm5ig==", null, false, null, null, "80802708-5429-4561-ac5a-c6fd27bb4866", null, null, false, "jack.dorsey@example.com" },
+                    { "108", 0, null, null, null, null, "2900b5d0-a79a-4d00-a333-03d403961b4f", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "larry.page@example.com", true, null, "Larry", null, null, true, false, false, false, "Page", null, false, null, false, "LARRY.PAGE@EXAMPLE.COM", "LARRY.PAGE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEBO9IJ2n1COtZ1JZ0cysbm1oM8hPD+byxm/NdCi2PGB0ujnZxuWvwcleUlTCOu0TPw==", null, false, null, null, "716e643a-47b8-4d99-9700-08b50a44bc7d", null, null, false, "larry.page@example.com" },
+                    { "109", 0, null, null, null, null, "8c285212-a462-4f9d-b83d-fd8b8e0bacc6", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sergey.brin@example.com", true, null, "Sergey", null, null, true, false, false, false, "Brin", null, false, null, false, "SERGEY.BRIN@EXAMPLE.COM", "SERGEY.BRIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEFOnsMJ2P1DUNbhwUMp32RCNaymHyVR4IK+gGC/SejpLIOPJ+KkeFx7y5JtxnoOQuw==", null, false, null, null, "87d75c41-e7d5-4be2-af2a-b0708a1e9a87", null, null, false, "sergey.brin@example.com" },
+                    { "110", 0, null, null, null, null, "3322fe4d-6245-46ae-8012-a5e61544330a", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "steve.jobs@example.com", true, null, "Steve", null, null, true, false, false, false, "Jobs", null, false, null, false, "STEVE.JOBS@EXAMPLE.COM", "STEVE.JOBS@EXAMPLE.COM", "AQAAAAIAAYagAAAAEBYhV1DtrYbx0Z5K82OJFY3LHNsuIsiqzE3NeUeIidZ3srcTdVB1pGFgd/JQjK9ioA==", null, false, null, null, "6d405964-8d0d-4166-9c1c-267ef9837777", null, null, false, "steve.jobs@example.com" },
+                    { "111", 0, null, null, null, null, "4e328443-1d22-4fbe-b59f-f718d9b9eac9", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sheryl.sandberg@example.com", true, null, "Sheryl", null, null, true, false, false, false, "Sandberg", null, false, null, false, "SHERYL.SANDBERG@EXAMPLE.COM", "SHERYL.SANDBERG@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMU5Lq++tYzgYtEVZKQ5rgLaZPrAYoL9y8bwdrEjqufIg/yrVRaD5eSnntZlaRcI4w==", null, false, null, null, "171dfbca-a291-4767-a176-9505e0f51e76", null, null, false, "sheryl.sandberg@example.com" },
+                    { "112", 0, null, null, null, null, "bcb47824-0961-4b85-8d1b-e666eee277b8", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "reed.hastings@example.com", true, null, "Reed", null, null, true, false, false, false, "Hastings", null, false, null, false, "REED.HASTINGS@EXAMPLE.COM", "REED.HASTINGS@EXAMPLE.COM", "AQAAAAIAAYagAAAAEA17D7LM84wiUCCIeNYVwapRZGW9/Djuptb7y1DJMvsplH5CK9OTkWabvECl0PmaBw==", null, false, null, null, "513ac0b1-1c6f-4495-88b2-3b9fa764a1fa", null, null, false, "reed.hastings@example.com" },
+                    { "113", 0, null, null, null, null, "d86ed202-0c0a-4c30-a10c-b2f46eec58b6", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "marissa.mayer@example.com", true, null, "Marissa", null, null, true, false, false, false, "Mayer", null, false, null, false, "MARISSA.MAYER@EXAMPLE.COM", "MARISSA.MAYER@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJ6fXF7DQUukmdOSx0aPOHOXlGTzEm7O7B54De/gqs1ADKGIgZ3pqJLNp64EHDBp5Q==", null, false, null, null, "477eed5e-3ed6-4bb7-9f4d-e3e7080dba1a", null, null, false, "marissa.mayer@example.com" },
+                    { "114", 0, null, null, null, null, "e5f1c9ce-9733-42c0-a9b0-5ee278cf44b9", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "elizabeth.holmes@example.com", true, null, "Elizabeth", null, null, true, false, false, false, "Holmes", null, false, null, false, "ELIZABETH.HOLMES@EXAMPLE.COM", "ELIZABETH.HOLMES@EXAMPLE.COM", "AQAAAAIAAYagAAAAEE13oegCMyES5cudt99ndC8ycFwDlfhkPABnl1qRhFqwrJh/+mfiLxudQTs+Bpq08A==", null, false, null, null, "69d38184-5c19-4210-86f7-dae34e6519b6", null, null, false, "elizabeth.holmes@example.com" },
+                    { "115", 0, null, null, null, null, "8a2cb779-6d57-48cf-b696-d32600a075fc", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "susan.wojcicki@example.com", true, null, "Susan", null, null, true, false, false, false, "Wojcicki", null, false, null, false, "SUSAN.WOJCICKI@EXAMPLE.COM", "SUSAN.WOJCICKI@EXAMPLE.COM", "AQAAAAIAAYagAAAAEOeT5UPc0vILOiUVWyX20VPL7ED98UMml+7Rv0ylXiaXGIl6v7p+NgJgDxutI7wSfw==", null, false, null, null, "51c2bc54-bc7d-4cd1-ae0f-8429db7a68ce", null, null, false, "susan.wojcicki@example.com" },
+                    { "116", 0, null, null, null, null, "7fecb311-21ed-4954-b93d-9a23fe6455cf", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "tim.arnold@example.com", true, null, "Tim", null, null, true, false, false, false, "Arnold", null, false, null, false, "TIM.ARNOLD@EXAMPLE.COM", "TIM.ARNOLD@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJFCXf6qLP1NTwq1pSmMwTcqY7JiM5Jy+oYNYBNt4AHhwEWdxxAC7JuPOHaW93WkGg==", null, false, null, null, "de4e2d44-95d4-4f23-b999-9ac9f7c5b9fc", null, null, false, "tim.arnold@example.com" },
+                    { "117", 0, null, null, null, null, "fc3555f8-1a11-408e-bcec-252f7418898b", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "bob.iger@example.com", true, null, "Bob", null, null, true, false, false, false, "Iger", null, false, null, false, "BOB.IGER@EXAMPLE.COM", "BOB.IGER@EXAMPLE.COM", "AQAAAAIAAYagAAAAEK3DBG5PIHJPe/ioHfZrrw2AKIcfmQHMzNJqZQFt2mi97ayFyrY86cqTVYogEbRcdQ==", null, false, null, null, "c6c11932-7bbc-485e-a038-173f7e58ab4f", null, null, false, "bob.iger@example.com" },
+                    { "118", 0, null, null, null, null, "7d6af487-432d-4cac-84b8-4fa0367f7748", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "larry.ellison@example.com", true, null, "Larry", null, null, true, false, false, false, "Ellison", null, false, null, false, "LARRY.ELLISON@EXAMPLE.COM", "LARRY.ELLISON@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPbGyHhdmBHKnANjldViMan3aJOQO3VVtk7tDm7j7VLzuxBfnJOwJQjrdi/NdMtgrA==", null, false, null, null, "c1138d35-a0d4-4e5e-a5f6-6acb2797f1c3", null, null, false, "larry.ellison@example.com" },
+                    { "119", 0, null, null, null, null, "e4ff4581-1cb7-4b3a-9e27-10fe72e2863b", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "richard.branson@example.com", true, null, "Richard", null, null, true, false, false, false, "Branson", null, false, null, false, "RICHARD.BRANSON@EXAMPLE.COM", "RICHARD.BRANSON@EXAMPLE.COM", "AQAAAAIAAYagAAAAEA/0qbAs8uMOmN6NhUH8XELaMegO9piuh+9sgBcmNf+n1JWxXoENT94a2avbrROfBA==", null, false, null, null, "7626d2b2-3e68-4ebe-8009-5e0926cc9277", null, null, false, "richard.branson@example.com" },
+                    { "120", 0, null, null, null, null, "9dfbfe51-add9-4381-9180-b4dcdbcb20ea", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "jack.ma@example.com", true, null, "Jack", null, null, true, false, false, false, "Ma", null, false, null, false, "JACK.MA@EXAMPLE.COM", "JACK.MA@EXAMPLE.COM", "AQAAAAIAAYagAAAAEAK+IJgj1p/OTLFXy2Ums3zrvEX2WdQozbpIo478imPcNGiRLYYmDSSmSTWsQytqew==", null, false, null, null, "d448f68f-b7e8-4910-8a81-0919da86478d", null, null, false, "jack.ma@example.com" },
+                    { "121", 0, null, null, null, null, "d2ed6c5b-1b51-4002-b821-ec6f2c32b9f3", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "warren.buffett@example.com", true, null, "Warren", null, null, true, false, false, false, "Buffett", null, false, null, false, "WARREN.BUFFETT@EXAMPLE.COM", "WARREN.BUFFETT@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPjlZ+ZiSeF1JCaJcW7p4AE+AmdDuYM+mzBXqt3QQKKCHd+CvVmwxMjrB1d2gsYTVA==", null, false, null, null, "5e04d087-d302-4e75-bfa1-1163b3fb5989", null, null, false, "warren.buffett@example.com" },
+                    { "122", 0, null, null, null, null, "7a260dba-e2a9-445b-8952-878a7462bd8a", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "mary.barrett@example.com", true, null, "Mary", null, null, true, false, false, false, "Barrett", null, false, null, false, "MARY.BARRETT@EXAMPLE.COM", "MARY.BARRETT@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJadAtxIDKanaP+BEAfgvnZWWlbjuptJiHl6/8dyujg+Hnf1FpL0rLRj6bGXBSzCWQ==", null, false, null, null, "a73e4af0-c7c9-432a-9c7c-ea34972902af", null, null, false, "mary.barrett@example.com" },
+                    { "123", 0, null, null, null, null, "4a583b5f-e28d-45ae-840c-f8c1e0b2101f", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "ginni.rometty@example.com", true, null, "Ginni", null, null, true, false, false, false, "Rometty", null, false, null, false, "GINNI.ROMETTY@EXAMPLE.COM", "GINNI.ROMETTY@EXAMPLE.COM", "AQAAAAIAAYagAAAAEAw5T9SQsXKx0bTERdCypZ9gSBOjSXYSU947zgoZeQkvw+RlpYP03if86u1SWMQvsg==", null, false, null, null, "bdf11b33-b1f3-41ed-86e7-5ebdb15a8357", null, null, false, "ginni.rometty@example.com" },
+                    { "124", 0, null, null, null, null, "d6f210bf-56f9-4d56-ab31-40f183e6f2d1", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "mark.benioff@example.com", true, null, "Mark", null, null, true, false, false, false, "Benioff", null, false, null, false, "MARK.BENIOFF@EXAMPLE.COM", "MARK.BENIOFF@EXAMPLE.COM", "AQAAAAIAAYagAAAAEE8ZpQvq/mAutzB6s9O0HJs6RDn8RHxZPo5pj5qSL5XHqB5dbYmIWzy3V4O45G7Oyg==", null, false, null, null, "f2be8204-471f-43da-9e6f-9bbab1a8ed9b", null, null, false, "mark.benioff@example.com" },
+                    { "125", 0, null, null, null, null, "745c87ef-137b-4e9f-b61e-dbf1faca68a7", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "kevin.systrom@example.com", true, null, "Kevin", null, null, true, false, false, false, "Systrom", null, false, null, false, "KEVIN.SYSTROM@EXAMPLE.COM", "KEVIN.SYSTROM@EXAMPLE.COM", "AQAAAAIAAYagAAAAELogxPaOo2oauNPUcpDgn0X3hMJSlEb/I9LTGfjald3NsN+ddmCFfkD3BV2YKgXWug==", null, false, null, null, "7b319357-16af-446a-bdbe-a4a46c22d15c", null, null, false, "kevin.systrom@example.com" },
+                    { "126", 0, null, null, null, null, "29e21a65-be16-4b20-85fb-8ce669e64b67", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "evan.spiegel@example.com", true, null, "Evan", null, null, true, false, false, false, "Spiegel", null, false, null, false, "EVAN.SPIEGEL@EXAMPLE.COM", "EVAN.SPIEGEL@EXAMPLE.COM", "AQAAAAIAAYagAAAAEEiR/t9DD5Io3+i6BZ3XgFDjuAnrAh3HSodJyRiT6xlNQ4rk884GdSleoX7mL6w8KA==", null, false, null, null, "7b9ae7cb-78bd-4467-b0d2-61a3c5686a25", null, null, false, "evan.spiegel@example.com" },
+                    { "127", 0, null, null, null, null, "c89971f7-5890-4503-ae81-f54d674b0877", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "jan.koum@example.com", true, null, "Jan", null, null, true, false, false, false, "Koum", null, false, null, false, "JAN.KOUM@EXAMPLE.COM", "JAN.KOUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMNYAaQd3JEvPc7vX/PudoW9O+jBgt2ww7/8ZFQ6Q6RTVnkVepb7FfoeDXdpXMCxxA==", null, false, null, null, "7977517d-5437-47db-a48b-c4b175202b60", null, null, false, "jan.koum@example.com" },
+                    { "128", 0, null, null, null, null, "41308137-d23a-42f1-9334-6cfc6304c8b1", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "janice.fang@example.com", true, null, "Janice", null, null, true, false, false, false, "Fang", null, false, null, false, "JANICE.FANG@EXAMPLE.COM", "JANICE.FANG@EXAMPLE.COM", "AQAAAAIAAYagAAAAEEZaPS8nu5Ws5QVrDdH0Wli6BhBWNuQbSQ9h5uO1KzlXHgi715G93dB5i3iwMgIHNQ==", null, false, null, null, "ded6bbc0-27f1-4731-babe-dca0495c9b38", null, null, false, "janice.fang@example.com" },
+                    { "129", 0, null, null, null, null, "33258229-7fc7-4143-924e-79350a83659d", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sergey.gladkikh@example.com", true, null, "Sergey", null, null, true, false, false, false, "Gladkikh", null, false, null, false, "SERGEY.GLADKIKH@EXAMPLE.COM", "SERGEY.GLADKIKH@EXAMPLE.COM", "AQAAAAIAAYagAAAAEKKurhUjommeEJBoEkoXparzYYn2pUJjTdrkYgYrkmSdutdt1vORnFJ21X0MeCHxXw==", null, false, null, null, "8a8812a8-ed5e-4f87-a881-168e823df40f", null, null, false, "sergey.gladkikh@example.com" },
+                    { "130", 0, null, null, null, null, "568b1972-9323-41cd-a594-bb94aaf22471", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "tony.hsieh@example.com", true, null, "Tony", null, null, true, false, false, false, "Hsieh", null, false, null, false, "TONY.HSIEH@EXAMPLE.COM", "TONY.HSIEH@EXAMPLE.COM", "AQAAAAIAAYagAAAAECIQqTskbi9Q71a5RqEmnaA+AgZJ3kGwNssDnsw34wPdIfasSbMuHHjhKGuq0pWw0w==", null, false, null, null, "fa47764a-4e49-4a12-983f-72b8e8146766", null, null, false, "tony.hsieh@example.com" },
+                    { "131", 0, null, null, null, null, "81aa2f02-a79f-4e9c-947d-5e2eb137e7ff", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "richard.hyne@example.com", true, null, "Richard", null, null, true, false, false, false, "Hyne", null, false, null, false, "RICHARD.HYNE@EXAMPLE.COM", "RICHARD.HYNE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHpphigrI/h+67J5uDBv4Ui+YK8pBn09lcfnlp8Xr+SkISCJC2wM+NA5x8wuhDaW7w==", null, false, null, null, "fa3eefb4-406d-4db1-a539-042b6147d8ad", null, null, false, "richard.hyne@example.com" },
+                    { "132", 0, null, null, null, null, "2076afcc-3522-42d9-bdb9-2de843e2b0f9", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "peter.thiel@example.com", true, null, "Peter", null, null, true, false, false, false, "Thiel", null, false, null, false, "PETER.THIEL@EXAMPLE.COM", "PETER.THIEL@EXAMPLE.COM", "AQAAAAIAAYagAAAAEABB32pFf99uQtyEO23fuPfYsDXzAElRWNcg8mwThk2vLWIzWypfV8i6/V7v+Ftehg==", null, false, null, null, "ec041e8b-62ec-45a7-87c9-2a302a4d80e3", null, null, false, "peter.thiel@example.com" },
+                    { "133", 0, null, null, null, null, "5bae11e4-2360-4d47-9489-e86e2f4fc970", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "steve.wozniak@example.com", true, null, "Steve", null, null, true, false, false, false, "Wozniak", null, false, null, false, "STEVE.WOZNIAK@EXAMPLE.COM", "STEVE.WOZNIAK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJ4GnDso16eIs7NA+FxqQ1DsL7ycP8tPk+3t2BSCoWxvDEXlJAWyQLcKhQgjuY84qw==", null, false, null, null, "29dc7683-4296-48af-a70e-c1ce103badec", null, null, false, "steve.wozniak@example.com" },
+                    { "134", 0, null, null, null, null, "dcea1b7d-9ff5-4099-98c1-a16d1ac8e92b", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "john.carmack@example.com", true, null, "John", null, null, true, false, false, false, "Carmack", null, false, null, false, "JOHN.CARMACK@EXAMPLE.COM", "JOHN.CARMACK@EXAMPLE.COM", "AQAAAAIAAYagAAAAEKKoIcWxlkfd7XcAzrd2TbjFTYtzM0CENd6Xw/+MJcehlWEOQmUF5fmcEioOO0YSFg==", null, false, null, null, "98111f17-ad0a-44ca-a811-9a249a444fe5", null, null, false, "john.carmack@example.com" },
+                    { "135", 0, null, null, null, null, "93dc7379-56d8-49a6-8c8a-6898dce427d0", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "mike.zyda@example.com", true, null, "Mike", null, null, true, false, false, false, "Zyda", null, false, null, false, "MIKE.ZYDA@EXAMPLE.COM", "MIKE.ZYDA@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHvfZArFLcuHgbBdc4NBv2z1fEaqRooowlwM9bmOaIvUUZhE+i2pcboiFqCVKkZBJA==", null, false, null, null, "bad0b129-7f98-4ca1-9075-64b452f87425", null, null, false, "mike.zyda@example.com" },
+                    { "136", 0, null, null, null, null, "fac03560-9b16-45d7-a6cd-3f7ff8fea31b", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "cheryl.sandberg@example.com", true, null, "Cheryl", null, null, true, false, false, false, "Sandberg", null, false, null, false, "CHERYL.SANDBERG@EXAMPLE.COM", "CHERYL.SANDBERG@EXAMPLE.COM", "AQAAAAIAAYagAAAAEAbDZSbXISERWIRR4T3+WyNGTYcM37CEa3sz6B2kZlnlW0EhQ8FQ+Vh/X4nfxV0cAQ==", null, false, null, null, "d2305a84-e40b-4e4f-bde7-f19e8c455502", null, null, false, "cheryl.sandberg@example.com" },
+                    { "137", 0, null, null, null, null, "137940f1-4234-4e4f-b2cd-3c1b05fcf52a", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "karen.smith@example.com", true, null, "Karen", null, null, true, false, false, false, "Smith", null, false, null, false, "KAREN.SMITH@EXAMPLE.COM", "KAREN.SMITH@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJixhJ0Pd/hTJiVGodLHNB7VJyQrDW+tmwFIG6sZf4kyV+JyNYL9VbRWnaITxxqluA==", null, false, null, null, "7c387265-a69d-46a5-af38-f942c1743d64", null, null, false, "karen.smith@example.com" },
+                    { "138", 0, null, null, null, null, "a90cec74-7067-4ca2-9315-beda04862ffe", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "david.lee@example.com", true, null, "David", null, null, true, false, false, false, "Lee", null, false, null, false, "DAVID.LEE@EXAMPLE.COM", "DAVID.LEE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJ7GXiN54uxr1EGCvVSv2eGRBTK/kiIDkV3Wq9QhuMNP91UceyVtD9JN8a3VlMnY6A==", null, false, null, null, "7ba569fa-1cdd-4738-be9c-2e5f331fdfb9", null, null, false, "david.lee@example.com" },
+                    { "139", 0, null, null, null, null, "050e34c9-4021-481f-a5bb-8a3d968b3300", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "james.taylor@example.com", true, null, "James", null, null, true, false, false, false, "Taylor", null, false, null, false, "JAMES.TAYLOR@EXAMPLE.COM", "JAMES.TAYLOR@EXAMPLE.COM", "AQAAAAIAAYagAAAAEEMfVA0HPAi1/YA8IpCaVvtSP0RPpCEc3zialnCK8wvQtYJ3YzN0HboeDGehuauBJg==", null, false, null, null, "a628e8d8-3a70-4e60-9f34-b588d511ac78", null, null, false, "james.taylor@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -1097,17 +1093,16 @@ namespace Hometown_Application.Migrations
                 columns: new[] { "BillItemsID", "AddedBy", "AddedOn", "Amount", "BillItemsModelBillItemsID", "Description", "IsDeleted", "PaymentDuration", "PaymentName", "UpdatedBy", "UpdatedOn" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(315), 3500.00m, null, "Monthly HOA dues covering maintenance, security, and amenities.", false, "Monthly", "Homeowners Association (HOA) Fees", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(325), 100.00m, null, "Monthly water consumption charges.", false, "Monthly", "Water Bill", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(328), 2500.00m, null, "Monthly payment for electricity consumption.", false, "Monthly", "Electricity Bill", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(330), 300.00m, null, "Monthly fee for waste disposal services.", false, "Monthly", "Garbage Collection Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(332), 1500.00m, null, "Monthly fee for subdivision security services.", false, "Monthly", "Security Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 6, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(334), 500.00m, null, "Monthly fee for streetlight maintenance.", false, "Monthly", "Street Lighting Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 7, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(336), 800.00m, null, "Annual fee for maintaining the clubhouse and shared spaces.", false, "Yearly", "Clubhouse Maintenance Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 8, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(338), 5000.00m, null, "Annual contribution for property tax remittance.", false, "Yearly", "Property Tax Contribution", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 9, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(340), 1200.00m, null, "Quarterly contribution for major subdivision repairs.", false, "Quarterly", "Sinking Fund Contribution", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 10, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(343), 600.00m, null, "Quarterly fee for pest control services in the subdivision.", false, "Quarterly", "Pest Control Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 11, null, new DateTime(2025, 4, 15, 0, 3, 28, 493, DateTimeKind.Utc).AddTicks(345), 1000.00m, null, "Annual fee for road maintenance and repairs.", false, "Yearly", "Road Maintenance Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(866), 2000.00m, null, "Monthly HOA dues for maintenance, security, and amenities.", false, "Monthly", "Homeowners Association (HOA) Fees", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(877), 350.00m, null, "Monthly water consumption charges.", false, "Monthly", "Water Bill", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(879), 200.00m, null, "Monthly fee for waste disposal services.", false, "Monthly", "Garbage Collection Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 5, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(882), 1000.00m, null, "Monthly fee for 24/7 subdivision security services.", false, "Monthly", "Security Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 6, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(884), 300.00m, null, "Monthly fee for streetlight maintenance and electricity.", false, "Monthly", "Street Lighting Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 7, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(886), 500.00m, null, "Monthly fee for clubhouse upkeep and utilities.", false, "Monthly", "Clubhouse Maintenance Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 8, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(888), 1000.00m, null, "Monthly contribution toward shared property tax obligations.", false, "Monthly", "Property Tax Contribution", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 9, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(890), 800.00m, null, "Monthly contribution to the long-term repair and reserve fund.", false, "Monthly", "Sinking Fund Contribution", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 10, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(891), 250.00m, null, "Monthly fee for regular pest control services.", false, "Monthly", "Pest Control Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 11, null, new DateTime(2025, 5, 1, 17, 0, 10, 864, DateTimeKind.Utc).AddTicks(892), 700.00m, null, "Monthly fee for road repair and upkeep.", false, "Monthly", "Road Maintenance Fee", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
@@ -1188,35 +1183,35 @@ namespace Hometown_Application.Migrations
                 columns: new[] { "HomeownerId", "ApprovedBy", "ApprovedOn", "HouseModelHouseId", "IsApproved", "IsBanned", "IsPromotedToAdmin", "IsPromotedToStaff", "MoveInDate", "MoveOutDate", "RegisteredOn", "UserId" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5380), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5378), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5378), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5380), "111" },
-                    { 2, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5386), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5385), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5385), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5386), "112" },
-                    { 3, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5396), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5388), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5395), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5396), "113" },
-                    { 4, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5399), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5397), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5398), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5399), "114" },
-                    { 5, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5402), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5401), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5401), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5402), "115" },
-                    { 6, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5405), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5404), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5404), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5405), "116" },
-                    { 7, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5408), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5407), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5407), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5409), "117" },
-                    { 8, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5411), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5410), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5410), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5412), "118" },
-                    { 9, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5414), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5413), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5413), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5415), "119" },
-                    { 10, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5417), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5416), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5416), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5418), "120" },
-                    { 11, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5420), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5419), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5419), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5421), "121" },
-                    { 12, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5423), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5422), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5422), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5423), "122" },
-                    { 13, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5426), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5425), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5425), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5427), "123" },
-                    { 14, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5429), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5428), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5428), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5430), "124" },
-                    { 15, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5432), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5431), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5431), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5433), "125" },
-                    { 16, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5435), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5434), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5434), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5436), "126" },
-                    { 17, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5438), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5437), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5437), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5439), "127" },
-                    { 18, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5441), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5440), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5440), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5442), "128" },
-                    { 19, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5444), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5443), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5443), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5445), "129" },
-                    { 20, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5447), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5446), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5446), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5447), "130" },
-                    { 21, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5450), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5449), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5449), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5451), "131" },
-                    { 22, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5453), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5452), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5452), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5454), "132" },
-                    { 23, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5456), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5455), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5455), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5457), "133" },
-                    { 24, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5459), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5458), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5458), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5460), "134" },
-                    { 25, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5462), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5461), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5461), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5462), "135" },
-                    { 26, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5465), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5464), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5464), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5465), "136" },
-                    { 27, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5468), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5467), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5467), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5468), "137" },
-                    { 28, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5471), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5469), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5470), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5471), "138" },
-                    { 29, null, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5475), null, true, false, false, false, new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5474), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5474), new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5476), "139" }
+                    { 1, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4843), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4841), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4842), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4843), "111" },
+                    { 2, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4849), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4848), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4848), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4849), "112" },
+                    { 3, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4853), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4852), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4852), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4854), "113" },
+                    { 4, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4856), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4855), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4855), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4856), "114" },
+                    { 5, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4858), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4857), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4858), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4859), "115" },
+                    { 6, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4861), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4860), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4860), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4861), "116" },
+                    { 7, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4864), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4863), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4863), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4865), "117" },
+                    { 8, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4867), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4866), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4866), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4867), "118" },
+                    { 9, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4869), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4868), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4868), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4870), "119" },
+                    { 10, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4872), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4871), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4871), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4872), "120" },
+                    { 11, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4875), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4874), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4874), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4876), "121" },
+                    { 12, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4878), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4877), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4877), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4878), "122" },
+                    { 13, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4880), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4879), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4879), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4881), "123" },
+                    { 14, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4883), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4881), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4882), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4883), "124" },
+                    { 15, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4887), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4886), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4886), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4887), "125" },
+                    { 16, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4889), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4888), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4889), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4890), "126" },
+                    { 17, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4892), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4891), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4891), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4892), "127" },
+                    { 18, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4894), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4893), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4893), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4895), "128" },
+                    { 19, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4898), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4897), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4897), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4898), "129" },
+                    { 20, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4900), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4899), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4899), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4901), "130" },
+                    { 21, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4903), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4901), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4902), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4903), "131" },
+                    { 22, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4905), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4904), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4904), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4905), "132" },
+                    { 23, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4908), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4907), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4908), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4909), "133" },
+                    { 24, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4911), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4910), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4910), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4911), "134" },
+                    { 25, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4913), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4912), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4912), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4914), "135" },
+                    { 26, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4918), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4917), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4918), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4919), "136" },
+                    { 27, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4922), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4921), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4921), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4922), "137" },
+                    { 28, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4924), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4923), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4924), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4925), "138" },
+                    { 29, null, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4927), null, true, false, false, false, new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4926), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4926), new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4927), "139" }
                 });
 
             migrationBuilder.InsertData(
@@ -1261,16 +1256,16 @@ namespace Hometown_Application.Migrations
                 columns: new[] { "StaffId", "AccountCreatedBy", "AccountCreatedOn", "Address", "Department", "EmergencyContactName", "EmergencyContactNumber", "EmergencyContactRelation", "HireDate", "IsActiveEmployee", "IsAlsoHomeOwner", "IsDeleted", "IsFired", "Position", "Salary", "UpdatedBy", "UpdatedOn", "UserId" },
                 values: new object[,]
                 {
-                    { 1, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5186), "123 Main St", 6, "Jane Doe", "1234567890", "Spouse", new DateTime(2022, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Security Officer", 25000.00m, null, null, "100" },
-                    { 2, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5199), "456 Oak St", 5, "John Smith", "0987654321", "Brother", new DateTime(2021, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Maintenance Supervisor", 30000.00m, null, null, "102" },
-                    { 3, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5214), "789 Pine St", 3, "Alice Brown", "5678901234", "Sister", new DateTime(2020, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "System Administrator", 35000.00m, null, null, "103" },
-                    { 4, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5223), "987 Cedar St", 2, "Bob White", "2345678901", "Father", new DateTime(2019, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Finance Manager", 40000.00m, null, null, "104" },
-                    { 5, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5232), "654 Birch St", 0, "Chris Green", "3456789012", "Friend", new DateTime(2021, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Amenities Coordinator", 28000.00m, null, null, "105" },
-                    { 6, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5240), "321 Maple St", 1, "Diana Blue", "4567890123", "Cousin", new DateTime(2023, 2, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Customer Service Representative", 26000.00m, null, null, "106" },
-                    { 7, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5248), "159 Elm St", 4, "Evan Red", "5678901234", "Uncle", new DateTime(2020, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Head Gardener", 27000.00m, null, null, "107" },
-                    { 8, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5256), "123 Main St", 6, "Jane Doe", "1234567890", "Spouse", new DateTime(2022, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Security Officer", 25000.00m, null, null, "108" },
-                    { 9, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5288), "456 Oak St", 5, "John Smith", "0987654321", "Brother", new DateTime(2021, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Maintenance Supervisor", 30000.00m, null, null, "109" },
-                    { 10, "admin", new DateTime(2025, 4, 15, 0, 3, 31, 335, DateTimeKind.Utc).AddTicks(5316), "789 Pine St", 3, "Alice Brown", "5678901234", "Sister", new DateTime(2020, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "System Administrator", 35000.00m, null, null, "110" }
+                    { 1, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4038), "123 Main St", 6, "Jane Doe", "1234567890", "Spouse", new DateTime(2022, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Security Officer", 25000.00m, null, null, "100" },
+                    { 2, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4068), "456 Oak St", 5, "John Smith", "0987654321", "Brother", new DateTime(2021, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Maintenance Supervisor", 30000.00m, null, null, "102" },
+                    { 3, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4086), "789 Pine St", 3, "Alice Brown", "5678901234", "Sister", new DateTime(2020, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "System Administrator", 35000.00m, null, null, "103" },
+                    { 4, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4101), "987 Cedar St", 2, "Bob White", "2345678901", "Father", new DateTime(2019, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Finance Manager", 40000.00m, null, null, "104" },
+                    { 5, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4117), "654 Birch St", 0, "Chris Green", "3456789012", "Friend", new DateTime(2021, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Amenities Coordinator", 28000.00m, null, null, "105" },
+                    { 6, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4136), "321 Maple St", 1, "Diana Blue", "4567890123", "Cousin", new DateTime(2023, 2, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Customer Service Representative", 26000.00m, null, null, "106" },
+                    { 7, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4150), "159 Elm St", 4, "Evan Red", "5678901234", "Uncle", new DateTime(2020, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Head Gardener", 27000.00m, null, null, "107" },
+                    { 8, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4162), "123 Main St", 6, "Jane Doe", "1234567890", "Spouse", new DateTime(2022, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Security Officer", 25000.00m, null, null, "108" },
+                    { 9, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4176), "456 Oak St", 5, "John Smith", "0987654321", "Brother", new DateTime(2021, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "Maintenance Supervisor", 30000.00m, null, null, "109" },
+                    { 10, "admin", new DateTime(2025, 5, 1, 17, 0, 13, 77, DateTimeKind.Utc).AddTicks(4420), "789 Pine St", 3, "Alice Brown", "5678901234", "Sister", new DateTime(2020, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, false, false, "System Administrator", 35000.00m, null, null, "110" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1321,6 +1316,11 @@ namespace Hometown_Application.Migrations
                 column: "BillAssignmentModelBillAssignmentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_BillAssignModelBillAssignId",
+                table: "AspNetUsers",
+                column: "BillAssignModelBillAssignId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_HomeownerProfilesHomeownerId",
                 table: "AspNetUsers",
                 column: "HomeownerProfilesHomeownerId");
@@ -1338,8 +1338,8 @@ namespace Hometown_Application.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BillAccounts_UserId",
-                table: "BillAccounts",
+                name: "IX_BillAssign_UserId",
+                table: "BillAssign",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -1353,14 +1353,9 @@ namespace Hometown_Application.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BillDetail_BillId",
-                table: "BillDetail",
-                column: "BillId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BillDetail_BillItemsID",
-                table: "BillDetail",
-                column: "BillItemsID");
+                name: "IX_BillFee_BillAssignmentId",
+                table: "BillFee",
+                column: "BillAssignmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BillItems_BillItemsModelBillItemsID",
@@ -1368,23 +1363,28 @@ namespace Hometown_Application.Migrations
                 column: "BillItemsModelBillItemsID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BillPayment_BillAssignmentId",
+                table: "BillPayment",
+                column: "BillAssignmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BillPayment_BillAssignmentModelBillAssignmentId",
+                table: "BillPayment",
+                column: "BillAssignmentModelBillAssignmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BillPayment_BillId",
                 table: "BillPayment",
                 column: "BillId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BillPayment_BillModelBillId",
+                table: "BillPayment",
+                column: "BillModelBillId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bills_UserId",
                 table: "Bills",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BillTransactions_BillItemsId",
-                table: "BillTransactions",
-                column: "BillItemsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BillTransactions_UserId",
-                table: "BillTransactions",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -1580,6 +1580,13 @@ namespace Hometown_Application.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUsers_BillAssign_BillAssignModelBillAssignId",
+                table: "AspNetUsers",
+                column: "BillAssignModelBillAssignId",
+                principalTable: "BillAssign",
+                principalColumn: "BillAssignId");
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUsers_BillAssignment_BillAssignmentModelBillAssignmentId",
                 table: "AspNetUsers",
                 column: "BillAssignmentModelBillAssignmentId",
@@ -1607,6 +1614,10 @@ namespace Hometown_Application.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_AdminProfiles_AspNetUsers_UserId",
                 table: "AdminProfiles");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_BillAssign_AspNetUsers_UserId",
+                table: "BillAssign");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_BillAssignment_AspNetUsers_UserId",
@@ -1644,16 +1655,13 @@ namespace Hometown_Application.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "BillAccounts");
+                name: "BillFee");
 
             migrationBuilder.DropTable(
-                name: "BillDetail");
+                name: "BillItems");
 
             migrationBuilder.DropTable(
                 name: "BillPayment");
-
-            migrationBuilder.DropTable(
-                name: "BillTransactions");
 
             migrationBuilder.DropTable(
                 name: "Chats");
@@ -1698,9 +1706,6 @@ namespace Hometown_Application.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "BillItems");
-
-            migrationBuilder.DropTable(
                 name: "QuestionOptions");
 
             migrationBuilder.DropTable(
@@ -1726,6 +1731,9 @@ namespace Hometown_Application.Migrations
 
             migrationBuilder.DropTable(
                 name: "AdminProfiles");
+
+            migrationBuilder.DropTable(
+                name: "BillAssign");
 
             migrationBuilder.DropTable(
                 name: "BillAssignment");
