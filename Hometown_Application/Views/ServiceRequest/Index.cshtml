@@ -1,49 +1,474 @@
-﻿@model IEnumerable<Hometown_Application.Models.ServiceRequestModel>
+﻿@model Hometown_Application.ViewModels.ServiceRequestListViewModel
 
-<h2>Service Requests</h2>
+@{
+    ViewData["Title"] = "Service Requests";
+}
 
-<!-- Admin and Homeowner View Buttons -->
-<div class="mb-3">
-    <a href="@Url.Action("AdminView", "ServiceRequest")" class="btn btn-primary">Admin View</a>
-    <a href="@Url.Action("HomeownerView", "ServiceRequest")" class="btn btn-secondary">Homeowner View</a>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: auto;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 100%;
+    }
+
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+    }
+
+        .table th {
+            color: var(--text-color);
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-light);
+            padding: 12px 10px;
+        }
+
+        .table td {
+            padding: 12px 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(111, 117, 78, 0.05);
+        }
+
+        .table a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+            .table a:hover {
+                color: var(--primary-dark);
+            }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-color);
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 8px 20px;
+        transition: var(--transition);
+    }
+
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.9rem;
+    }
+
+    .custom-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+    }
+
+        .custom-btn:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .btn-edit {
+        background-color: var(--warning-color);
+        color: var(--text-color);
+        border: none;
+    }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+
+    .btn-delete {
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+    }
+
+        .btn-delete:hover {
+            background-color: #bd2130;
+            transform: translateY(-2px);
+        }
+
+    .btn-secondary {
+        background-color: var(--secondary-color);
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .alert {
+        border-radius: var(--border-radius);
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border: none;
+    }
+
+    .alert-success {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: var(--success-color);
+        border-left: 4px solid var(--success-color);
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--danger-color);
+        border-left: 4px solid var(--danger-color);
+    }
+
+    .pagination {
+        display: flex;
+        padding-left: 0;
+        list-style: none;
+        border-radius: 0.25rem;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .page-link {
+        color: var(--primary-color);
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 0.75rem;
+        margin: 0 2px;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+        .page-link:hover {
+            color: var(--primary-dark);
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            transform: translateY(-2px);
+        }
+
+    .badge {
+        padding: 6px 10px;
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
+
+    .bg-success {
+        background-color: var(--success-color) !important;
+    }
+
+    .bg-warning {
+        background-color: var(--warning-color) !important;
+        color: var(--text-color);
+    }
+
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+    }
+
+    .modal-header {
+        background-color: var(--primary-light);
+        color: white;
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        border-bottom: none;
+    }
+
+    .modal-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    select {
+        border-radius: 8px;
+        padding: 6px 10px;
+        border: 1px solid #ced4da;
+        transition: var(--transition);
+    }
+
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(111, 117, 78, 0.25);
+        }
+
+    .status-select {
+        min-width: 140px;
+    }
+
+    .back-link {
+        display: inline-block;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        margin-top: 20px;
+        transition: var(--transition);
+    }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+            transform: translateX(-3px);
+        }
+
+        .back-link:before {
+            content: '←';
+            margin-right: 5px;
+        }
+</style>
+
+<div class="content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Service Requests</h1>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn custom-btn">New Request</a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card">
+        @if (Model.Requests != null && Model.Requests.Any())
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a asp-action="Index" asp-route-page="@Model.CurrentPage" asp-route-sortBy="RequestType" asp-route-ascending="@(Model.SortBy == "RequestType" && Model.Ascending ? "false" : "true")">
+                                    Category
+                                    @if (Model.SortBy == "RequestType")
+                                    {
+                                        <i class="bi @(Model.Ascending ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                    }
+                                </a>
+                            </th>
+                            <th>Description</th>
+                            <th>
+                                <a asp-action="Index" asp-route-page="@Model.CurrentPage" asp-route-sortBy="Urgency" asp-route-ascending="@(Model.SortBy == "Urgency" && Model.Ascending ? "false" : "true")">
+                                    Urgency
+                                    @if (Model.SortBy == "Urgency")
+                                    {
+                                        <i class="bi @(Model.Ascending ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                    }
+                                </a>
+                            </th>
+                            <th>Email</th>
+                            <th>
+                                <a asp-action="Index" asp-route-page="@Model.CurrentPage" asp-route-sortBy="Status" asp-route-ascending="@(Model.SortBy == "Status" && Model.Ascending ? "false" : "true")">
+                                    Status
+                                    @if (Model.SortBy == "Status")
+                                    {
+                                        <i class="bi @(Model.Ascending ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                    }
+                                </a>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var request in Model.Requests)
+                        {
+                            <tr>
+                                <td>@request.RequestType?.Name</td>
+                                <td>@request.Details</td>
+                                <td>@request.Urgency</td>
+                                <td>@request.Email</td>
+                                <td>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <form asp-action="UpdateServiceRequestStatus" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" value="@request.ServiceRequestId" />
+                                            <select name="newStatusId" onchange="this.form.submit()" class="status-select">
+                                                @foreach (var status in Model.Statuses)
+                                                {
+                                                    if (request.StatusId.ToString() == status.Value)
+                                                    {
+                                                        <option value="@status.Value" selected>@status.Text</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@status.Value">@status.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge @(request.Status?.StatusName == "Completed" ? "bg-success" : "bg-warning")">
+                                            @request.Status?.StatusName
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-edit btn-sm">Edit</a>
+                                    <button type="button" class="btn btn-delete btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            onclick="setDeleteId(@request.ServiceRequestId, '@request.RequestType?.Name')">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <nav>
+                <ul class="pagination">
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = i, sortBy = Model.SortBy, ascending = Model.Ascending })">@i</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+        else if (TempData["Error"] == null)
+        {
+            <p class="text-center">No service requests found. <a asp-action="Create">Create a new request</a>.</p>
+        }
+    </div>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Category</th>
-            <th>Description</th>
-            <th>Urgency</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var request in Model)
-        {
-            <tr>
-                d>
-                <td>@request.Urgency</td>
-                <td>@request.Email</td>
-                <td>@request.Status</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@request.ServiceRequestId" class="btn btn-warning">Edit</a>
-
-                    <!-- Delete Button (Triggers Modal) -->
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                            onclick="setDeleteId(@request.ServiceRequestId)">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<a asp-action="Create" class="btn btn-success">New Request</a>
-
-<!-- 🔴 DELETE CONFIRMATION MODAL -->
+<!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -52,13 +477,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this service request?</p>
+                <p>Are you sure you want to delete the request for "<span id="deleteRequestName"></span>"?</p>
             </div>
             <div class="modal-footer">
                 <form id="deleteForm" asp-action="Delete" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" id="deleteRequestId" />
-                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                    <button type="submit" class="btn btn-delete">Confirm Delete</button>
                 </form>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             </div>
@@ -66,9 +491,9 @@
     </div>
 </div>
 
-<!-- 🔹 JavaScript to Set ID in Modal -->
 <script>
-    function setDeleteId(id) {
+    function setDeleteId(id, name) {
         document.getElementById("deleteRequestId").value = id;
+        document.getElementById("deleteRequestName").innerText = name;
     }
 </script>

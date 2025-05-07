@@ -4,240 +4,640 @@
     ViewData["Title"] = "Vehicle Gate Passes";
 }
 
-<h1>@ViewData["Title"]</h1>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<a asp-controller="VehicleGatepass" asp-action="Create" class="btn btn-secondary">
-    <i class="fas fa-comment"></i>Create
-</a>
+    /* Page title and header */
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Image</th>
-            <th>Vehicle Brand</th>
-            <th>Vehicle Color</th>
-            <th>Plate Number</th>
-            <th>Owner</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Where(v => !v.IsDeleted && v.IsApproved == true))
-        {
-            <tr>
-                <td>
-                    @if (item.VehicleImage != null)
-                    {
-                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.VehicleImage)" alt="Feedback Image" width="100" height="100" />
-                    }
-                    else
-                    {
-                        <span>No Image</span>
-                    }
-    
-                </td>
-                <td>@item.VehicleBrand</td>
-                <td>@item.VehicleColor</td>
-                <td>@item.VehiclePlateNumber</td>
-                <td>@item.ApplicationUser.UserName</td>
-                <td>@item.ApprovalStatus</td>
-                <td>
-                    <a asp-controller="VehicleGatePass" asp-action="Edit" asp-route-id="@item.VehicleId" class="btn btn-primary">
-                        Edit
-                    </a>
-
-                    <!-- Delete Button triggers Modal -->
-                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand">
-                        Delete
-                    </button>
-                </td>
-            </tr>
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
         }
-    </tbody>
-</table>
 
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
 
+    /* Action buttons */
+    .action-button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
 
-<!-- Tabs for Approve/Reject -->
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="true">Pending</a>
-    </li>
-    <li class="nav-item" role="presentation">
-        <a class="nav-link" id="approved-tab" data-bs-toggle="tab" href="#approved" role="tab" aria-controls="approved" aria-selected="false">Approved</a>
-    </li>
-    <li class="nav-item" role="presentation">
-        <a class="nav-link" id="rejected-tab" data-bs-toggle="tab" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">Rejected</a>
-    </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-    <!-- Pending Tab -->
-    <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
-        <h3>Pending Approvals</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Vehicle Brand</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Where(v => !v.IsDeleted && !(v.IsApproved ?? false) && !(v.IsRejected ?? false)))
-                {
-                    <tr>
-                        <td>@item.VehicleBrand</td>
-                        <td>
-                            <!-- Approve Button triggers Modal -->
-                            <button class="btn btn-success" data-toggle="modal" data-target="#approveRejectModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand" data-action="approve">
-                                Approve
-                            </button>
+        .action-button:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
 
-                            <!-- Reject Button triggers Modal -->
-                            <button class="btn btn-warning" data-toggle="modal" data-target="#approveRejectModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand" data-action="reject">
-                                Reject
-                            </button>
-                        </td>
-                    </tr>
-                }
+        .action-button.primary {
+            background-color: var(--primary-color);
+        }
 
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Approved Tab -->
-    <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
-        <h3>Approved Gate Passes</h3>
-        <div class="row">
-            @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsApproved ?? false)))
-            {
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">@item.VehicleBrand</h5>
-                            <span class="badge badge-success mb-2">Approved</span>
-                            <br>
-
-                            <td>
-                                @if (item.VehicleImage != null)
-                                {
-                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.VehicleImage)" alt="Feedback Image" width="100" height="100" />
-                                }
-                                else
-                                {
-                                    <span>No Image</span>
-                                }
-
-                            </td>
-
-                            <a asp-controller="VehicleGatePass" asp-action="DownloadPDF" asp-route-id="@item.VehicleId" class="btn btn-primary btn-sm">
-                                Download PDF
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            .action-button.primary:hover {
+                background-color: var(--primary-light);
             }
+
+        .action-button i {
+            font-size: 1.1rem;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* Stats cards */
+    .stat-cards-container {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        gap: 20px;
+    }
+
+    .stat-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 15px 20px;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 15px;
+        flex-grow: 1;
+        flex: 1;
+        max-width: 30%;
+        min-width: 250px;
+        position: relative;
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .stat-card.pending::before {
+            background-color: var(--warning-color);
+        }
+
+        .stat-card.amount::before {
+            background-color: var(--info-color);
+        }
+
+        .stat-card.count::before {
+            background-color: var(--primary-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+    .stat-icon {
+        font-size: 1.5rem;
+        background-color: rgba(0,0,0,0.05);
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .pending-icon {
+        color: var(--warning-color);
+    }
+
+    .amount-icon {
+        color: var(--info-color);
+    }
+
+    .count-icon {
+        color: var(--primary-color);
+    }
+
+    .stat-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Search container */
+    .search-container {
+        display: flex;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid #eee;
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        font-size: 1rem;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--primary-light);
+        }
+
+    .search-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        padding: 0 25px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+        .search-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+    /* Tab container */
+    .tab-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        padding: 25px;
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 3rem;
+    }
+
+    /* Tabs styling */
+    .custom-nav-pills {
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+        .custom-nav-pills .nav-link {
+            background-color: rgba(0,0,0,0.05);
+            color: var(--text-color);
+            border-radius: var(--border-radius);
+            padding: 12px 24px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+            .custom-nav-pills .nav-link:hover {
+                background-color: rgba(0,0,0,0.08);
+            }
+
+            .custom-nav-pills .nav-link.active {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+    /* Table styling */
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+
+        .custom-table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            border: none;
+        }
+
+        .custom-table tbody tr {
+            background-color: white;
+            transition: var(--transition);
+        }
+
+            .custom-table tbody tr:hover {
+                background-color: rgba(0,0,0,0.02);
+            }
+
+        .custom-table tbody td {
+            padding: 15px;
+            text-align: center;
+            vertical-align: middle;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+    }
+
+        .empty-state i {
+            color: var(--secondary-color);
+            opacity: 0.7;
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+    /* Approval button styling */
+    .btn-approve {
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: var(--transition);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-right: 8px;
+    }
+
+        .btn-approve:hover {
+            background-color: #157347;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-approve i {
+            margin-right: 5px;
+        }
+
+    /* Reject button styling */
+    .btn-reject {
+        background-color: var(--warning-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: var(--transition);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+        .btn-reject:hover {
+            background-color: #d39e00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-reject i {
+            margin-right: 5px;
+        }
+
+    /* Card grid styling */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .vehicle-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: var(--transition);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+    .vehicle-card-header {
+        background-color: var(--primary-light);
+        color: white;
+        padding: 15px;
+        font-weight: 600;
+    }
+
+    .vehicle-card-body {
+        padding: 20px;
+    }
+
+    .vehicle-card-footer {
+        padding: 15px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .vehicle-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        margin-bottom: 15px;
+    }
+
+    .badge-status {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
+
+    .badge-approved {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .badge-rejected {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    .badge-pending {
+        background-color: var(--warning-color);
+        color: white;
+    }
+
+    /* Modal styling */
+    .custom-modal-content {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    .custom-modal-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 15px 20px;
+        border-bottom: none;
+    }
+
+    .custom-modal-body {
+        padding: 25px;
+    }
+
+    .custom-modal-footer {
+        border-top: 1px solid rgba(0,0,0,0.05);
+        padding: 15px 20px;
+    }
+
+    .btn-download {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: var(--transition);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-download:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            color: white;
+        }
+</style>
+
+<div class="content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Vehicle Gate Passes</h1>
+        <div class="action-buttons">
+            <a asp-controller="VehicleGatepass" asp-action="Create" class="action-button primary">
+                <i class="fas fa-plus-circle"></i>
+                <span>Create New Gate Pass</span>
+            </a>
         </div>
     </div>
 
 
-    <!-- Rejected Tab -->
-    <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
-        <h3>Rejected Gate Passes</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Vehicle Brand</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsRejected ?? true)))  
-                {
-                    <tr>
-                        <td>@item.VehicleBrand</td>
-                        <td>@item.RejectionReason</td>
-                        <td>
-                            <span class="badge badge-danger">Rejected</span>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+
+    <!-- Tab Container -->
+    <div class="tab-container">
+        <!-- Tabs for Approve/Reject -->
+        <ul class="nav nav-pills custom-nav-pills mb-4" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="true">Pending</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="approved-tab" data-bs-toggle="tab" href="#approved" role="tab" aria-controls="approved" aria-selected="false">Approved</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="rejected-tab" data-bs-toggle="tab" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">Rejected</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="gatepasTabContent">
+            <!-- Pending Tab -->
+            <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Vehicle Brand</th>
+                                <th>Model</th>
+                                <th>Registration No.</th>
+                                <th>Submission Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Where(v => !v.IsDeleted && !(v.IsApproved ?? false) && !(v.IsRejected ?? false)))
+                            {
+                                <tr>
+                                    <td>@item.VehicleBrand</td>
+                                    <td>
+                                        <button class="btn-approve" data-toggle="modal" data-target="#approveRejectModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand" data-action="approve">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                        <button class="btn-reject" data-toggle="modal" data-target="#approveRejectModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand" data-action="reject">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Approved Tab -->
+            <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+                <div class="row">
+                    @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsApproved ?? false)))
+                    {
+                        <div class="col-md-4 mb-3">
+                            <div class="vehicle-card">
+                                <div class="vehicle-card-body">
+                                    <h5 class="card-title">@item.VehicleBrand</h5>
+                                    <span class="badge badge-status badge-approved mb-2">Approved</span>
+                                    <div>
+                                        @if (item.VehicleImage != null)
+                                        {
+                                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.VehicleImage)" alt="Feedback Image" class="img-fluid" />
+                                        }
+                                        else
+                                        {
+                                            <span>No Image</span>
+                                        }
+                                    </div>
+                                    <a asp-controller="VehicleGatePass" asp-action="DownloadPDF" asp-route-id="@item.VehicleId" class="btn-download mt-3">
+                                        Download PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Rejected Tab -->
+            <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Vehicle Brand</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsRejected ?? true)))
+                        {
+                            <tr>
+                                <td>@item.VehicleBrand</td>
+                                <td>@item.RejectionReason</td>
+                                <td>
+                                    <span class="badge badge-status badge-rejected">Rejected</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
-
-<!-- Modal for PDF Preview -->
-<div class="modal fade" id="pdfPreviewModal" tabindex="-1" role="dialog" aria-labelledby="pdfPreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="pdfPreviewModalLabel">Vehicle Gate Pass Preview</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <iframe id="pdfViewer" src="" width="100%" height="500px"></iframe>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Modal for Delete -->
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete the vehicle gate pass for "<span id="vehicleBrand"></span>"?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="post" action="#">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Modal for Approve/Reject -->
 <div class="modal fade" id="approveRejectModal" tabindex="-1" role="dialog" aria-labelledby="approveRejectModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
                 <h5 class="modal-title" id="approveRejectModalLabel">Approve/Reject Gate Pass</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                Are you sure you want to <span id="actionType"></span> the vehicle gate pass for "<span id="vehicleBrand"></span>"?
+            <div class="modal-body custom-modal-body">
+                <p>Are you sure you want to <span id="actionType"></span> the vehicle gate pass for "<span id="vehicleBrand"></span>"?</p>
 
                 <!-- Rejection Reason (Appears when Reject is selected) -->
-                <div id="rejectionReasonContainer" style="display:none;">
-                    <label for="RejectionReason">Rejection Reason:</label>
-                    <textarea class="form-control" id="RejectionReason" name="RejectionReason"></textarea>
+                <div id="rejectionReasonContainer" style="display:none;" class="mt-3">
+                    <label for="RejectionReason" class="form-label">Rejection Reason:</label>
+                    <textarea class="form-control" id="RejectionReason" name="RejectionReason" rows="3" placeholder="Please provide a reason for rejection..."></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer custom-modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <form id="approveRejectForm" method="post" action="#">
                     @Html.AntiForgeryToken()
-
-                    <!-- Hidden field for action (approve/reject) -->
                     <input type="hidden" id="action" name="action" value="" />
-
-                    <button type="submit" id="approveRejectButton" class="btn btn-success">Approve</button>
+                    <input type="hidden" id="vehicleId" name="vehicleId" value="" />
+                    <input type="hidden" id="rejectionReasonInput" name="rejectionReason" value="" />
+                    <button type="submit" id="approveRejectButton" class="btn-approve">Approve</button>
                 </form>
             </div>
         </div>
@@ -245,68 +645,70 @@
 </div>
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
     <script>
-        // Handle Approve/Reject Modal dynamic data
-        $('#approveRejectModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var vehicleId = button.data('id'); // Extract info from data-* attributes
-            var vehicleBrand = button.data('name');
-            var action = button.data('action'); // Get the action (approve or reject)
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('gatepassSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function () {
+                    const searchTerm = this.value.toLowerCase();
+                    const allTables = document.querySelectorAll('.custom-table');
 
-            // Update the modal's content
-            var modal = $(this);
-            modal.find('.modal-body #vehicleBrand').text(vehicleBrand);
-            modal.find('.modal-body #actionType').text(action.charAt(0).toUpperCase() + action.slice(1)); // Capitalize action (approve/reject)
+                    allTables.forEach(table => {
+                        const allRows = table.querySelectorAll('tbody tr');
 
-            // Set the form action URL
-            var formActionUrl = '@Url.Action("ApproveRejectConfirmed", "VehicleGatePass")/' + vehicleId;
-            modal.find('form').attr('action', formActionUrl);
+                        allRows.forEach(row => {
+                            const rowText = row.innerText.toLowerCase();
+                            if (rowText.includes(searchTerm)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    });
 
-            // Set action in hidden field
-            modal.find('#action').val(action);
-
-            // Show rejection reason only if rejecting
-            if (action === "reject") {
-                $('#rejectionReasonContainer').show();
-                $('#approveRejectButton').text("Reject");
-                $('#approveRejectButton').removeClass('btn-success').addClass('btn-warning');
-            } else {
-                $('#rejectionReasonContainer').hide();
-                $('#approveRejectButton').text("Approve");
-                $('#approveRejectButton').removeClass('btn-warning').addClass('btn-success');
+                    const allCards = document.querySelectorAll('.vehicle-card');
+                    allCards.forEach(card => {
+                        const cardText = card.innerText.toLowerCase();
+                        if (cardText.includes(searchTerm)) {
+                            card.style.display = '';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
             }
         });
 
-                // Handle Delete Modal dynamic data
-               // Handle Delete Modal dynamic data
-        $('#deleteModal').on('show.bs.modal', function (event) {
+        // Handle Approve/Reject Modal dynamic data
+        $('#approveRejectModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
-            var vehicleId = button.data('id'); // Extract the vehicleId
-            var vehicleBrand = button.data('name'); // Extract the vehicleBrand
+            var vehicleId = button.data('id');
+            var vehicleBrand = button.data('name');
+            var action = button.data('action');
 
-            // Update the modal's content
             var modal = $(this);
             modal.find('.modal-body #vehicleBrand').text(vehicleBrand);
-            modal.find('.modal-body #vehicleId').val(vehicleId); // Set vehicleId for the form
+            modal.find('.modal-body #actionType').text(action.charAt(0).toUpperCase() + action.slice(1));
+            modal.find('#vehicleId').val(vehicleId);
 
-            // Set the action URL for the form
-            var formActionUrl = '@Url.Action("DeleteConfirmed", "VehicleGatePass")/' + vehicleId;
+            var formActionUrl = '@Url.Action("ApproveRejectConfirmed", "VehicleGatePass")/' + vehicleId;
             modal.find('form').attr('action', formActionUrl);
-        });
+            modal.find('#action').val(action);
 
-              $(document).ready(function () {
-            $('.preview-pdf-btn').on('click', function () {
-                var pdfUrl = $(this).data('url');  // Get the PDF URL from the button
-                $('#pdfViewer').attr('src', pdfUrl); // Load the PDF in the iframe
-            });
+            if (action === "reject") {
+                $('#rejectionReasonContainer').show();
+                $('#approveRejectButton').text("Reject").removeClass('btn-approve').addClass('btn-reject');
 
-            // Clear iframe when the modal is closed (optional for performance)
-            $('#pdfPreviewModal').on('hidden.bs.modal', function () {
-                $('#pdfViewer').attr('src', '');
-            });
+                // Set up the rejection reason transfer
+                $("#RejectionReason").on('input', function() {
+                    $("#rejectionReasonInput").val($(this).val());
+                });
+            } else {
+                $('#rejectionReasonContainer').hide();
+                $('#approveRejectButton').text("Approve").removeClass('btn-reject').addClass('btn-approve');
+                $("#rejectionReasonInput").val("");
+            }
         });
     </script>
 }

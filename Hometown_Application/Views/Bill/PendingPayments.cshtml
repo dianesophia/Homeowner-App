@@ -1,0 +1,464 @@
+﻿@model List<Hometown_Application.Models.BillPaymentModel>
+@using Hometown_Application.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Pending Payments";
+}
+
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    /* Page title and header */
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* Action buttons */
+    .action-button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+        .action-button:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+
+        .action-button.primary {
+            background-color: var(--primary-color);
+        }
+
+            .action-button.primary:hover {
+                background-color: var(--primary-light);
+            }
+
+        .action-button i {
+            font-size: 1.1rem;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* Stats cards */
+    .stat-cards-container {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        gap: 20px;
+    }
+
+    .stat-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 15px 20px;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 15px;
+        flex-grow: 1;
+        flex: 1;
+        max-width: 30%;
+        min-width: 250px;
+        position: relative;
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .stat-card.pending::before {
+            background-color: var(--warning-color);
+        }
+
+        .stat-card.amount::before {
+            background-color: var(--info-color);
+        }
+
+        .stat-card.count::before {
+            background-color: var(--primary-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+    .stat-icon {
+        font-size: 1.5rem;
+        background-color: rgba(0,0,0,0.05);
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .pending-icon {
+        color: var(--warning-color);
+    }
+
+    .amount-icon {
+        color: var(--info-color);
+    }
+
+    .count-icon {
+        color: var(--primary-color);
+    }
+
+    .stat-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Search container */
+    .search-container {
+        display: flex;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid #eee;
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        font-size: 1rem;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--primary-light);
+        }
+
+    .search-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        padding: 0 25px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+        .search-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+    /* Tab container */
+    .payments-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        padding: 25px;
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 3rem;
+    }
+
+    /* Table styling */
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+
+        .custom-table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            border: none;
+        }
+
+        .custom-table tbody tr {
+            background-color: white;
+            transition: var(--transition);
+        }
+
+            .custom-table tbody tr:hover {
+                background-color: rgba(0,0,0,0.02);
+            }
+
+        .custom-table tbody td {
+            padding: 15px;
+            text-align: center;
+            vertical-align: middle;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+    }
+
+        .empty-state i {
+            color: var(--secondary-color);
+            opacity: 0.7;
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+    /* Approval button styling */
+    .btn-approve {
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: var(--transition);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+        .btn-approve:hover {
+            background-color: #157347;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-approve i {
+            margin-right: 5px;
+        }
+</style>
+
+<div class="content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Pending Payments</h1>
+        <div class="action-buttons">
+            <!--<a asp-controller="Bill" asp-action="AdminDashboard" class="action-button primary">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>-->
+        </div>
+    </div>
+
+    <!-- Statistics Cards 
+    <div class="stat-cards-container">
+        <div class="stat-card count">
+            <div class="stat-icon count-icon">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@Model.Count()</div>
+                <div class="stat-label">Pending Payments</div>
+            </div>
+        </div>
+        <div class="stat-card amount">
+            <div class="stat-icon amount-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@Model.Sum(p => p.AmountPaid).ToString("C")</div>
+                <div class="stat-label">Total Pending Amount</div>
+            </div>
+        </div>
+        <div class="stat-card pending">
+            <div class="stat-icon pending-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@Model.Select(p => p.BillId).Distinct().Count()</div>
+                <div class="stat-label">Unique Bills Pending</div>
+            </div>
+        </div>
+    </div>-->
+
+    <!-- Search bar -->
+    <div class="search-container">
+        <input type="text" class="search-input" id="paymentSearch" placeholder="Search by Bill ID, Payer name, or Reference Number...">
+        <button class="search-button">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+
+    <!-- Payments Table Container -->
+    <div class="payments-container">
+        <div class="table-responsive">
+            <table class="custom-table" id="paymentsTable">
+                <thead>
+                    <tr>
+                        <th>Bill ID</th>
+                        <th>Payer Name</th>
+                        <th>Amount Paid</th>
+                        <th>Payment Method</th>
+                        <th>Reference Number</th>
+                        <th>Payment Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Count > 0)
+                    {
+                        @foreach (var payment in Model)
+                        {
+                            <tr>
+                                <td>@payment.BillId</td>
+                                <td>
+                                    @{
+                                        var user = payment.Bill?.ApplicationUser;
+                                        var fullName = user != null ? $"{user.FirstName} {user.LastName}" : "";
+                                    }
+                                    @fullName
+                                </td>
+                                <td>@payment.AmountPaid.ToString("C")</td>
+                                <td>@payment.PaymentMethod</td>
+                                <td>@payment.ReferenceNumber</td>
+                                <td>@payment.PaymentDate.ToString("g")</td>
+                                <td>
+                                    <form asp-action="ApprovePayment" method="post">
+                                        <input type="hidden" name="paymentId" value="@payment.PaymentId" />
+                                        <button type="submit" class="btn-approve">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="fas fa-check-circle"></i>
+                                    <p>No pending payments to approve.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('paymentSearch');
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = this.value.toLowerCase();
+                const allRows = document.querySelectorAll('#paymentsTable tbody tr');
+
+                allRows.forEach(row => {
+                    const rowText = row.innerText.toLowerCase();
+                    if (rowText.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+}

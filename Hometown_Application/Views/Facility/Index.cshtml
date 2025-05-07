@@ -99,7 +99,6 @@
     .page-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
         margin-bottom: 2rem;
         flex-wrap: wrap;
         gap: 20px;
@@ -250,63 +249,67 @@
         .img-thumbnail:hover {
             transform: scale(1.05);
         }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: auto;
+    }
 </style>
 
 <div class="content">
     <div class="page-header">
-        <div>
-            <h1 class="page-title">Facilities</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="page-title">Manage Facilities</h1>
         </div>
-        <div>
-            <a asp-action="CreateOrEditFacility" class="create-btn">
-                <i class="fas fa-plus"></i> Create New Facility
-            </a>
+        <div class="d-flex justify-content-between align-items-center">
+            <a asp-action="CreateOrEditFacility" class="create-btn"><i class="fas fa-plus"></i> Create New Facility</a>
         </div>
     </div>
 
     <div class="facilities-container">
         @if (TempData["SuccessMessage"] != null)
         {
-            <p class="success-message">
-                ✓ @TempData["SuccessMessage"]
-            </p>
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
         }
         @if (TempData["ErrorMessage"] != null)
         {
-            <p class="error-message">
-                ⚠️ @TempData["ErrorMessage"]
-            </p>
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
         }
 
-        <table class="facilities-table">
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Capacity</th>
-                    <th>Description</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
+        @if (Model.Any())
+        {
+            <table class="facilities-table">
+                <thead>
                     <tr>
-                        <td colspan="6" class="text-center">No facilities found.</td>
+                        <th scope="col">Image</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Capacity</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Availability</th>
+                        <th scope="col">Actions</th>
                     </tr>
-                }
-                else
-                {
+                </thead>
+                <tbody>
                     @foreach (var item in Model)
                     {
+                        var imageSrc = item.Image != null && item.Image.Length > 0
+                        ? $"data:image/jpeg;base64,{Convert.ToBase64String(item.Image)}"
+                        : null;
                         <tr>
-                            <td class="text-center">
-                                @if (item.Image != null && item.Image.Length > 0)
+                            <td>
+                                @if (imageSrc != null)
                                 {
-                                    var base64Image = Convert.ToBase64String(item.Image);
-                                    var imageSrc = $"data:image/png;base64,{base64Image}"; // Change 'png' if needed
-                                    <img src="@imageSrc" alt="Facility Image" class="img-thumbnail" style="max-width: 80px; height: 80px; object-fit: cover;" />
+                                    <img src="@imageSrc" alt="@item.Name Facility Image" class="img-thumbnail" />
                                 }
                                 else
                                 {
@@ -314,33 +317,26 @@
                                 }
                             </td>
                             <td>@item.Name</td>
-                            <td>
-                                @if (item.Type == "Other" && !string.IsNullOrEmpty(item.OtherType))
-                                {
-                                    @item.OtherType
-                                }
-                                else
-                                {
-                                    @item.Type
-                                }
-                            </td>
+                            <td>@(item.Type == "Other" ? item.OtherType : item.Type)</td>
                             <td>@item.Capacity</td>
-                            <td>@(string.IsNullOrEmpty(item.Description) ? "No description provided" : item.Description)</td>
-                            <td class="facility-actions">
-                                <a asp-action="CreateOrEditFacility" asp-route-id="@item.FacilityId" class="btn-edit">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to soft delete this facility? This action can be reversed by an admin.');">
-                                    <input type="hidden" name="id" value="@item.FacilityId" />
-                                    <button type="submit" class="btn-delete">
-                                        <i class="fas fa-trash" aria-hidden="true"></i> Delete
-                                    </button>
-                                </form>
+                            <td>@(string.IsNullOrEmpty(item.Description) ? "No Description" : item.Description)</td>
+                            <td>@(item.IsAvailable ? "Available" : "Not Available")</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a asp-action="CreateOrEditFacility" asp-route-id="@item.FacilityId" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
+                                    <form asp-action="Delete" asp-route-id="@item.FacilityId" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this facility?')">
+                                        <button type="submit" class="btn btn-delete"><i class="fas fa-trash"></i> Delete</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted">No facilities available. Click "Create New Facility" to add one.</p>
+        }
     </div>
 </div>

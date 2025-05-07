@@ -192,10 +192,9 @@
     </div>
     <p class="page-subtitle">Create a new poll or survey for community feedback</p>
 
-    <div class="form-container">
-        <form id="PollForm" asp-action="Create" asp-controller="Poll" onsubmit="return validatePollForm()">
-            <input type="hidden" name="PollId" value="@Model?.PollId" />
-            <input type="hidden" name="CreatorId" value="@(Model?.CreatorId ?? user?.Id)" />
+<form id="PollForm" asp-action="Create" asp-controller="Poll" onsubmit="return validatePollForm()">
+    <input type="hidden" name="PollId" value="@Model?.PollId" />
+    <input type="hidden" name="CreatorId" value="@(Model?.CreatorId ?? user?.Id)" />
 
             <div class="form-group">
                 <label for="Title" class="form-label">Poll Title <span class="text-danger">*</span></label>
