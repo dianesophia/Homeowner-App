@@ -750,6 +750,9 @@
                             </li>
                 }
 
+
+
+                 @if (SignInManager.IsSignedIn(User) && !User.IsInRole("Staff")){
                 <!-- Facilities & Reservations -->
                 <div class="sidebar-category"><span>Facilities</span></div>
                 <li class="sidebar-dropdown">
@@ -796,8 +799,11 @@
                         </ul>
                     </div>
                 </li>
+                }
 
                 <!-- Finance -->
+
+                 @if (SignInManager.IsSignedIn(User) && !User.IsInRole("Staff")){
                 <div class="sidebar-category"><span>Finance</span></div>
 
                         <li>
@@ -814,7 +820,7 @@
                                 </a>
                             </li>
                         }
-
+                }
                 <!-- Common Tools -->
                 <div class="sidebar-category"><span>Tools</span></div>
                 <li>

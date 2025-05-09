@@ -28,7 +28,8 @@ namespace Hometown_Application.Controllers
             return View(documents);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Staff")]
+
         [HttpPost]
         public async Task<IActionResult> UploadFiles(List<IFormFile> files)
         {
