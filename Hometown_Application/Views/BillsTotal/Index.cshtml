@@ -3,19 +3,26 @@
 }
 
 <h2 style="margin-bottom: 15px; font-size: 24px; font-weight: bold; color: #333;">
-    Total Payment: @ViewBag.TotalOutstandingBalance.ToString("C")
+    Bill Liquidation
 </h2>
 
 <div style="display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
-    <div style="padding: 10px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); min-width: 200px;">
-        <strong>Monthly Fees:</strong> @ViewBag.TotalMonthly.ToString("C")
+  <!--  <div style="padding: 10px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); min-width: 200px;">
+        <strong>Total Monthly Fees:</strong> @ViewBag.TotalMonthly.ToString("C")
     </div>
     <div style="padding: 10px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); min-width: 200px;">
-        <strong>Quarterly Fees:</strong> @ViewBag.TotalQuarterly.ToString("C")
+        <strong>Total Quarterly Fees:</strong> @ViewBag.TotalQuarterly.ToString("C")
     </div>
     <div style="padding: 10px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); min-width: 200px;">
-        <strong>Yearly Fees:</strong> @ViewBag.TotalYearly.ToString("C")
+        <strong>Total Yearly Fees:</strong> @ViewBag.TotalYearly.ToString("C")
     </div>
+    -->
+
+    <div style="padding: 10px; background-color: #eaf4fc; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); min-width: 250px;">
+        <strong>Monthly Payment (All Fees):</strong> @ViewBag.NewMonthly.ToString("C")
+    </div>
+
+
 </div>
 
 <!-- Download PDF Button -->

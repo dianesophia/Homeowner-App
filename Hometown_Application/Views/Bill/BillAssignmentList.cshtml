@@ -13,7 +13,8 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Bill Assignment ID</th>
+                            <th>Bill Assignment ID</th
+                             <th>Bill Id</th>
                             <th>User</th>
                             <th>Bill Name</th>
                             <th>Amount</th>
@@ -30,6 +31,7 @@
                             <tr>
                                 <td>@billAssignment.BillAssignmentId</td>
                                 <td>@($"{billAssignment.ApplicationUser?.FirstName} {billAssignment.ApplicationUser?.LastName}")</td>
+                                <td>@billAssignment.Bill?.BillId</td>
                                 <td>@billAssignment.BillName</td>
                                 <td>@billAssignment.Amount.ToString("C")</td>
                                 <td>@billAssignment.Description</td>

@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Visitor Logs";
+}
+
+<div class="container mt-4">
+    <h1>Visitor Logs</h1>
+
+    <!-- Tabs for Arrived and Exited -->
+    <ul class="nav nav-tabs" id="visitorTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="arrived-tab" data-bs-toggle="tab" href="#arrived" role="tab" aria-controls="arrived" aria-selected="true">Arrived</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="exited-tab" data-bs-toggle="tab" href="#exited" role="tab" aria-controls="exited" aria-selected="false">Exited</a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content mt-3">
+        <!-- Arrived Tab -->
+        <div class="tab-pane fade show active" id="arrived" role="tabpanel" aria-labelledby="arrived-tab">
+            <h3>Arrived Visitors</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Visitor Name</th>
+                        <th>Purpose</th>
+                        <th>Visit Date</th>
+                        <th>Vehicle Type</th>
+                        <th>Vehicle Plate</th>
+                        <th>Approval Status</th>
+                        <th>Arrival Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var visitor in (List<VisitorGatepassModel>)ViewBag.ArrivedVisitors)
+                    {
+                        <tr>
+                            <td>@visitor.VisitorName</td>
+                            <td>@visitor.Purpose</td>
+                            <td>@visitor.VisitDate.ToString("yyyy-MM-dd")</td>
+                            <td>@visitor.VehicleType</td>
+                            <td>@visitor.VehiclePlateNumber</td>
+                            <td>@visitor.ApprovalStatus</td>
+                            <td>@visitor.ArrivalDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Exited Tab -->
+        <div class="tab-pane fade" id="exited" role="tabpanel" aria-labelledby="exited-tab">
+            <h3>Exited Visitors</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Visitor Name</th>
+                        <th>Purpose</th>
+                        <th>Visit Date</th>
+                        <th>Vehicle Type</th>
+                        <th>Vehicle Plate</th>
+                        <th>Approval Status</th>
+                        <th>Exit Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var visitor in (List<VisitorGatepassModel>)ViewBag.ExitedVisitors)
+                    {
+                        <tr>
+                            <td>@visitor.VisitorName</td>
+                            <td>@visitor.Purpose</td>
+                            <td>@visitor.VisitDate.ToString("yyyy-MM-dd")</td>
+                            <td>@visitor.VehicleType</td>
+                            <td>@visitor.VehiclePlateNumber</td>
+                            <td>@visitor.ApprovalStatus</td>
+                            <td>@visitor.ExitDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@* Include Bootstrap JS if not included yet in your layout *@
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+}

@@ -2,63 +2,255 @@
 @using Hometown_Application.Areas.Identity.Data
 @inject UserManager<ApplicationUser> UserManager
 @model Hometown_Application.ViewModel.PollViewModel
-
 @{
     var user = await UserManager.GetUserAsync(User);
     ViewData["Title"] = "Create a new poll or survey";
 }
 
-<h2>Create a new poll or survey</h2>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<form id="PollForm" asp-action="Create" asp-controller="Poll" onsubmit="return validatePollForm()">
-    <input type="hidden" name="PollId" value="@Model?.PollId" />
-    <input type="hidden" name="CreatorId" value="@(Model?.CreatorId ?? user?.Id)" />
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
 
-    <div class="mb-3">
-        <label for="Title" class="form-label">Title</label>
-        <input class="form-control" id="Title" name="Title" value="@Model?.Title" placeholder="Enter the concise title for your poll" required />
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label for="Description" class="form-label">Description</label>
-        <textarea class="form-control" id="Description" name="Description" placeholder="Provide a brief description of the poll (optional)">@Model?.Description</textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label for="ExpiryDate" class="form-label">Expiry Date</label>
-        @{
-            string expiryDateValue = "";
-            if (Model != null && Model.ExpiryDate.HasValue)
-            {
-                expiryDateValue = Model.ExpiryDate.Value.ToString("yyyy-MM-dd");
-            }
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
         }
-        <input class="form-control" id="ExpiryDate" type="date" name="ExpiryDate" value="@expiryDateValue" />
-        <small class="form-text text-muted">Leave blank for no expiry date.</small>
-        <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 30px;
+        margin-bottom: 3rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control {
+        border-radius: var(--border-radius);
+        border: 1px solid #ced4da;
+        padding: 12px 15px;
+        transition: var(--transition);
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 0.2rem rgba(111, 117, 78, 0.25);
+        }
+
+    textarea.form-control {
+        min-height: 120px;
+    }
+
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-check-label {
+        padding-left: 0.5rem;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-text {
+        color: var(--secondary-color);
+        font-size: 0.875rem;
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 10px 20px;
+        transition: var(--transition);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-secondary {
+        background-color: transparent;
+        border: 1px solid var(--secondary-color);
+        color: var(--secondary-color);
+    }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .alert {
+        border-radius: var(--border-radius);
+        padding: 15px 20px;
+    }
+
+    .alert-info {
+        background-color: rgba(13, 202, 240, 0.1);
+        border-left: 4px solid var(--info-color);
+        color: var(--text-color);
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-left: 4px solid var(--danger-color);
+        color: var(--text-color);
+    }
+
+    .validation-error {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 2rem;
+    }
+
+    .btn-primary:active {
+        animation: pulse 0.3s;
+    }
+</style>
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Create New Poll</h1>
     </div>
+    <p class="page-subtitle">Create a new poll or survey for community feedback</p>
 
-    <div class="form-check mb-3">
-        <input class="form-check-input" id="IsActive" type="checkbox" name="IsActive" value="true" @(Model != null && Model.IsActive ? "checked" : "") />
-        <label class="form-check-label" for="IsActive">
-            Make this poll active and available to users
-        </label>
-        <span asp-validation-for="IsActive" class="text-danger"></span>
-    </div>
+    <div class="form-container">
+        <form id="PollForm" asp-action="Create" asp-controller="Poll" onsubmit="return validatePollForm()">
+            <input type="hidden" name="PollId" value="@Model?.PollId" />
+            <input type="hidden" name="CreatorId" value="@(Model?.CreatorId ?? user?.Id)" />
 
-    <div class="alert alert-info mb-3">
-        After creating the poll, you will be redirected to the edit page where you can add questions and options.
-    </div>
+            <div class="form-group">
+                <label for="Title" class="form-label">Poll Title <span class="text-danger">*</span></label>
+                <input class="form-control" id="Title" name="Title" value="@Model?.Title" placeholder="Enter the concise title for your poll" required />
+                <span asp-validation-for="Title" class="validation-error"></span>
+            </div>
 
-    <button class="btn btn-primary mt-3" type="submit">Create Poll</button>
-    <a asp-action="Index" asp-controller="Poll" class="btn btn-secondary mt-3">Back to List</a>
+            <div class="form-group">
+                <label for="Description" class="form-label">Description</label>
+                <textarea class="form-control" id="Description" name="Description" placeholder="Provide a brief description of the poll (optional)">@Model?.Description</textarea>
+                <span asp-validation-for="Description" class="validation-error"></span>
+            </div>
 
-    @Html.AntiForgeryToken()
-</form>
+            <div class="form-group">
+                <label for="ExpiryDate" class="form-label">Expiry Date</label>
+                @{
+                    string expiryDateValue = "";
+                    if (Model != null && Model.ExpiryDate.HasValue)
+                    {
+                        expiryDateValue = Model.ExpiryDate.Value.ToString("yyyy-MM-dd");
+                    }
+                }
+                <input class="form-control" asp-for="ExpiryDate" type="date" />
+                <span asp-validation-for="ExpiryDate" class="validation-error"></span>
 
-<!--@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+                <small class="form-text">Leave blank for no expiry date.</small>
+                <span asp-validation-for="ExpiryDate" class="validation-error"></span>
+            </div>
+
+            <div class="form-check form-group">
+                <input class="form-check-input" id="IsActive" type="checkbox" name="IsActive" value="true" @(Model != null && Model.IsActive ? "checked" : "") />
+                <label class="form-check-label" for="IsActive">
+                    Make this poll active and available to users
+                </label>
+                <span asp-validation-for="IsActive" class="validation-error"></span>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                After creating the poll, you will be redirected to the edit page where you can add questions and options.
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-save"></i> Create Poll
+                </button>
+                <a asp-action="Index" asp-controller="Poll" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+
+            @Html.AntiForgeryToken()
+        </form>
+
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
 {
     <div class="alert alert-danger mt-3">
         <strong>Validation Errors:</strong>
@@ -69,24 +261,37 @@
             }
         </ul>
     </div>
-}-->
+}
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
-
-<script>
-    function validatePollForm() {
-        var title = document.querySelector('input[name="Title"]').value;
-
-        if (!title || title.trim() === "") {
-            alert("Please fill in all required fields, including the poll title.");
-            return false;
+    <script>
+        function validatePollForm() {
+            var title = document.querySelector('input[name="Title"]').value;
+            if (!title || title.trim() === "") {
+                alert("Please fill in all required fields, including the poll title.");
+                return false;
+            }
+            return true;
         }
 
-        return true;
-    }
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus the title field when the page loads
+            document.getElementById('Title').focus();
 
-</script>
+            // Visual feedback when clicking buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = '';
+                });
+            });
+        });
+    </script>
+}

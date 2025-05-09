@@ -40,14 +40,12 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     //Billing
     public DbSet<BillModel> Bills { get; set; }
     public DbSet<BillItemsModel> BillItems { get; set; }
-    public DbSet<BillAccountModel> BillAccounts { get; set; }
-    public DbSet<BillTransactionModel> BillTransactions { get; set; }
-
+    public DbSet<BillAssignModel> BillAssign { get; set; }
     public DbSet<BillPaymentModel> BillPayment { get; set; }
+    public DbSet<BillFeeModel> BillFee { get; set; }
     public DbSet<BillAssignmentModel> BillAssignment { get; set; }
 
-    public DbSet<BillDetailModel> BillDetail { get; set; }
-
+  
     // Add Poll and Survey related DbSets
     public DbSet<PollModel> Polls { get; set; }
     public DbSet<PollQuestionModel> PollQuestions { get; set; }
@@ -148,6 +146,11 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
            .HasForeignKey(p => p.UserId)
            .OnDelete(DeleteBehavior.NoAction);
 
+        builder.Entity<BillAssignModel>()
+          .HasOne(c => c.ApplicationUser)
+          .WithMany()
+          .HasForeignKey(c => c.UserId)
+          .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<BillAssignmentModel>()
            .HasOne(c => c.ApplicationUser)
@@ -161,24 +164,23 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
         .HasForeignKey(c => c.BillId)  // BillAssignmentModel has a BillId to reference the Bill
         .OnDelete(DeleteBehavior.NoAction);  // Set the delete behavior (you can change this based on your requirements)
 
-
-        builder.Entity<BillAccountModel>()
-           .HasOne(c => c.ApplicationUser)
-           .WithMany()
-           .HasForeignKey(c => c.UserId)
-           .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<BillTransactionModel>()
-         .HasOne(c => c.ApplicationUser)
-         .WithMany()
-         .HasForeignKey(c => c.UserId)
-         .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<BillTransactionModel>()
-        .HasOne(c => c.BillItemsModel)
-        .WithMany()
-        .HasForeignKey(c => c.BillItemsId)
+        builder.Entity<BillPaymentModel>()
+        .HasOne(c => c.Bill)  // Correct the navigation property to 'Bill' (not 'BillModel')
+        .WithMany()  // This means a Bill can be assigned to many BillAssignments
+        .HasForeignKey(c => c.BillId)  // BillAssignmentModel has a BillId to reference the Bill
         .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BillPaymentModel>()
+       .HasOne(c => c.BillAssignment)  // Correct the navigation property to 'Bill' (not 'BillModel')
+       .WithMany()  // This means a Bill can be assigned to many BillAssignments
+       .HasForeignKey(c => c.BillAssignmentId)  // BillAssignmentModel has a BillId to reference the Bill
+       .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<BillFeeModel>()
+     .HasOne(c => c.BillAssignment)  // Correct the navigation property to 'Bill' (not 'BillModel')
+     .WithMany()  // This means a Bill can be assigned to many BillAssignments
+     .HasForeignKey(c => c.BillAssignmentId)  // BillAssignmentModel has a BillId to reference the Bill
+     .OnDelete(DeleteBehavior.NoAction);
 
         // Relationship for Recipient
         builder.Entity<ChatMessageModel>()
@@ -208,18 +210,18 @@ public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
             );
 
         builder.Entity<BillItemsModel>().HasData(
-       new BillItemsModel { BillItemsID = 1, PaymentName = "Homeowners Association (HOA) Fees", Amount = 3500.00m, Description = "Monthly HOA dues covering maintenance, security, and amenities.", PaymentDuration = "Monthly" },
-       new BillItemsModel { BillItemsID = 2, PaymentName = "Water Bill", Amount = 100.00m, Description = "Monthly water consumption charges.", PaymentDuration = "Monthly" },
-       new BillItemsModel { BillItemsID = 3, PaymentName = "Electricity Bill", Amount = 2500.00m, Description = "Monthly payment for electricity consumption.", PaymentDuration = "Monthly" },
-       new BillItemsModel { BillItemsID = 4, PaymentName = "Garbage Collection Fee", Amount = 300.00m, Description = "Monthly fee for waste disposal services.", PaymentDuration = "Monthly" },
-       new BillItemsModel { BillItemsID = 5, PaymentName = "Security Fee", Amount = 1500.00m, Description = "Monthly fee for subdivision security services.", PaymentDuration = "Monthly" },
-       new BillItemsModel { BillItemsID = 6, PaymentName = "Street Lighting Fee", Amount = 500.00m, Description = "Monthly fee for streetlight maintenance.", PaymentDuration = "Monthly" },
-       new BillItemsModel { BillItemsID = 7, PaymentName = "Clubhouse Maintenance Fee", Amount = 800.00m, Description = "Annual fee for maintaining the clubhouse and shared spaces.", PaymentDuration = "Yearly" },
-       new BillItemsModel { BillItemsID = 8, PaymentName = "Property Tax Contribution", Amount = 5000.00m, Description = "Annual contribution for property tax remittance.", PaymentDuration = "Yearly" },
-       new BillItemsModel { BillItemsID = 9, PaymentName = "Sinking Fund Contribution", Amount = 1200.00m, Description = "Quarterly contribution for major subdivision repairs.", PaymentDuration = "Quarterly" },
-       new BillItemsModel { BillItemsID = 10, PaymentName = "Pest Control Fee", Amount = 600.00m, Description = "Quarterly fee for pest control services in the subdivision.", PaymentDuration = "Quarterly" },
-       new BillItemsModel { BillItemsID = 11, PaymentName = "Road Maintenance Fee", Amount = 1000.00m, Description = "Annual fee for road maintenance and repairs.", PaymentDuration = "Yearly" }
-   );
+         new BillItemsModel { BillItemsID = 1, PaymentName = "Homeowners Association (HOA) Fees", Amount = 2000.00m, Description = "Monthly HOA dues for maintenance, security, and amenities.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 2, PaymentName = "Water Bill", Amount = 350.00m, Description = "Monthly water consumption charges.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 4, PaymentName = "Garbage Collection Fee", Amount = 200.00m, Description = "Monthly fee for waste disposal services.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 5, PaymentName = "Security Fee", Amount = 1000.00m, Description = "Monthly fee for 24/7 subdivision security services.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 6, PaymentName = "Street Lighting Fee", Amount = 300.00m, Description = "Monthly fee for streetlight maintenance and electricity.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 7, PaymentName = "Clubhouse Maintenance Fee", Amount = 500.00m, Description = "Monthly fee for clubhouse upkeep and utilities.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 8, PaymentName = "Property Tax Contribution", Amount = 1000.00m, Description = "Monthly contribution toward shared property tax obligations.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 9, PaymentName = "Sinking Fund Contribution", Amount = 800.00m, Description = "Monthly contribution to the long-term repair and reserve fund.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 10, PaymentName = "Pest Control Fee", Amount = 250.00m, Description = "Monthly fee for regular pest control services.", PaymentDuration = "Monthly" },
+         new BillItemsModel { BillItemsID = 11, PaymentName = "Road Maintenance Fee", Amount = 700.00m, Description = "Monthly fee for road repair and upkeep.", PaymentDuration = "Monthly" }
+     );
+
 
         /*  builder.Entity<BillModel>().HasData(
                new BillModel { BillId = 1, UserId = "111", TotalAmount = 3500.00m, IssueDate = DateTime.UtcNow, DueDate = DateTime.UtcNow.AddDays(30), IsPaid = false },

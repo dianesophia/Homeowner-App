@@ -39,7 +39,7 @@ namespace Hometown_Application.Controllers
             return View(userRoles);
         }
 
-        /* async Task<IActionResult> ViewDetails(string id)
+         async Task<IActionResult> ViewDetails(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -48,7 +48,7 @@ namespace Hometown_Application.Controllers
             }
             return View(user);
         }
-
+        /*
         public async Task<IActionResult> ApproveUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);

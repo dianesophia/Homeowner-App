@@ -25,13 +25,43 @@ namespace Hometown_Application.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var visitorGatepasses = await _context.VisitorGatepasses
-                .Where(v => v.IsDeleted == false) // Exclude soft-deleted entries
-                .Include(v => v.ApplicationUser)
-                .ToListAsync();
+            var userName = User.Identity.Name;
+            var isAdmin = User.IsInRole("Admin");
+
+            // Start with the base query
+            var visitorGatepassesQuery = _context.VisitorGatepasses
+                .Include(v => v.ApplicationUser)  // Include the related ApplicationUser entity
+                .Where(v => v.IsDeleted == false); // Exclude soft-deleted entries
+
+            if (!isAdmin)
+            {
+                // Filter by the current user's username (or UserId for more reliability)
+                visitorGatepassesQuery = visitorGatepassesQuery
+                    .Where(v => v.ApplicationUser.UserName == userName);
+            }
+
+            var visitorGatepasses = await visitorGatepassesQuery.ToListAsync();
 
             return View(visitorGatepasses);
         }
+        public async Task<IActionResult> VisitorLogs()
+        {
+            var arrivedVisitors = await _context.VisitorGatepasses
+                .Where(v => v.IsArrived == true && v.IsDeleted == false)
+                .ToListAsync();
+
+            var exitedVisitors = await _context.VisitorGatepasses
+                .Where(v => v.IsExited == true && v.IsDeleted == false)
+                .ToListAsync();
+
+            // Pass the data directly to the view
+            ViewBag.ArrivedVisitors = arrivedVisitors;
+            ViewBag.ExitedVisitors = exitedVisitors;
+
+            return View();
+        }
+    
+
 
         public IActionResult Create()
         {
@@ -125,6 +155,7 @@ namespace Hometown_Application.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Approve(int id)
         {
@@ -158,6 +189,36 @@ namespace Hometown_Application.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Arrived(int id, string adminNotes)
+        {
+            var visitor = await _context.VisitorGatepasses.FindAsync(id);
+            if (visitor == null)
+                return NotFound();
+
+            visitor.IsApproved = true;
+            visitor.ArrivalDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Exit(int id, string adminNotes)
+        {
+            var visitor = await _context.VisitorGatepasses.FindAsync(id);
+            if (visitor == null)
+                return NotFound();
+
+            visitor.IsExited = true;
+            visitor.ExitDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+
 
         private async Task<IDocument> GenerateVisitorGatePassDocument(VisitorGatepassModel visitor)
         {

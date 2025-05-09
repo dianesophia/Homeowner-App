@@ -7,9 +7,17 @@ using System;
 using Hometown_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Hometown_Application.ViewModel;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using System.IO;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace Hometown_Application.Controllers
 {
+    [Authorize]
     public class BillController : Controller
     {
         private readonly ApplicationDBContext _context;
@@ -26,35 +34,64 @@ namespace Hometown_Application.Controllers
         public async Task<IActionResult> AdminBoard()
         {
             // Step 1: Get the total amount of each PaymentDuration
-            var totalMonthlyBills = await _context.BillItems
-                .Where(bi => !bi.IsDeleted && bi.PaymentDuration == "Monthly")
-                .SumAsync(bi => bi.Amount ?? 0);
+            var totalBillsByDuration = await _context.BillItems
+                .Where(bi => !bi.IsDeleted)
+                .GroupBy(bi => bi.PaymentDuration)
+                .Select(g => new
+                {
+                    PaymentDuration = g.Key,
+                    TotalAmount = g.Sum(bi => bi.Amount ?? 0)
+                })
+                .ToListAsync();
 
-            var totalYearlyBills = await _context.BillItems
-                .Where(bi => !bi.IsDeleted && bi.PaymentDuration == "Yearly")
-                .SumAsync(bi => bi.Amount ?? 0);
-
-            var totalQuarterlyBills = await _context.BillItems
-                .Where(bi => !bi.IsDeleted && bi.PaymentDuration == "Quarterly")
-                .SumAsync(bi => bi.Amount ?? 0);
+            // Extract totals for each payment duration
+            var totalMonthlyBills = totalBillsByDuration.FirstOrDefault(b => b.PaymentDuration == "Monthly")?.TotalAmount ?? 0;
+            var totalYearlyBills = totalBillsByDuration.FirstOrDefault(b => b.PaymentDuration == "Yearly")?.TotalAmount ?? 0;
+            var totalQuarterlyBills = totalBillsByDuration.FirstOrDefault(b => b.PaymentDuration == "Quarterly")?.TotalAmount ?? 0;
 
             // Step 2: Get total number of homeowners
             var totalHomeowners = await _userManager.GetUsersInRoleAsync("HomeOwner");
 
-           
-
-            // Step 4: Pass all the results to the view
+            // Step 3: Set ViewBag for total bills by duration * number of homeowners
             ViewBag.TotalMonthlyBills = totalMonthlyBills * totalHomeowners.Count;
             ViewBag.TotalYearlyBills = totalYearlyBills * totalHomeowners.Count;
             ViewBag.TotalQuarterlyBills = totalQuarterlyBills * totalHomeowners.Count;
 
-            var bills = await _context.Bills.Include(b => b.ApplicationUser).ToListAsync();
+            // Step 4: Get all bills including user info, ordered by username
+            var bills = await _context.Bills
+                .Include(b => b.ApplicationUser)
+                .OrderBy(b => b.ApplicationUser.UserName)
+                .ToListAsync();
 
+
+            // Get current month and year
+            var currentMonth = DateTime.UtcNow.Month;
+            var currentYear = DateTime.UtcNow.Year;
+
+            // Step 5: Count users who have fully paid in the current month
+            var fullyPaidUserCount = bills
+                .Where(b => b.IssueDate.Month == currentMonth &&
+                            b.IssueDate.Year == currentYear &&
+                            b.RemainingBalance <= 0)
+                .Select(b => b.UserId)
+                .Distinct()
+                .Count();
+
+            // Step 6: Calculate total collected this month
+            var totalCollectedThisMonth = bills
+                .Where(b => b.IssueDate.Month == currentMonth &&
+                            b.IssueDate.Year == currentYear)
+                .Sum(b => b.TotalAmount - b.RemainingBalance);
+
+            ViewBag.FullyPaidUserCount = fullyPaidUserCount;
+            ViewBag.TotalCollectedThisMonth = totalCollectedThisMonth;
+
+            // Step 7: Pass bills list to the view
             ViewBag.BillList = bills;
-         
 
             return View();
         }
+
 
         public async Task<IActionResult> AssignUserBill()
         {
@@ -102,7 +139,7 @@ namespace Hometown_Application.Controllers
             // Fetching all BillAssignmentModel records from the database
             var billAssignments = _context.BillAssignment
                                           .Include(b => b.ApplicationUser)
-                                         // .Include(b => b.Bill)
+                                          // .Include(b => b.Bill)
                                           .Include(b => b.Users) // Include users associated with the bill
                                           .ToList();  // Fetch all BillAssignmentModel records as a list
 
@@ -112,7 +149,7 @@ namespace Hometown_Application.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> PayBill(int billId, decimal amountPaid,string paymentMethod, string referenceNumber)
+        public async Task<IActionResult> PayBill(int billId, decimal amountPaid, string paymentMethod, string referenceNumber)
         {
             var bill = await _context.Bills.FindAsync(billId);
             if (bill == null)
@@ -131,13 +168,109 @@ namespace Hometown_Application.Controllers
                 AmountPaid = amountPaid,
                 PaymentMethod = paymentMethod, // Replace with the actual method
                 PaymentDate = DateTime.UtcNow,
-                ReferenceNumber = referenceNumber,  
+                ReferenceNumber = referenceNumber,
             };
 
             _context.Add(payment);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index)); 
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpGet("PayBillAssignment/{billAssignmentId}")]
+        public async Task<IActionResult> PayBillAssignment(int billAssignmentId)
+        {
+            var billAssignment = await _context.BillAssignment
+                .Include(b => b.Bill)
+                .FirstOrDefaultAsync(b => b.BillAssignmentId == billAssignmentId);
+
+            if (billAssignment == null)
+                return NotFound();
+
+            ViewBag.BillAssignmentId = billAssignment.BillAssignmentId;
+            ViewBag.BillId = billAssignment.BillId;
+
+            return View(new BillPaymentModel()); // pass empty model for the form
+        }
+
+        // POST method for handling the payment
+        /* [HttpPost("PayBillAssignment")]
+         public async Task<IActionResult> PayBillAssignment(BillPaymentModel model)
+         {
+             var billAssignment = await _context.BillAssignment
+                 .Include(b => b.Bill)
+                 .FirstOrDefaultAsync(b => b.BillAssignmentId == model.BillAssignmentId);
+
+             if (billAssignment == null)
+                 return NotFound();
+
+             if (billAssignment.IsPaid)
+                 return BadRequest("This bill assignment is already paid.");
+
+             // Update data
+             billAssignment.IsPaid = true;
+             billAssignment.PaidDate = DateTime.UtcNow;
+
+             if (billAssignment.Bill != null)
+             {
+                 billAssignment.Bill.UpdateRemainingBalance(model.AmountPaid);
+                 _context.Update(billAssignment.Bill);
+             }
+
+             var payment = new BillPaymentModel
+             {
+                 BillAssignmentId = model.BillAssignmentId,
+                 BillId = billAssignment.BillId,
+                 AmountPaid = model.AmountPaid,
+                 PaymentMethod = model.PaymentMethod,
+                 ReferenceNumber = model.ReferenceNumber,
+                 PaymentDate = DateTime.UtcNow
+             };
+
+             _context.Add(payment);
+             _context.Update(billAssignment);
+             await _context.SaveChangesAsync();
+
+             return RedirectToAction("Index");
+         }*/
+
+        [HttpPost]
+        [HttpPost]
+        public async Task<IActionResult> PayBillAssignment(BillFeeModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Find the related BillAssignment
+            var billAssignment = await _context.BillAssignment.FindAsync(model.BillAssignmentId);
+            if (billAssignment == null)
+            {
+                return NotFound();
+            }
+
+            // Add a new record to the BillPayments table
+            var payment = new BillFeeModel
+            {
+                BillAssignmentId = model.BillAssignmentId,
+               // BillId = model.BillId,
+                AmountPaid = model.AmountPaid,
+                PaymentMethod = model.PaymentMethod,
+                ReferenceNumber = model.ReferenceNumber,
+                PaymentDate = DateTime.Now
+            };
+
+            _context.BillFee.Add(payment);
+
+            // Optional: update the assignment as paid
+            billAssignment.IsPaid = true;
+            _context.BillAssignment.Update(billAssignment);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
 
 
@@ -146,30 +279,81 @@ namespace Hometown_Application.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound("User not found");
 
-            // Get the bills for the user
-            var bills = await _context.Bills.Where(b => b.UserId == user.Id).ToListAsync();
-
-            // Get BillAssignments for the logged-in user
-            var billAssignments = await _context.BillAssignment
-                .Where(ba => ba.UserId == user.Id)
-                .Include(ba => ba.Bill)
+            // Fetch bills for the logged-in user
+            var bills = await _context.Bills
+                .Where(b => b.UserId == user.Id)
                 .ToListAsync();
 
-            // Create the ViewModel
-            var viewModel = bills.Select(b => new HomeownerBoardViewModel
-            {
-                BillId = b.BillId,
-                RemainingBalance = b.RemainingBalance,
-                Status = b.Status,
-                //BillName = b.BillName,
-                BillName = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.BillName,
-                Amount = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.Amount ?? 0,
-                Description = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.Description,
-                DueDate = billAssignments.FirstOrDefault(ba => ba.BillId == b.BillId)?.DueDate ?? DateTime.MinValue
-            }).ToList();
+            // Fetch assignments and payments
+           var billAssignments = await _context.BillAssignment
+    .Where(ba => ba.UserId == user.Id)
+    .Include(ba => ba.Bill) // Make sure Bill is included if necessary
+    .ToListAsync();
 
-            // Pass the ViewModel to the view
-            return View(viewModel);
+
+            var payments = await _context.BillPayment
+                .Where(p => p.Bill.UserId == user.Id)
+                .Include(p => p.Bill)
+                .ToListAsync();
+
+            var viewModel = new List<HomeownerBoardViewModel>();
+
+            foreach (var b in bills)
+            {
+                var relatedAssignments = billAssignments
+                    .Where(ba => ba.BillId == b.BillId)
+                    .ToList();
+
+                var relatedPayments = payments
+                    .Where(p => p.BillId == b.BillId)
+                    .ToList();
+
+                // No payments
+                if (!relatedPayments.Any())
+                {
+                    viewModel.Add(new HomeownerBoardViewModel
+                    {
+                        BillId = b.BillId,
+                        RemainingBalance = b.RemainingBalance,
+                        Status = b.Status,
+                        BillName = relatedAssignments.FirstOrDefault()?.BillName,
+                        Amount = relatedAssignments.FirstOrDefault()?.Amount ?? 0,
+                        Description = relatedAssignments.FirstOrDefault()?.Description,
+                        DueDate = relatedAssignments.FirstOrDefault()?.DueDate ?? DateTime.MinValue,
+                        BillAssignments = relatedAssignments
+                    });
+                }
+                else
+                {
+                    foreach (var p in relatedPayments)
+                    {
+                        viewModel.Add(new HomeownerBoardViewModel
+                        {
+                            BillId = b.BillId,
+                            RemainingBalance = b.RemainingBalance,
+                            Status = b.Status,
+                            BillName = relatedAssignments.FirstOrDefault()?.BillName,
+                            Amount = relatedAssignments.FirstOrDefault()?.Amount ?? 0,
+                            Description = relatedAssignments.FirstOrDefault()?.Description,
+                            DueDate = relatedAssignments.FirstOrDefault()?.DueDate ?? DateTime.MinValue,
+                            PaymentId = p.PaymentId,
+                            PaymentDate = p.PaymentDate,
+                            AmountPaid = p.AmountPaid,
+                            PaymentMethod = p.PaymentMethod,
+                            ReferenceNumber = p.ReferenceNumber,
+                            IsApproved = p.IsApproved,
+                            BillAssignments = relatedAssignments
+                        });
+                    }
+                }
+            }
+
+            // You can keep filtering if you need
+            var filteredViewModel = viewModel
+                .Where(b => b.RemainingBalance > 0 && b.PaymentId != 0)
+                .ToList();
+
+            return View(viewModel); // You can also return filteredViewModel if needed
         }
 
 
@@ -218,37 +402,46 @@ namespace Hometown_Application.Controllers
             {
                 return NotFound("No homeowners found.");
             }
-            var totalAmount = _context.BillItems
-                             .Where(b => !b.IsDeleted)
-                             .Sum(b => b.Amount) ?? 0;
 
-            // Loop through each user and assign a bill automatically
+            // Get the current month and year
+            var currentMonth = DateTime.UtcNow.Month;
+            var currentYear = DateTime.UtcNow.Year;
+
+            // Calculate total bill amount from active bill items
+            var totalAmount = _context.BillItems
+                              .Where(b => !b.IsDeleted)
+                              .Sum(b => b.Amount) ?? 0;
+
             foreach (var homeowner in homeowners)
             {
-                // Set the total amount and remaining balance (can be dynamic or constant)
-                decimal remainingBalance = totalAmount; // Initially, Remaining Balance is equal to Total Amount
+                // Check if a bill already exists for this user in the current month
+                bool billExists = _context.Bills.Any(b =>
+                    b.UserId == homeowner.Id &&
+                    b.IssueDate.Month == currentMonth &&
+                    b.IssueDate.Year == currentYear);
 
-                // Create a new BillModel for each homeowner
+                if (billExists)
+                {
+                    continue; // Skip this homeowner
+                }
+
+                // Create a new BillModel if no duplicate
                 var newBill = new BillModel
                 {
                     UserId = homeowner.Id,
-                    IssueDate = DateTime.UtcNow,  // Current date as the issue date
-                    DueDate = DateTime.UtcNow.AddDays(30),  // Due date set to 30 days from the current date
+                    IssueDate = DateTime.UtcNow,
+                    DueDate = DateTime.UtcNow.AddDays(30),
                     TotalAmount = totalAmount,
-                    RemainingBalance = remainingBalance,
-                    Status = "Pending",  // Default status
-                    Remarks = "Automatic Bill Assignment"  // Optional remarks
+                    RemainingBalance = totalAmount,
+                    Status = "Pending",
+                    Remarks = "Automatic Bill Assignment"
                 };
 
-                // Add the new bill to the Bills table
                 _context.Bills.Add(newBill);
             }
 
-            // Save all the changes to the database
             await _context.SaveChangesAsync();
-
-            // Optionally, redirect or display a success message
-            return RedirectToAction("AdminBoard"); // Adjust to your specific admin dashboard page
+            return RedirectToAction("AdminBoard");
         }
 
         public async Task<IActionResult> UserBillingHistory()
@@ -299,8 +492,8 @@ namespace Hometown_Application.Controllers
             }
 
             // Update remaining balance
-         //   bill.UpdateRemainingBalance(amountPaid);
-           // _context.Update(bill);
+            //   bill.UpdateRemainingBalance(amountPaid);
+            // _context.Update(bill);
 
             // Add payment record
             var payment = new BillPaymentModel
@@ -326,6 +519,7 @@ namespace Hometown_Application.Controllers
         {
             var pendingPayments = await _context.BillPayment
                 .Include(p => p.Bill)
+                     .ThenInclude(b => b.ApplicationUser)
                 .Where(p => !p.IsApproved)
                 .ToListAsync();
 
@@ -359,12 +553,110 @@ namespace Hometown_Application.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult DownloadConfirmationSlip(int paymentId)
+        {
+            var payment = _context.BillPayment
+                .Include(p => p.Bill)
+                .ThenInclude(b => b.ApplicationUser)
+                .FirstOrDefault(p => p.PaymentId == paymentId && p.IsApproved);
+
+            if (payment == null)
+            {
+                return NotFound("Approved payment not found.");
+            }
+
+            // Load logo image from wwwroot or elsewhere (adjust the path as needed)
+            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "logo.png");
+            var logoImage = System.IO.File.Exists(logoPath) ? System.IO.File.ReadAllBytes(logoPath) : null;
+
+            var pdfBytes = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(40);
+                    page.DefaultTextStyle(x => x.FontSize(12).FontFamily("Georgia"));
+
+                    // Header with logo and title
+                    page.Header().Row(row =>
+                    {
+                        row.RelativeItem(1).Height(80).AlignMiddle().AlignLeft().Image(logoImage, ImageScaling.FitHeight);
+                        row.RelativeItem(3).Column(col =>
+                        {
+                            col.Item().Text("HOMETOWN COMMUNITY ASSOCIATION")
+                                .FontSize(18).Bold().AlignRight().FontColor(Colors.Blue.Darken3);
+                            col.Item().Text("Payment Confirmation Slip")
+                                .FontSize(16).SemiBold().AlignRight().FontColor(Colors.Grey.Darken1);
+                            col.Item().Text($"Date Issued: {DateTime.Now:MMMM dd, yyyy}")
+                                .FontSize(12).AlignRight().FontColor(Colors.Grey.Lighten1);
+                        });
+                    });
+
+                    page.Content().Column(col =>
+                    {
+                        col.Item().PaddingVertical(15).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+
+                        col.Item().PaddingBottom(12).Text("Payment Details")
+                            .FontSize(14).Bold().Underline().FontColor(Colors.Blue.Darken1);
+
+                        col.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(160);
+                                columns.RelativeColumn();
+                            });
+
+                            void AddRow(string label, string value)
+                            {
+                                table.Cell().PaddingVertical(6).PaddingHorizontal(8).Text(label).SemiBold().FontColor(Colors.Grey.Darken2);
+                                table.Cell().PaddingVertical(6).PaddingHorizontal(8).Text(value).FontColor(Colors.Black);
+                            }
+
+                            AddRow("Homeowner Name:", $"{payment.Bill.ApplicationUser.FirstName} {payment.Bill.ApplicationUser.LastName}");
+                            AddRow("Bill ID:", payment.BillId.ToString());
+                            AddRow("Payment Date:", payment.PaymentDate.ToString("MMMM dd, yyyy"));
+                            AddRow("Amount Paid:", payment.AmountPaid.ToString("C"));
+                            AddRow("Payment Method:", payment.PaymentMethod);
+                            AddRow("Reference Number:", payment.ReferenceNumber);
+                            AddRow("Payment Status:", "Approved");
+                        });
+
+                        col.Item().PaddingTop(20).Text("This slip serves as formal confirmation of your successful payment to the Hometown Community Association. Please keep this document for your records.")
+                            .FontSize(12).FontColor(Colors.Grey.Darken1);
+
+                        col.Item().PaddingTop(25).Text("For any concerns or inquiries, you may reach out to our office through the contact information provided below.")
+                            .FontSize(11).Italic().FontColor(Colors.Grey.Darken2);
+                    });
+
+                    page.Footer().AlignCenter().Text(text =>
+                    {
+                        text.Span("Hometown Community Association")
+                            .SemiBold()
+                            .FontSize(10)
+                            .FontColor(Colors.Grey.Darken1);
+                        text.Span(" | ");
+                        text.Span("Contact: (123) 456-7890 | Email: info@hometownhoa.org")
+                            .Italic()
+                            .FontSize(10)
+                            .FontColor(Colors.Grey.Darken1);
+                    });
+
+                });
+            }).GeneratePdf();
+
+            return File(pdfBytes, "application/pdf", $"ConfirmationSlip_Payment_{payment.PaymentId}.pdf");
+        }
+
+
+
         public async Task<IActionResult> MarkAsPaid(int id)
         {
             var billAssignment = await _context.BillAssignment.FindAsync(id);
             if (billAssignment == null)
             {
-                return NotFound();  
+                return NotFound();
             }
 
             billAssignment.IsPaid = true;
@@ -375,6 +667,100 @@ namespace Hometown_Application.Controllers
             return RedirectToAction(nameof(HomeownerBoard));
         }
 
+
+        public async Task<IActionResult> AssignList()
+        {
+            var bills = await _context.BillAssign
+                .Include(b => b.ApplicationUser)
+                .Where(b => !b.IsDeleted)
+                .ToListAsync();
+            return View(bills);
+        }
+
+        public IActionResult AssignBill()
+        {
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignBill(BillAssignModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Index");
+
+            if (ModelState.IsValid)
+            {
+                model.AddedOn = DateTime.UtcNow;
+                model.AddedBy = user.Id;
+                _context.BillAssign.Add(model);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(AssignList));
+            }
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", model.UserId);
+            return View(model);
+        }
+
+        public async Task<IActionResult> Create(VehicleGatepassModel model, IFormFile vehicleImage)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Index");
+
+            if (vehicleImage != null && vehicleImage.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await vehicleImage.CopyToAsync(memoryStream);
+                    model.VehicleImage = memoryStream.ToArray();
+                }
+            }
+            model.UserId = user.Id;
+            model.AddedOn = DateTime.UtcNow;
+            model.AddedBy = user.Id;
+            _context.VehicleGatepasses.Add(model);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: BillAssign/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var model = await _context.BillAssign.FindAsync(id);
+            if (model == null) return NotFound();
+
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", model.UserId);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, BillAssignModel model)
+        {
+            if (id != model.BillAssignId) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    model.UpdatedOn = DateTime.UtcNow;
+                    _context.Update(model);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.BillAssign.Any(e => e.BillAssignId == id))
+                        return NotFound();
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", model.UserId);
+            return View(model);
+        }
 
     }
 }

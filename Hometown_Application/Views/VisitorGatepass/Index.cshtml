@@ -4,136 +4,202 @@
     ViewData["Title"] = "Visitor Gatepass List";
 }
 
-<h2>Visitor Gatepass List</h2>
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Visitor Gatepass List</h2>
 
-@if (TempData["Message"] != null)
-{
-    <div class="alert alert-info">
-        @TempData["Message"]
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Nav Tabs -->
+    <ul class="nav nav-tabs" id="gatepassTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
+                    type="button" role="tab" aria-controls="pending" aria-selected="true">
+                Pending
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved"
+                    type="button" role="tab" aria-controls="approved" aria-selected="false">
+                Approved
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected"
+                    type="button" role="tab" aria-controls="rejected" aria-selected="false">
+                Rejected
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content pt-4">
+        <!-- Pending Tab -->
+        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Approvals</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Visitor Name</th>
+                                    <th>Purpose</th>
+                                    <th>Visit Date</th>
+                                    <th>No. of Visitors</th>
+                                    <th>Contact</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Pending"))
+                                {
+                                    <tr>
+                                        <td>@item.VisitorName</td>
+                                        <td>@item.Purpose</td>
+                                        <td>@item.VisitDate:yyyy-MM-dd</td>
+                                        <td>@item.NumberOfVisitors</td>
+                                        <td>@item.ContactNumber</td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Edit" asp-route-id="@item.VisitorId" class="btn btn-warning btn-sm">
+                                                    <i class="bi bi-pencil-square"></i> Edit
+                                                </a>
+
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    <form asp-action="Approve" asp-route-id="@item.VisitorId" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-outline-success btn-sm" title="Approve this visitor">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    <form asp-action="Reject" asp-route-id="@item.VisitorId" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Reject this visitor">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+
+                                            @if (User.IsInRole("Homeowner"))
+                                            {
+                                                <div class="text-muted fst-italic mt-2">Awaiting Admin Review</div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approved Tab -->
+        <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Approved Gatepasses</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Visitor Name</th>
+                                    <th>Purpose</th>
+                                    <th>Visit Date</th>
+                                    <th>No. of Visitors</th>
+                                    <th>Contact</th>
+                                    <th>Approved By</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Approved"))
+                                {
+                                    <tr>
+                                        <td>@item.VisitorName</td>
+                                        <td>@item.Purpose</td>
+                                        <td>@item.VisitDate:yyyy-MM-dd</td>
+                                        <td>@item.NumberOfVisitors</td>
+                                        <td>@item.ContactNumber</td>
+                                        <td>@(item.ApprovedBy ?? "N/A")</td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="DownloadVisitorGatePass" asp-route-id="@item.VisitorId" class="btn btn-primary btn-sm">
+                                                    <i class="bi bi-download"></i> PDF
+                                                </a>
+
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    <form asp-action="Arrived" asp-route-id="@item.VisitorId" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Mark as Arrived">
+                                                            <i class="bi bi-check-circle"></i> Arrived
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rejected Tab -->
+        <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Rejected Gatepasses</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Visitor Name</th>
+                                    <th>Purpose</th>
+                                    <th>Visit Date</th>
+                                    <th>No. of Visitors</th>
+                                    <th>Contact</th>
+                                    <th>Admin Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Rejected"))
+                                {
+                                    <tr>
+                                        <td>@item.VisitorName</td>
+                                        <td>@item.Purpose</td>
+                                        <td>@item.VisitDate:yyyy-MM-dd</td>
+                                        <td>@item.NumberOfVisitors</td>
+                                        <td>@item.ContactNumber</td>
+                                        <td>@(item.AdminNotes ?? "No notes provided")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-}
 
-<!-- Bootstrap Tabs -->
-<ul class="nav nav-tabs" id="gatepassTabs">
-    <li class="nav-item">
-        <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending">Pending</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="approved-tab" data-bs-toggle="tab" href="#approved">Approved</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="rejected-tab" data-bs-toggle="tab" href="#rejected">Rejected</a>
-    </li>
-</ul>
+    <div class="mt-4 d-flex justify-content-between">
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="VisitorLogs" class="btn btn-secondary">
+                <i class="bi bi-clock-history"></i> Visitor Logs
+            </a>
+        }
 
-<!-- Tab Content -->
-<div class="tab-content mt-3">
-    <!-- Pending Approval -->
-    <div class="tab-pane fade show active" id="pending">
-        <h3>Pending Approval</h3>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Visitor Name</th>
-                    <th>Purpose</th>
-                    <th>Visit Date</th>
-                    <th>Number of Visitors</th>
-                    <th>Contact Number</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Pending"))
-                {
-                    <tr>
-                        <td>@item.VisitorName</td>
-                        <td>@item.Purpose</td>
-                        <td>@item.VisitDate.ToString("yyyy-MM-dd")</td>
-                        <td>@item.NumberOfVisitors</td>
-                        <td>@item.ContactNumber</td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.VisitorId" class="btn btn-warning btn-sm">Edit</a>
-
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <form asp-action="Approve" asp-route-id="@item.VisitorId" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                </form>
-
-                                <form asp-action="Reject" asp-route-id="@item.VisitorId" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                </form>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Approved Gatepasses -->
-    <div class="tab-pane fade" id="approved">
-        <h3>Approved Gatepasses</h3>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Visitor Name</th>
-                    <th>Purpose</th>
-                    <th>Visit Date</th>
-                    <th>Number of Visitors</th>
-                    <th>Contact Number</th>
-                    <th>Approved By</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Approved"))
-                {
-                    <tr>
-                        <td>@item.VisitorName</td>
-                        <td>@item.Purpose</td>
-                        <td>@item.VisitDate.ToString("yyyy-MM-dd")</td>
-                        <td>@item.NumberOfVisitors</td>
-                        <td>@item.ContactNumber</td>
-                        <td>@(item.ApprovedBy ?? "N/A")</td>
-                    </tr>
-                <td>
-                    <a asp-action="DownloadVisitorGatePass" asp-route-id="@item.VisitorId" class="btn btn-primary btn-sm">Download PDF</a>
-                </td>
-
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Rejected Gatepasses -->
-    <div class="tab-pane fade" id="rejected">
-        <h3>Rejected Gatepasses</h3>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Visitor Name</th>
-                    <th>Purpose</th>
-                    <th>Visit Date</th>
-                    <th>Number of Visitors</th>
-                    <th>Contact Number</th>
-                    <th>Admin Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Rejected"))
-                {
-                    <tr>
-                        <td>@item.VisitorName</td>
-                        <td>@item.Purpose</td>
-                        <td>@item.VisitDate.ToString("yyyy-MM-dd")</td>
-                        <td>@item.NumberOfVisitors</td>
-                        <td>@item.ContactNumber</td>
-                        <td>@(item.AdminNotes ?? "No notes provided")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Create New Gatepass
+        </a>
     </div>
 </div>
-
-<a asp-action="Create" class="btn btn-primary">Create New Gatepass</a>

@@ -4,55 +4,268 @@
     ViewData["Title"] = "Poll Results";
 }
 
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .card-header {
+        background-color: rgba(111, 117, 78, 0.1);
+        border-bottom: 1px solid rgba(111, 117, 78, 0.2);
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        padding: 15px 20px;
+    }
+
+    .card-body {
+        padding: 25px;
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 10px 20px;
+        transition: var(--transition);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-outline-secondary {
+        color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .bg-success {
+        background-color: var(--success-color) !important;
+    }
+
+    .bg-secondary {
+        background-color: var(--secondary-color) !important;
+    }
+
+    .stats-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .stat-item {
+        padding: 15px;
+        border-radius: var(--border-radius);
+        background-color: rgba(111, 117, 78, 0.05);
+        min-width: 150px;
+    }
+
+        .stat-item h5 {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-item h2 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .stat-item p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+    .text-primary {
+        color: var(--primary-color) !important;
+    }
+
+    .list-group-item {
+        padding: 15px;
+        border: 1px solid rgba(111, 117, 78, 0.2);
+        margin-bottom: 10px;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+        .list-group-item:hover {
+            background-color: rgba(111, 117, 78, 0.05);
+        }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: auto;
+        margin-bottom: 30px;
+    }
+
+        .chart-container canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 300px;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+    .table {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+        .table th {
+            background-color: rgba(111, 117, 78, 0.1);
+            color: var(--text-color);
+            border-color: rgba(111, 117, 78, 0.2);
+        }
+
+        .table td {
+            border-color: rgba(111, 117, 78, 0.1);
+        }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .alert-info {
+        background-color: rgba(13, 202, 240, 0.1);
+        border-left: 4px solid var(--info-color);
+        color: var(--text-color);
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    .text-muted {
+        color: var(--secondary-color) !important;
+    }
+</style>
+
 <div class="container">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h1 class="display-4">@Model.Title - Results</h1>
-            @if (!string.IsNullOrEmpty(Model.Description))
-            {
-                <p class="lead">@Model.Description</p>
-            }
-        </div>
+    <div class="page-header">
+        <h1 class="page-title">@Model.Title - Results</h1>
     </div>
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <p class="page-subtitle">@Model.Description</p>
+    }
 
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-4 flex-wrap">
-                        <div class="mb-3">
-                            <h5>Total Responses</h5>
-                            <h2 class="text-primary">@Model.TotalResponses</h2>
-                        </div>
-                        <div class="mb-3">
-                            <h5>Created Date</h5>
-                            <p>@Model.CreatedDate.ToString("MMM dd, yyyy")</p>
-                        </div>
-                        <div class="mb-3">
-                            <h5>Expiry Date</h5>
-                            <p>@(Model.ExpiryDate.HasValue ? Model.ExpiryDate.Value.ToString("MMM dd, yyyy") : "No expiry date")</p>
-                        </div>
-                        <div class="mb-3">
-                            <h5>Status</h5>
-                            @if (Model.IsActive)
-                            {
-                                <span class="badge bg-success">Active</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Inactive</span>
-                            }
-                        </div>
-                    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="stats-container mb-4">
+                <div class="stat-item">
+                    <h5>Total Responses</h5>
+                    <h2 class="text-primary">@Model.TotalResponses</h2>
+                </div>
+                <div class="stat-item">
+                    <h5>Created Date</h5>
+                    <p>@Model.CreatedDate.ToString("MMM dd, yyyy")</p>
+                </div>
+                <div class="stat-item">
+                    <h5>Expiry Date</h5>
+                    <p>@(Model.ExpiryDate.HasValue ? Model.ExpiryDate.Value.ToString("MMM dd, yyyy") : "No expiry date")</p>
+                </div>
+                <div class="stat-item">
+                    <h5>Status</h5>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactive</span>
+                    }
+                </div>
+            </div>
 
-                    <div class="text-end mb-3">
-                        <a asp-action="Edit" asp-route-id="@Model.PollId" class="btn btn-outline-primary" aria-label="Edit this poll">
-                            <i class="fas fa-edit"></i> Edit Poll
-                        </a>
-                        <a asp-action="Index" class="btn btn-outline-secondary" aria-label="Return to polls list">
-                            <i class="fas fa-arrow-left"></i> Back to List
-                        </a>
-                    </div>
+            <div class="text-end">
+                <div class="button-group">
+                    <a asp-action="Edit" asp-route-id="@Model.PollId" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> Edit Poll
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
                 </div>
             </div>
         </div>
@@ -60,66 +273,61 @@
 
     @foreach (var question in Model.Questions)
     {
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card shadow-sm">
-                    <div class="card-header">
-                        <h5 class="mb-0">@question.QuestionText</h5>
-                        <small class="text-muted">@question.ResponseCount responses</small>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">@question.QuestionText</h5>
+                <small class="text-muted">@question.ResponseCount responses</small>
+            </div>
+            <div class="card-body">
+                @if (question.QuestionType == Hometown_Application.Data.QuestionType.MultipleChoice)
+                {
+                    <div class="chart-container">
+                        <canvas id="chart_@question.QuestionId"></canvas>
                     </div>
-                    <div class="card-body">
-                        @if (question.QuestionType == Hometown_Application.Data.QuestionType.MultipleChoice)
-                        {
-                            <div class="chart-container">
-                                <canvas id="chart_@question.QuestionId"></canvas>
-                            </div>
-                            <div class="table-responsive mt-4">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Option</th>
-                                            <th>Count</th>
-                                            <th>Percentage</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var option in question.Options.OrderByDescending(o => o.Count))
-                                        {
-                                            <tr>
-                                                <td>@option.OptionText</td>
-                                                <td>@option.Count</td>
-                                                <td>@option.Percentage%</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <h6>Text Responses:</h6>
-                            <div class="text-responses mt-3">
-                                @if (question.TextResponses.Any())
+                    <div class="table-responsive mt-4">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Option</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var option in question.Options.OrderByDescending(o => o.Count))
                                 {
-                                    <div class="list-group">
-                                        @foreach (var response in question.TextResponses)
-                                        {
-                                            <div class="list-group-item">
-                                                @response
-                                            </div>
-                                        }
-                                    </div>
+                                    <tr>
+                                        <td>@option.OptionText</td>
+                                        <td>@option.Count</td>
+                                        <td>@option.Percentage%</td>
+                                    </tr>
                                 }
-                                else
-                                {
-                                    <div class="alert alert-info">
-                                        No text responses received yet.
-                                    </div>
-                                }
-                            </div>
-                        }
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <h6 class="mb-3">Text Responses:</h6>
+                    @if (question.TextResponses.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var response in question.TextResponses)
+                            {
+                                <div class="list-group-item">
+                                    @response
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No text responses received yet.
+                        </div>
+                    }
+                }
             </div>
         </div>
     }
@@ -127,27 +335,20 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: auto;
-        }
-
-            .chart-container canvas {
-                width: 100% !important;
-                height: auto !important;
-                max-height: 300px;
-            }
-    </style>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var colors = [
-                "rgba(54, 162, 235, 0.5)", "rgba(255, 99, 132, 0.5)", "rgba(255, 206, 86, 0.5)",
-                "rgba(75, 192, 192, 0.5)", "rgba(153, 102, 255, 0.5)", "rgba(255, 159, 64, 0.5)",
-                "rgba(199, 199, 199, 0.5)", "rgba(83, 102, 255, 0.5)", "rgba(255, 159, 159, 0.5)"
+                "rgba(111, 117, 78, 0.7)", // primary
+                "rgba(160, 141, 103, 0.7)", // secondary
+                "rgba(47, 58, 49, 0.7)", // text color
+                "rgba(186, 181, 156, 0.7)",
+                "rgba(103, 108, 72, 0.7)",
+                "rgba(180, 161, 123, 0.7)",
+                "rgba(230, 221, 196, 0.7)",
+                "rgba(67, 78, 69, 0.7)",
+                "rgba(140, 147, 108, 0.7)"
             ];
-            var borderColors = colors.map(color => color.replace("0.5", "1"));
+            var borderColors = colors.map(color => color.replace("0.7", "1"));
 
             const QuestionType = {
                 MultipleChoice: @((int)Hometown_Application.Data.QuestionType.MultipleChoice),
@@ -178,17 +379,41 @@
                         }]
                     },
                     options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    precision: 0
+                                    precision: 0,
+                                    color: 'rgba(47, 58, 49, 0.8)'
+                                },
+                                grid: {
+                                    color: 'rgba(111, 117, 78, 0.1)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: 'rgba(47, 58, 49, 0.8)'
+                                },
+                                grid: {
+                                    color: 'rgba(111, 117, 78, 0.1)'
                                 }
                             }
                         },
                         plugins: {
                             legend: {
                                 display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: '#2F3A31',
+                                bodyColor: '#2F3A31',
+                                borderWidth: 1,
+                                borderColor: 'rgba(111, 117, 78, 0.2)',
+                                cornerRadius: 8,
+                                displayColors: true,
+                                boxPadding: 6
                             }
                         }
                     }
@@ -206,14 +431,33 @@
                         datasets: [{
                             data: data,
                             backgroundColor: backgroundColor,
-                            borderColor: borderColor,
+                            borderColor: borderColors,
                             borderWidth: 1
                         }]
                     },
                     options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                position: "right"
+                                position: "right",
+                                labels: {
+                                    color: 'rgba(47, 58, 49, 0.8)',
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: '#2F3A31',
+                                bodyColor: '#2F3A31',
+                                borderWidth: 1,
+                                borderColor: 'rgba(111, 117, 78, 0.2)',
+                                cornerRadius: 8,
+                                displayColors: true,
+                                boxPadding: 6
                             }
                         }
                     }
@@ -224,13 +468,13 @@
         @foreach (var question in Model.Questions)
         {
             <text>
-                                questions.push({
-                                    questionId: @question.QuestionId,
-                                    questionType: @((int)question.QuestionType),
-                                    optionLabels: [@Html.Raw(string.Join(",", question.Options.Select(o => $"\"{System.Net.WebUtility.HtmlEncode(o.OptionText)}\"")))],
-                                    optionData: [@Html.Raw(string.Join(",", question.Options.Select(o => o.Count)))],
-                                    optionCount: @question.Options.Count
-                                });
+                        questions.push({
+                            questionId: @question.QuestionId,
+                            questionType: @((int)question.QuestionType),
+                            optionLabels: [@Html.Raw(string.Join(",", question.Options.Select(o => $"\"{System.Net.WebUtility.HtmlEncode(o.OptionText)}\"")))],
+                            optionData: [@Html.Raw(string.Join(",", question.Options.Select(o => o.Count)))],
+                            optionCount: @question.Options.Count
+                        });
             </text>
         }
 
@@ -238,6 +482,17 @@
                 if (question.questionType === QuestionType.MultipleChoice) {
                     initializeCharts(question.questionId, question.optionLabels, question.optionData, question.optionCount);
                 }
+            });
+
+            // Add some interactivity
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = '';
+                });
             });
         });
     </script>

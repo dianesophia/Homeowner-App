@@ -4,23 +4,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hometown_Application.Models
 {
-    public class BillAssignmentModel
+    public class BillAssignModel
     {
         [Key]
-        public int BillAssignmentId { get; set; }
+        public int BillAssignId { get; set; }
 
+        [Required]
         public string UserId { get; set; }
+
         [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
-
-        public int? BillId { get; set; }  // Foreign Key to Bill model
-        [ForeignKey("BillId")]
-        public BillModel Bill { get; set; }
 
         public string BillName { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
-        public DateTime DueDate { get; set; } 
+        public DateTime DueDate { get; set; }
 
         public DateTime IssuedDate { get; set; } = DateTime.UtcNow;
         public string? Remarks { get; set; }
@@ -42,8 +40,5 @@ namespace Hometown_Application.Models
         public bool IsDeleted { get; set; } = false;
 
         public IEnumerable<ApplicationUser> Users { get; set; }
-
-
-        public ICollection<BillPaymentModel>? Payments { get; set; }
     }
 }

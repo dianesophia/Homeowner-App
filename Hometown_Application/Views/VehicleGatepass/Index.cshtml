@@ -6,61 +6,12 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<a asp-controller="VehicleGatepass" asp-action="Create" class="btn btn-secondary">
-    <i class="fas fa-comment"></i>Create
+<a asp-controller="VehicleGatepass" asp-action="Create" class="btn btn-primary mb-3">
+    <i class="fas fa-plus-circle"></i> Create
 </a>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Image</th>
-            <th>Vehicle Brand</th>
-            <th>Vehicle Color</th>
-            <th>Plate Number</th>
-            <th>Owner</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Where(v => !v.IsDeleted && v.IsApproved == true))
-        {
-            <tr>
-                <td>
-                    @if (item.VehicleImage != null)
-                    {
-                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.VehicleImage)" alt="Feedback Image" width="100" height="100" />
-                    }
-                    else
-                    {
-                        <span>No Image</span>
-                    }
-    
-                </td>
-                <td>@item.VehicleBrand</td>
-                <td>@item.VehicleColor</td>
-                <td>@item.VehiclePlateNumber</td>
-                <td>@item.ApplicationUser.UserName</td>
-                <td>@item.ApprovalStatus</td>
-                <td>
-                    <a asp-controller="VehicleGatePass" asp-action="Edit" asp-route-id="@item.VehicleId" class="btn btn-primary">
-                        Edit
-                    </a>
-
-                    <!-- Delete Button triggers Modal -->
-                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-
-
 <!-- Tabs for Approve/Reject -->
-<ul class="nav nav-tabs" id="myTab" role="tablist">
+<ul class="nav nav-pills mb-3" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
         <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="true">Pending</a>
     </li>
@@ -71,11 +22,12 @@
         <a class="nav-link" id="rejected-tab" data-bs-toggle="tab" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">Rejected</a>
     </li>
 </ul>
+
 <div class="tab-content" id="myTabContent">
     <!-- Pending Tab -->
     <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
         <h3>Pending Approvals</h3>
-        <table class="table">
+        <table class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th>Vehicle Brand</th>
@@ -88,19 +40,15 @@
                     <tr>
                         <td>@item.VehicleBrand</td>
                         <td>
-                            <!-- Approve Button triggers Modal -->
                             <button class="btn btn-success" data-toggle="modal" data-target="#approveRejectModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand" data-action="approve">
                                 Approve
                             </button>
-
-                            <!-- Reject Button triggers Modal -->
                             <button class="btn btn-warning" data-toggle="modal" data-target="#approveRejectModal" data-id="@item.VehicleId" data-name="@item.VehicleBrand" data-action="reject">
                                 Reject
                             </button>
                         </td>
                     </tr>
                 }
-
             </tbody>
         </table>
     </div>
@@ -116,21 +64,17 @@
                         <div class="card-body">
                             <h5 class="card-title">@item.VehicleBrand</h5>
                             <span class="badge badge-success mb-2">Approved</span>
-                            <br>
-
-                            <td>
+                            <div>
                                 @if (item.VehicleImage != null)
                                 {
-                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.VehicleImage)" alt="Feedback Image" width="100" height="100" />
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.VehicleImage)" alt="Feedback Image" class="img-fluid" />
                                 }
                                 else
                                 {
                                     <span>No Image</span>
                                 }
-
-                            </td>
-
-                            <a asp-controller="VehicleGatePass" asp-action="DownloadPDF" asp-route-id="@item.VehicleId" class="btn btn-primary btn-sm">
+                            </div>
+                            <a asp-controller="VehicleGatePass" asp-action="DownloadPDF" asp-route-id="@item.VehicleId" class="btn btn-primary btn-sm mt-3">
                                 Download PDF
                             </a>
                         </div>
@@ -140,11 +84,10 @@
         </div>
     </div>
 
-
     <!-- Rejected Tab -->
     <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
         <h3>Rejected Gate Passes</h3>
-        <table class="table">
+        <table class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th>Vehicle Brand</th>
@@ -153,7 +96,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsRejected ?? true)))  
+                @foreach (var item in Model.Where(v => !v.IsDeleted && (v.IsRejected ?? true)))
                 {
                     <tr>
                         <td>@item.VehicleBrand</td>
@@ -167,24 +110,6 @@
         </table>
     </div>
 </div>
-
-<!-- Modal for PDF Preview -->
-<div class="modal fade" id="pdfPreviewModal" tabindex="-1" role="dialog" aria-labelledby="pdfPreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="pdfPreviewModalLabel">Vehicle Gate Pass Preview</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <iframe id="pdfViewer" src="" width="100%" height="500px"></iframe>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <!-- Modal for Delete -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -233,10 +158,7 @@
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <form id="approveRejectForm" method="post" action="#">
                     @Html.AntiForgeryToken()
-
-                    <!-- Hidden field for action (approve/reject) -->
                     <input type="hidden" id="action" name="action" value="" />
-
                     <button type="submit" id="approveRejectButton" class="btn btn-success">Approve</button>
                 </form>
             </div>
@@ -252,61 +174,39 @@
         // Handle Approve/Reject Modal dynamic data
         $('#approveRejectModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
-            var vehicleId = button.data('id'); // Extract info from data-* attributes
+            var vehicleId = button.data('id');
             var vehicleBrand = button.data('name');
-            var action = button.data('action'); // Get the action (approve or reject)
+            var action = button.data('action');
 
-            // Update the modal's content
             var modal = $(this);
             modal.find('.modal-body #vehicleBrand').text(vehicleBrand);
-            modal.find('.modal-body #actionType').text(action.charAt(0).toUpperCase() + action.slice(1)); // Capitalize action (approve/reject)
+            modal.find('.modal-body #actionType').text(action.charAt(0).toUpperCase() + action.slice(1));
 
-            // Set the form action URL
             var formActionUrl = '@Url.Action("ApproveRejectConfirmed", "VehicleGatePass")/' + vehicleId;
             modal.find('form').attr('action', formActionUrl);
-
-            // Set action in hidden field
             modal.find('#action').val(action);
 
-            // Show rejection reason only if rejecting
             if (action === "reject") {
                 $('#rejectionReasonContainer').show();
-                $('#approveRejectButton').text("Reject");
-                $('#approveRejectButton').removeClass('btn-success').addClass('btn-warning');
+                $('#approveRejectButton').text("Reject").removeClass('btn-success').addClass('btn-warning');
             } else {
                 $('#rejectionReasonContainer').hide();
-                $('#approveRejectButton').text("Approve");
-                $('#approveRejectButton').removeClass('btn-warning').addClass('btn-success');
+                $('#approveRejectButton').text("Approve").removeClass('btn-warning').addClass('btn-success');
             }
         });
 
-                // Handle Delete Modal dynamic data
-               // Handle Delete Modal dynamic data
+        // Handle Delete Modal dynamic data
         $('#deleteModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var vehicleId = button.data('id'); // Extract the vehicleId
-            var vehicleBrand = button.data('name'); // Extract the vehicleBrand
+            var button = $(event.relatedTarget);
+            var vehicleId = button.data('id');
+            var vehicleBrand = button.data('name');
 
-            // Update the modal's content
             var modal = $(this);
             modal.find('.modal-body #vehicleBrand').text(vehicleBrand);
-            modal.find('.modal-body #vehicleId').val(vehicleId); // Set vehicleId for the form
+            modal.find('.modal-body #vehicleId').val(vehicleId);
 
-            // Set the action URL for the form
             var formActionUrl = '@Url.Action("DeleteConfirmed", "VehicleGatePass")/' + vehicleId;
             modal.find('form').attr('action', formActionUrl);
-        });
-
-              $(document).ready(function () {
-            $('.preview-pdf-btn').on('click', function () {
-                var pdfUrl = $(this).data('url');  // Get the PDF URL from the button
-                $('#pdfViewer').attr('src', pdfUrl); // Load the PDF in the iframe
-            });
-
-            // Clear iframe when the modal is closed (optional for performance)
-            $('#pdfPreviewModal').on('hidden.bs.modal', function () {
-                $('#pdfViewer').attr('src', '');
-            });
         });
     </script>
 }

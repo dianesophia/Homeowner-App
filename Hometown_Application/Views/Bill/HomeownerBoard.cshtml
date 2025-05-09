@@ -4,57 +4,242 @@
     ViewData["Title"] = "Homeowner Dashboard";
 }
 
-<h2>Homeowner Dashboard</h2>
+<h2 class="text-center text-primary">Homeowner Dashboard</h2>
 
 @if (ViewData["Message"] != null)
 {
-    <div class="alert alert-warning">
+    <div class="alert alert-warning text-center">
         @ViewData["Message"]
     </div>
 }
 
 <div class="row">
-    @foreach (var item in Model.Where(b => b.RemainingBalance > 0))
+    @foreach (var item in Model)
     {
-        <div class="col-md-4 mb-4">
-            <!-- Card for Bill ID and Remaining Balance -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5>Bill ID: @item.BillId</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">
-                        <strong>Remaining Balance:</strong> @item.RemainingBalance.ToString("C")
-                    </p>
-                    <p class="card-text">
-                        <strong>Status:</strong> @item.Status
-                    </p>
+        <!-- Only render the Bill Summary Card if the Remaining Balance is greater than 0 -->
+        @if (item.RemainingBalance > 0)
+        {
+            <div class="col-md-6 mb-4">
+                <!-- Bill Summary Card -->
+                <div class="card shadow mb-3 border-secondary">
+                    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Bill ID: @item.BillId</h5>
+                        <span class="badge bg-warning text-dark">Remaining Balance</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Remaining Balance:</strong> @item.RemainingBalance.ToString("C")</p>
 
-                    <a asp-action="PayBill" asp-controller="Bill" asp-route-billId="@item.BillId" class="btn btn-success">
-                        Pay Now
-                    </a>
+                        <a asp-action="PayBill" asp-controller="Bill" asp-route-billId="@item.BillId" class="btn btn-success btn-lg w-100">
+                            Pay Now
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Bill Details Card -->
+                <div class="card shadow border-secondary">
+                    <div class="card-header bg-secondary text-white">
+                        <h5>@item.BillName</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Amount:</strong> @item.Amount.ToString("C")</p>
+                        <p><strong>Description:</strong> @item.Description</p>
+                        <p><strong>Due Date:</strong> @item.DueDate.ToString("MM/dd/yyyy")</p>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- New Card for Bill Name and Amount -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h5>@item.BillName</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">
-                        <strong>Amount:</strong> @item.Amount.ToString("C")
-                    </p>
-                    <p class="card-text">
-                        <strong>Description:</strong> @item.Description
-                    </p>
-                    <p class="card-text">
-                        <strong>Due Date:</strong> @item.DueDate.ToString("MM/dd/yyyy")
-                    </p>
+        }
+        else
+        {
+            <!-- Show a message for paid bills -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow mb-3 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5>Bill ID: @item.BillId</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Status:</strong> Paid</p>
+                        <p><strong>Amount Paid:</strong> @item.Amount.ToString("C")</p>
+                        <p><strong>Payment Date:</strong> @item.PaymentDate.ToString("MM/dd/yyyy")</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
+        <!--
+            Display Bill Assignments
+        @if (item.BillAssignments != null && item.BillAssignments.Any())
+        {
+                    <div class="col-md-12 mb-4">
+                        <div class="card shadow border-secondary">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">Bill Assignments for Bill ID: @item.BillId</h5>
+                            </div>
+                            <div class="card-body">
+                        @foreach (var assignment in item.BillAssignments)
+                        {
+                                        <div class="card mb-3 border">
+                                            <div class="card-body">
+                                                <div class="row mb-2">
+                                                    <div class="col-md-3">
+                                                        <strong>Assignment ID:</strong> @assignment.BillAssignmentId
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Bill Name:</strong> @assignment.BillName
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Amount:</strong> @assignment.Amount.ToString("C")
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Status:</strong>
+                                            @if (assignment.IsPaid)
+                                            {
+                                                                <span class="badge bg-success">Paid</span>
+                                            }
+                                            else
+                                            {
+                                                                <span class="badge bg-warning text-dark">Unpaid</span>
+                                            }
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-2">
+                                                    <div class="col-md-6">
+                                                        <strong>Description:</strong> @assignment.Description
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Issued Date:</strong> @assignment.IssuedDate.ToString("MM/dd/yyyy")
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Due Date:</strong> @assignment.DueDate.ToString("MM/dd/yyyy")
+                                                    </div>
+                                                </div>
+
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-6">
+                                                        <strong>Remarks:</strong> @assignment.Remarks
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <strong>Paid Date:</strong> @(assignment.PaidDate?.ToString("MM/dd/yyyy") ?? "N/A")
+                                                    </div>
+                                                    <div class="col-md-3 text-end">
+                                            @if (!assignment.IsPaid)
+                                            {
+                                                                <a href="@Url.Action("PayBillAssignment", "Bill", new { billAssignmentId = assignment.BillAssignmentId })" class="btn btn-primary btn-sm">
+                                                                    Pay Bill
+                                                                </a>
+                                            }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                        }
+                            </div>
+                        </div>
+                    </div>
+        }
+        else
+        {
+                    <div class="col-md-12 mb-4 text-center text-muted">
+                        <p>No assignments available for this bill.</p>
+                    </div>
+        }
+        -->
     }
+</div>
+
+<hr />
+
+<h3 class="text-center text-secondary">Payment History</h3>
+
+<!-- Tabs for approved and pending payments -->
+<ul class="nav nav-tabs" id="paymentTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="approved-tab" data-bs-toggle="tab" href="#approved" role="tab" aria-controls="approved" aria-selected="true">
+            <i class="bi bi-check-circle"></i> Approved Payments
+        </a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="false">
+            <i class="bi bi-clock"></i> Pending Payments
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content" id="paymentTabsContent">
+    <!-- Approved Payments Tab -->
+    <div class="tab-pane fade show active" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+        @if (Model.Any(p => p.PaymentId != 0 && p.IsApproved))
+        {
+            <table class="table table-bordered mt-3">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Payment Date</th>
+                        <th>Amount Paid</th>
+                        <th>Payment Method</th>
+                        <th>Reference Number</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var payment in Model.Where(p => p.PaymentId != 0 && p.IsApproved))
+                    {
+                        <tr>
+                            <td>@payment.PaymentId</td>
+                            <td>@payment.PaymentDate.ToShortDateString()</td>
+                            <td>@payment.AmountPaid.ToString("C")</td>
+                            <td>@payment.PaymentMethod</td>
+                            <td>@payment.ReferenceNumber</td>
+                            <td>
+                                <a asp-controller="Bill"
+                                   asp-action="DownloadConfirmationSlip"
+                                   asp-route-paymentId="@payment.PaymentId"
+                                   class="btn btn-sm btn-outline-primary"
+                                   target="_blank">
+                                    <i class="bi bi-download"></i> Download Confirmation
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted mt-3 text-center">No approved payments available.</p>
+        }
+    </div>
+
+    <!-- Pending Payments Tab -->
+    <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+        @if (Model.Any(p => p.PaymentId != 0 && !p.IsApproved))
+        {
+            <table class="table table-bordered mt-3">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Payment Date</th>
+                        <th>Amount Paid</th>
+                        <th>Payment Method</th>
+                        <th>Reference Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var payment in Model.Where(p => p.PaymentId != 0 && !p.IsApproved))
+                    {
+                        <tr>
+                            <td>@payment.PaymentId</td>
+                            <td>@payment.PaymentDate.ToShortDateString()</td>
+                            <td>@payment.AmountPaid.ToString("C")</td>
+                            <td>@payment.PaymentMethod</td>
+                            <td>@payment.ReferenceNumber</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted mt-3 text-center">No pending payments available.</p>
+        }
+    </div>
 </div>

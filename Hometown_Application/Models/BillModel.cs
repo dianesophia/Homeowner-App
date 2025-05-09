@@ -44,9 +44,21 @@ namespace Hometown_Application.Models
         // Calculate the total amount of BillItems for this bill
         public void CalculateTotalAmount(IEnumerable<BillItemsModel> billItems)
         {
-            // Calculate the total amount by summing the amounts of all bill items
-            TotalAmount = billItems.Sum(b => b.Amount ?? 0);
-            RemainingBalance = TotalAmount;  // Set the remaining balance to total amount initially
+            decimal monthlyTotal = billItems
+                .Where(b => b.PaymentDuration == "Monthly" && b.Amount.HasValue)
+                .Sum(b => b.Amount.Value);
+
+            decimal quarterlyTotal = billItems
+                .Where(b => b.PaymentDuration == "Quarterly" && b.Amount.HasValue)
+                .Sum(b => b.Amount.Value) / 3;
+
+            decimal yearlyTotal = billItems
+                .Where(b => b.PaymentDuration == "Yearly" && b.Amount.HasValue)
+                .Sum(b => b.Amount.Value) / 12;
+
+            // Total monthly + equivalent monthly of quarterly and yearly
+            TotalAmount = monthlyTotal + quarterlyTotal + yearlyTotal;
+            RemainingBalance = TotalAmount;
         }
 
         public void UpdateRemainingBalance(decimal paymentAmount)

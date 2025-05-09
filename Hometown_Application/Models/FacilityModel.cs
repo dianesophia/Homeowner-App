@@ -24,6 +24,8 @@ namespace Hometown_Application.Models
         [StringLength(252)]
         public string Description { get; set; }
 
+        public int? RatePerHour { get; set; }
+
         public DateTime AddedOn { get; set; } = DateTime.UtcNow;
 
         [StringLength(50)]
