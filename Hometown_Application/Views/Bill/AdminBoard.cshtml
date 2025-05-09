@@ -1,121 +1,468 @@
-﻿<h1 class="mb-4 fw-bold">Admin Billing Dashboard</h1>
+﻿
+@model IEnumerable<Hometown_Application.Models.BillModel>
+@using Hometown_Application.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
-<div class="d-flex flex-column flex-md-row gap-3 mb-4">
-    <a asp-controller="Bill" asp-action="AssignAutomaticBills" class="btn btn-primary d-flex align-items-center gap-2">
-        <i class="fas fa-tasks"></i> Assign Automatic Bills
-    </a>
-    <a asp-controller="Bill" asp-action="PendingPayments" class="btn btn-outline-primary d-flex align-items-center gap-2">
-        <i class="fas fa-plus-circle"></i> Pending Payments
-    </a>
-    <a asp-controller="Bill" asp-action="AssignUserBill" class="btn btn-outline-primary d-flex align-items-center gap-2">
-        <i class="fas fa-plus-circle"></i> Create Custom Bill
-    </a>
-</div>
+@{
+    ViewData["Title"] = "Admin Billing Dashboard";
+}
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<div class="container">
-    <!-- Summary Cards -->
-    <div class="row mb-5">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title text-primary">Estimated Monthly Collection</h5>
-                    <p class="card-text fs-4 fw-semibold">@ViewBag.TotalMonthlyBills.ToString("C")</p>
-                </div>
+    /* Page title and header */
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* Action buttons */
+    .action-button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+        .action-button:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+
+        .action-button.primary {
+            background-color: var(--primary-color);
+        }
+
+            .action-button.primary:hover {
+                background-color: var(--primary-light);
+            }
+
+        .action-button i {
+            font-size: 1.1rem;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* Stats cards */
+    .stat-cards-container {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        gap: 20px;
+    }
+
+    .stat-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 15px 20px;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 15px;
+        flex-grow: 1;
+        flex: 1;
+        max-width: 30%;
+        min-width: 250px;
+        position: relative;
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .stat-card.collection::before {
+            background-color: var(--primary-color);
+        }
+
+        .stat-card.paid::before {
+            background-color: var(--success-color);
+        }
+
+        .stat-card.total::before {
+            background-color: var(--info-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+    .stat-icon {
+        font-size: 1.5rem;
+        background-color: rgba(0,0,0,0.05);
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .collection-icon {
+        color: var(--primary-color);
+    }
+
+    .paid-icon {
+        color: var(--success-color);
+    }
+
+    .total-icon {
+        color: var(--info-color);
+    }
+
+    .stat-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Search container */
+    .search-container {
+        display: flex;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid #eee;
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        font-size: 1rem;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--primary-light);
+        }
+
+    .search-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        padding: 0 25px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+        .search-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+    /* Tab container */
+    .tab-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 10rem;
+    }
+
+    .nav-tabs {
+        display: flex;
+        gap: 0;
+        padding: 15px 15px 0;
+        background-color: var(--primary-color);
+        border-bottom: none;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+        .nav-tabs .nav-item {
+            margin-right: 4px;
+            margin-bottom: 0;
+        }
+
+        .nav-tabs .nav-link {
+            color: rgba(255,255,255,0.8);
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            transition: var(--transition);
+            background-color: rgba(255,255,255,0.1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .nav-tabs .nav-link:hover {
+                color: white;
+                background-color: rgba(255,255,255,0.2);
+            }
+
+            .nav-tabs .nav-link.active {
+                color: var(--text-color);
+                background-color: white;
+                box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            }
+
+            .nav-tabs .nav-link i {
+                margin-right: 8px;
+                font-size: 1rem;
+            }
+
+    .tab-content {
+        padding: 25px;
+        background-color: var(--card-bg);
+    }
+
+    /* Table styling */
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+
+        .custom-table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            border: none;
+        }
+
+        .custom-table tbody tr {
+            background-color: white;
+            transition: var(--transition);
+        }
+
+            .custom-table tbody tr:hover {
+                background-color: rgba(0,0,0,0.02);
+            }
+
+        .custom-table tbody td {
+            padding: 15px;
+            text-align: center;
+            vertical-align: middle;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .custom-table.fully-paid thead th {
+            background-color: var(--success-color);
+        }
+
+        .custom-table.overdue thead th {
+            background-color: var(--danger-color);
+        }
+
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+    }
+
+        .empty-state i {
+            color: var(--secondary-color);
+            opacity: 0.7;
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+</style>
+
+<div class="content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Admin Billing Dashboard</h1>
+        <div class="action-buttons">
+            <a asp-controller="Bill" asp-action="AssignAutomaticBills" class="action-button primary">
+                <i class="fas fa-tasks"></i>
+                <span>Assign Automatic Bills</span>
+            </a>
+            <a asp-controller="Bill" asp-action="PendingPayments" class="action-button">
+                <i class="fas fa-credit-card"></i>
+                <span>Pending Payments</span>
+            </a>
+            <a asp-controller="Bill" asp-action="AssignUserBill" class="action-button">
+                <i class="fas fa-plus-circle"></i>
+                <span>Create Custom Bill</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stat-cards-container">
+        <div class="stat-card collection">
+            <div class="stat-icon collection-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@ViewBag.TotalMonthlyBills.ToString("C")</div>
+                <div class="stat-label">Est. Monthly Collection</div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title text-success">Fully Paid Users (This Month)</h5>
-                    <p class="card-text fs-4 fw-semibold">@ViewBag.FullyPaidUserCount users</p>
-                </div>
+        <div class="stat-card paid">
+            <div class="stat-icon paid-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@ViewBag.FullyPaidUserCount</div>
+                <div class="stat-label">Fully Paid Users (This Month)</div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title text-info">Total Collected (This Month)</h5>
-                    <p class="card-text fs-4 fw-semibold">@ViewBag.TotalCollectedThisMonth.ToString("C")</p>
-                </div>
+        <div class="stat-card total">
+            <div class="stat-icon total-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@ViewBag.TotalCollectedThisMonth.ToString("C")</div>
+                <div class="stat-label">Total Collected (This Month)</div>
             </div>
         </div>
     </div>
 
-    <!-- 🔹 Tab Navigation -->
-    <ul class="nav nav-tabs mb-4" id="billTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All Bills</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="fullyPaid-tab" data-bs-toggle="tab" data-bs-target="#fullyPaid" type="button" role="tab">Fully Paid</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="overdue-tab" data-bs-toggle="tab" data-bs-target="#overdue" type="button" role="tab">Overdue</button>
-        </li>
-    </ul>
+    <!-- Search bar -->
+    <div class="search-container">
+        <input type="text" class="search-input" id="billSearch" placeholder="Search by User, Bill ID, or Remarks...">
+        <button class="search-button">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
 
-    <!-- 🔹 Tab Content -->
-    <div class="tab-content" id="billTabsContent">
-        <!-- All Bills Tab -->
-        <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
-            <div class="mb-3">
-                <input type="text" id="billSearch" class="form-control" placeholder="Search by User, Bill ID, or Remarks...">
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered" id="billTable">
-                    <thead class="table-primary text-center">
-                        <tr>
-                            <th>Bill ID</th>
-                            <th>User</th>
-                            <th>Issue Date</th>
-                            <th>Due Date</th>
-                            <th>Total Amount</th>
-                            <th>Remaining Balance</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var bill in ViewBag.BillList as List<Hometown_Application.Models.BillModel>)
-                        {
-                            <tr class="text-center align-middle">
-                                <td>@bill.BillId</td>
-                                <td>@bill.ApplicationUser?.UserName</td>
-                                <td>@bill.IssueDate.ToString("MM/dd/yyyy")</td>
-                                <td>@bill.DueDate.ToString("MM/dd/yyyy")</td>
-                                <td>@bill.TotalAmount.ToString("C")</td>
-                                <td>@bill.RemainingBalance.ToString("C")</td>
-                                <td>@bill.Remarks</td>
+    <!-- Tab Container -->
+    <div class="tab-container">
+        <ul class="nav nav-tabs" id="billTabs">
+            <li class="nav-item">
+                <a class="nav-link active" id="all-tab" data-bs-toggle="tab" href="#all">
+                    <i class="fas fa-th-list"></i> All Bills
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="fullyPaid-tab" data-bs-toggle="tab" href="#fullyPaid">
+                    <i class="fas fa-check-circle"></i> Fully Paid
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="overdue-tab" data-bs-toggle="tab" href="#overdue">
+                    <i class="fas fa-exclamation-circle"></i> Overdue
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- All Bills Tab -->
+            <div class="tab-pane fade show active" id="all">
+                <div class="table-responsive">
+                    <table class="custom-table" id="billTable">
+                        <thead>
+                            <tr>
+                                <th>Bill ID</th>
+                                <th>User</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Total Amount</th>
+                                <th>Remaining Balance</th>
+                                <th>Remarks</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Fully Paid Tab -->
-        <div class="tab-pane fade" id="fullyPaid" role="tabpanel" aria-labelledby="fullyPaid-tab">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered">
-                    <thead class="table-success text-center">
-                        <tr>
-                            <th>Bill ID</th>
-                            <th>User</th>
-                            <th>Issue Date</th>
-                            <th>Due Date</th>
-                            <th>Total Amount</th>
-                            <th>Remaining Balance</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            var hasFullyPaid = false;
-                            foreach (var bill in ViewBag.BillList as List<Hometown_Application.Models.BillModel>)
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.BillList != null && ViewBag.BillList.Count > 0)
                             {
-                                if (bill.RemainingBalance == 0)
+                                @foreach (var bill in ViewBag.BillList as List<Hometown_Application.Models.BillModel>)
                                 {
-                                    hasFullyPaid = true;
-                                    <tr class="text-center align-middle">
+                                    <tr>
                                         <td>@bill.BillId</td>
                                         <td>@bill.ApplicationUser?.UserName</td>
                                         <td>@bill.IssueDate.ToString("MM/dd/yyyy")</td>
@@ -126,78 +473,154 @@
                                     </tr>
                                 }
                             }
-
-                            if (!hasFullyPaid)
+                            else
                             {
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted">No homeowner fully paid</td>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <i class="fas fa-file-invoice-dollar"></i>
+                                            <p>No bills found.</p>
+                                        </div>
+                                    </td>
                                 </tr>
                             }
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <!-- Overdue Tab -->
-        <div class="tab-pane fade" id="overdue" role="tabpanel" aria-labelledby="overdue-tab">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered">
-                    <thead class="table-danger text-center">
-                        <tr>
-                            <th>Bill ID</th>
-                            <th>User</th>
-                            <th>Issue Date</th>
-                            <th>Due Date</th>
-                            <th>Total Amount</th>
-                            <th>Remaining Balance</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            var hasOverdue = false;
-                            foreach (var bill in ViewBag.BillList as List<Hometown_Application.Models.BillModel>)
-                            {
-                                if (bill.RemainingBalance > 0 && bill.DueDate < DateTime.Now)
+            <!-- Fully Paid Tab -->
+            <div class="tab-pane fade" id="fullyPaid">
+                <div class="table-responsive">
+                    <table class="custom-table fully-paid">
+                        <thead>
+                            <tr>
+                                <th>Bill ID</th>
+                                <th>User</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Total Amount</th>
+                                <th>Remaining Balance</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var hasFullyPaid = false;
+
+                                if (ViewBag.BillList != null)
                                 {
-                                    hasOverdue = true;
-                                    <tr class="text-center align-middle">
-                                        <td>@bill.BillId</td>
-                                        <td>@bill.ApplicationUser?.UserName</td>
-                                        <td>@bill.IssueDate.ToString("MM/dd/yyyy")</td>
-                                        <td>@bill.DueDate.ToString("MM/dd/yyyy")</td>
-                                        <td>@bill.TotalAmount.ToString("C")</td>
-                                        <td>@bill.RemainingBalance.ToString("C")</td>
-                                        <td>@bill.Remarks</td>
+                                    foreach (var bill in ViewBag.BillList as List<Hometown_Application.Models.BillModel>)
+                                    {
+                                        if (bill.RemainingBalance == 0)
+                                        {
+                                            hasFullyPaid = true;
+                                            <tr>
+                                                <td>@bill.BillId</td>
+                                                <td>@bill.ApplicationUser?.UserName</td>
+                                                <td>@bill.IssueDate.ToString("MM/dd/yyyy")</td>
+                                                <td>@bill.DueDate.ToString("MM/dd/yyyy")</td>
+                                                <td>@bill.TotalAmount.ToString("C")</td>
+                                                <td>@bill.RemainingBalance.ToString("C")</td>
+                                                <td>@bill.Remarks</td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+
+                                if (!hasFullyPaid)
+                                {
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="empty-state">
+                                                <i class="fas fa-check-circle"></i>
+                                                <p>No homeowner fully paid.</p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 }
                             }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                            if (!hasOverdue)
-                            {
-                                <tr>
-                                    <td colspan="7" class="text-center text-muted">No homeowner overdue</td>
-                                </tr>
+            <!-- Overdue Tab -->
+            <div class="tab-pane fade" id="overdue">
+                <div class="table-responsive">
+                    <table class="custom-table overdue">
+                        <thead>
+                            <tr>
+                                <th>Bill ID</th>
+                                <th>User</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Total Amount</th>
+                                <th>Remaining Balance</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var hasOverdue = false;
+
+                                if (ViewBag.BillList != null)
+                                {
+                                    foreach (var bill in ViewBag.BillList as List<Hometown_Application.Models.BillModel>)
+                                    {
+                                        if (bill.RemainingBalance > 0 && bill.DueDate < DateTime.Now)
+                                        {
+                                            hasOverdue = true;
+                                            <tr>
+                                                <td>@bill.BillId</td>
+                                                <td>@bill.ApplicationUser?.UserName</td>
+                                                <td>@bill.IssueDate.ToString("MM/dd/yyyy")</td>
+                                                <td>@bill.DueDate.ToString("MM/dd/yyyy")</td>
+                                                <td>@bill.TotalAmount.ToString("C")</td>
+                                                <td>@bill.RemainingBalance.ToString("C")</td>
+                                                <td>@bill.Remarks</td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+
+                                if (!hasOverdue)
+                                {
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="empty-state">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                <p>No homeowner overdue.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                             }
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- JavaScript for Search -->
 @section Scripts {
     <script>
-        document.getElementById("billSearch").addEventListener("keyup", function () {
-            const query = this.value.toLowerCase();
-            const rows = document.querySelectorAll("#billTable tbody tr");
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('billSearch');
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = this.value.toLowerCase();
+                const allRows = document.querySelectorAll('#billTable tbody tr');
 
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(query) ? "" : "none";
+                allRows.forEach(row => {
+                    const rowText = row.innerText.toLowerCase();
+                    if (rowText.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
             });
         });
     </script>

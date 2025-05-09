@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hometown_Application.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250508210057_aa")]
-    partial class aa
+    [Migration("20250509115655_ADFERWER")]
+    partial class ADFERWER
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,9 @@ namespace Hometown_Application.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("AdminProfilesAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BillAssignModelBillAssignId")
                         .HasColumnType("int");
 
                     b.Property<int?>("BillAssignmentModelBillAssignmentId")
@@ -140,6 +143,8 @@ namespace Hometown_Application.Migrations
 
                     b.HasIndex("AdminProfilesAdminId");
 
+                    b.HasIndex("BillAssignModelBillAssignId");
+
                     b.HasIndex("BillAssignmentModelBillAssignmentId");
 
                     b.HasIndex("HomeownerProfilesHomeownerId");
@@ -161,7 +166,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "09f2be73-b6ad-4795-9ded-f7377c23f27c",
+                            ConcurrencyStamp = "682c2a72-dfe4-49cf-8642-cf319d7730b3",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elon.musk@example.com",
                             EmailConfirmed = true,
@@ -175,10 +180,10 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELON.MUSK@EXAMPLE.COM",
                             NormalizedUserName = "ELON.MUSK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBSS26AMeOtZBKo95qs5NuhldIc9ReDDcTKhK7wPJZAq+EvvYP0KIAa+kP1qipUSLw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDjSRWyE4azK5W5h4g3DhtD66ZY1bXY2gzkMvbODtYSoItfft+y0OR8zBCJz2SMzMw==",
                             PhoneNumberConfirmed = false,
                             ProfilePicturePath = "wwwroot/images/picc.png",
-                            SecurityStamp = "ab7d29ca-348b-42c8-b488-b802087be93b",
+                            SecurityStamp = "9873177b-ca2d-4180-abdc-a1fb9e30757c",
                             TwoFactorEnabled = false,
                             UserName = "elon.musk@example.com"
                         },
@@ -186,7 +191,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "102",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7c951381-4059-4064-93d2-38be730b1baf",
+                            ConcurrencyStamp = "b7b6f733-3431-4a1b-959a-7411eeb3ece4",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "bill.gates@example.com",
                             EmailConfirmed = true,
@@ -200,9 +205,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "BILL.GATES@EXAMPLE.COM",
                             NormalizedUserName = "BILL.GATES@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP60nmrBTfh6njeevFkTTzR0dd0gRxE7ZDp36AKI4GowbA0ejn/Dc/6POE/N8i/SWg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJWymfBg8sAqfm6fJ/WjAC5wnNQwozjOBxgfkTdiuRZlGLWqHZfNJV8qlRuRlJ/Rvg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9076266c-255d-40dd-a3c9-3d0baaa5fc15",
+                            SecurityStamp = "1a87b2ae-228c-4849-aacb-07a221d5ecc9",
                             TwoFactorEnabled = false,
                             UserName = "bill.gates@example.com"
                         },
@@ -210,7 +215,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "103",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "64a6b72f-890b-435b-aa1a-bf2dab513879",
+                            ConcurrencyStamp = "d4da317e-06e0-405a-9969-95fe4a962670",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "mark.zuckerberg@example.com",
                             EmailConfirmed = true,
@@ -224,9 +229,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "MARK.ZUCKERBERG@EXAMPLE.COM",
                             NormalizedUserName = "MARK.ZUCKERBERG@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHDHHMPCH6zB1XHRRoSnWkrqQgJBhMwpy+E/SBuu2C3GIp7imKoRrvlubqB256pw1A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDvKlNJr9HZ9c3qRW9awMO7NvNaRTxYjXa62pNIpoFTeEetDAnLot7TklMOUhQzE4A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ea877e41-dd69-4fe3-bc42-617e51e6ad58",
+                            SecurityStamp = "4670ee46-8be1-4adc-bd31-63f41cc72384",
                             TwoFactorEnabled = false,
                             UserName = "mark.zuckerberg@example.com"
                         },
@@ -234,7 +239,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "104",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f9dec91d-f41c-49eb-a7d5-9c25bd9cbbef",
+                            ConcurrencyStamp = "9f2d1549-884a-4665-94a4-28c409d9bfd3",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "sundar.pichai@example.com",
                             EmailConfirmed = true,
@@ -248,9 +253,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "SUNDAR.PICHAI@EXAMPLE.COM",
                             NormalizedUserName = "SUNDAR.PICHAI@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN02cUYJ/4zgqozH1xmFmP+uuydA9fSSOVMfiDvUM8yM75ayiA2coXf3tcX57GrvvQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEhmmlovqJQk+z3CdIZ/stA8JRMr62GHGbheHgf/m0xU4/u9q1MVBcGe4GAjZ0kuyQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9c11cbe2-e630-4132-b065-facbebaf20c3",
+                            SecurityStamp = "94bf9a05-23b1-403e-80f9-f781a09dac53",
                             TwoFactorEnabled = false,
                             UserName = "sundar.pichai@example.com"
                         },
@@ -258,7 +263,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "105",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f02998f8-b050-4ac1-bd02-0df446102131",
+                            ConcurrencyStamp = "74c97231-5a35-4308-8f91-d6e1f9f3c0e8",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "tim.cook@example.com",
                             EmailConfirmed = true,
@@ -272,9 +277,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "TIM.COOK@EXAMPLE.COM",
                             NormalizedUserName = "TIM.COOK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEA+/+C4tihQ+vXV6DudGLyj9WEs1tHuE7TFF/11G8Y4ceBj8xTVEFPA5dpmTjLFSA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKc9HUeJste0RTRnGOns6RBSTcB1F+Jzze66XCVwagOWyLbm5uGWr0hIsigJ3/H13g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1da7b65c-1354-4554-ab22-3176ee09a172",
+                            SecurityStamp = "bfdb9847-6c5f-48ea-9486-6b9937f7c353",
                             TwoFactorEnabled = false,
                             UserName = "tim.cook@example.com"
                         },
@@ -282,7 +287,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "106",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "095baca6-536c-424a-904e-c8fbff328df9",
+                            ConcurrencyStamp = "4690793e-1a30-4b19-80f1-510d7731cad8",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "satya.nadella@example.com",
                             EmailConfirmed = true,
@@ -296,9 +301,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "SATYA.NADELLA@EXAMPLE.COM",
                             NormalizedUserName = "SATYA.NADELLA@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGpUsJuRXtAoTAkGiPk7RXuk0AUGGNbAY516Nta+FVE+XZ7e9RkUPFpKqi+MHG6DiA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENidvtlya0B6NE6CPzvcDvCTehW6X48lGX4JIX1zzRwMmMNEd8BAsHS72lhhTbD70Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9cfc3d91-1599-415d-87ed-d86ecbc5cd4e",
+                            SecurityStamp = "bcee0728-6a63-4800-b279-f1728c7d5182",
                             TwoFactorEnabled = false,
                             UserName = "satya.nadella@example.com"
                         },
@@ -306,7 +311,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "107",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "395f13b2-be9d-4b9a-a6cc-3adc24b168dd",
+                            ConcurrencyStamp = "938fcbc9-4a59-4076-ba9f-608357aa935b",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "jack.dorsey@example.com",
                             EmailConfirmed = true,
@@ -320,9 +325,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "JACK.DORSEY@EXAMPLE.COM",
                             NormalizedUserName = "JACK.DORSEY@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDKoOPrSj/3h3vB2phjZqaiJ/l3/Vg6xf221JspRw/bPDv8EoDIt5v9kNX3rW/li+w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEF6UwDIfr+eRlrip9sNHSlHcY2zW/wrtwpLdlImPPuRMQ/gCAJCM+4QoK5TBp0q66Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2008c5db-3452-412e-92dc-20f3942cb3e0",
+                            SecurityStamp = "c1c1e7d8-9d45-478b-ab01-d6f2e021e0e6",
                             TwoFactorEnabled = false,
                             UserName = "jack.dorsey@example.com"
                         },
@@ -330,7 +335,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "108",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4f2b8910-738c-456a-8397-21166d9cce65",
+                            ConcurrencyStamp = "0f39651d-53d3-417f-8df6-a477af126d69",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "larry.page@example.com",
                             EmailConfirmed = true,
@@ -344,9 +349,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "LARRY.PAGE@EXAMPLE.COM",
                             NormalizedUserName = "LARRY.PAGE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFv2HPn5/D0gastl6WuVxEqBN7LTAQTRjQ8qYjmnlWi1YfIMb9mrqwzpd1WmFGR+dQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFMv967Cu2/B8Z6vQ9JRCkb/GOTPjBLG3kJAIY1OXU4cgGDQ6c60GC5c5j947wPasA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1007cb3b-f2bf-4fe7-bf8e-297280b8af00",
+                            SecurityStamp = "4ce91fd7-029a-4690-8886-f2fe48f8aef8",
                             TwoFactorEnabled = false,
                             UserName = "larry.page@example.com"
                         },
@@ -354,7 +359,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "109",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4a5e7e72-c94d-41b3-90b0-1e36f2607200",
+                            ConcurrencyStamp = "1324bfd1-4f9b-4d86-a065-ba533f0d64c0",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "sergey.brin@example.com",
                             EmailConfirmed = true,
@@ -368,9 +373,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "SERGEY.BRIN@EXAMPLE.COM",
                             NormalizedUserName = "SERGEY.BRIN@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP05p4clhO7SG7RPbAEy4CCCjYJPvyLLqEXPIvhkU1z2hyMGgaWLl53pE2F9rJAfjw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGewt9cysM2IddUwXg/sKqGj//uKatJqlIXyb6gCPPOJfbY090hUQh538fZ73X4Xuw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e781e097-0b1c-40e8-9451-60a69d2d603e",
+                            SecurityStamp = "db651b48-eadf-45ce-838c-823a2cc15653",
                             TwoFactorEnabled = false,
                             UserName = "sergey.brin@example.com"
                         },
@@ -378,7 +383,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "110",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "41d62052-1489-4476-b19f-122e8a7decd5",
+                            ConcurrencyStamp = "3e854b23-9b28-4fa8-8dd3-951f2f2e3eb7",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "steve.jobs@example.com",
                             EmailConfirmed = true,
@@ -392,9 +397,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "STEVE.JOBS@EXAMPLE.COM",
                             NormalizedUserName = "STEVE.JOBS@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPvDmbnCKGk1BT0vgODsxp3mQeecgv4T7l2SqORFbMLib8Wx6gITSq0xawCDPu0u5g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhXIUco8OflvsBNb9CRm70+rIvSZccZd4SkKnXy+ZaUmU2cYyix52eP0JftaP0Lew==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "99945bcb-ff0f-47f7-bc2d-c1fc111f99f9",
+                            SecurityStamp = "3456eced-5b64-47c8-b044-ab3f80534d1e",
                             TwoFactorEnabled = false,
                             UserName = "steve.jobs@example.com"
                         },
@@ -402,7 +407,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "111",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2a7e4cb2-83da-4b64-a0c8-5bd1e88519ea",
+                            ConcurrencyStamp = "ccf54fd5-d74d-4c08-9dd4-af18b6987a7f",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "sheryl.sandberg@example.com",
                             EmailConfirmed = true,
@@ -416,9 +421,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "SHERYL.SANDBERG@EXAMPLE.COM",
                             NormalizedUserName = "SHERYL.SANDBERG@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECFFbI2aH0pAN4rrZx6It0HFJhtoU/YS6J6J0JtTBUE1+K9ex1fJ75yUh+wKdfcIow==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG9W82NWJ968x/J1ZKxHdUnqJv6ng6uu4Yc6OEUDbldPOqo98DBI2+DTGHisAliSFQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9f142981-1313-482a-80c0-bdf6de1b7697",
+                            SecurityStamp = "16012d51-0153-429f-b515-62155351ee08",
                             TwoFactorEnabled = false,
                             UserName = "sheryl.sandberg@example.com"
                         },
@@ -426,7 +431,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "112",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e7ab0abd-f3cf-44bc-beca-78b4321087e2",
+                            ConcurrencyStamp = "f9232934-179e-45bd-a3d2-3067dda0ef5d",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "reed.hastings@example.com",
                             EmailConfirmed = true,
@@ -440,9 +445,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "REED.HASTINGS@EXAMPLE.COM",
                             NormalizedUserName = "REED.HASTINGS@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC/tvFe4PE7n3gYcyTJzSeAeudIvYS/yqgYCln/rxIqUAO7UyGEhpUmDU0+49nDkkw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEImlJ9pO/VFXIzb9Or0VZyXYUfLflF/kYL+Ax6wRMfuf6SpzT1FQXGzKDX6ZMIiPGw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a4d42e48-4dc6-450f-82f3-68d535a52215",
+                            SecurityStamp = "650e3e60-9437-4615-9c9d-05a6f4b23138",
                             TwoFactorEnabled = false,
                             UserName = "reed.hastings@example.com"
                         },
@@ -450,7 +455,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "113",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8b85ff88-7373-4f68-a68d-3d3768ffb0c2",
+                            ConcurrencyStamp = "8d69f226-46fd-4683-bf90-b0c7121ddc51",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "marissa.mayer@example.com",
                             EmailConfirmed = true,
@@ -464,9 +469,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "MARISSA.MAYER@EXAMPLE.COM",
                             NormalizedUserName = "MARISSA.MAYER@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECExOZkZd5xFrDQUG/Gp9XsmvlF4ABpHMjinWb1EWaIPnn2L20Cb769QpCtn2hvVKQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGQJXhRO68GhPCXfqZjmVjqcycKuk08+LRD5f00NlDyyUKXxVyMYLd/X4oihvXU8MA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "58b8accd-20b3-41f9-86f1-b1852d31136a",
+                            SecurityStamp = "95df40e6-a45a-4737-981e-f30f6dcb41bb",
                             TwoFactorEnabled = false,
                             UserName = "marissa.mayer@example.com"
                         },
@@ -474,7 +479,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "114",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7df0d4a8-b448-4f45-be95-ecf022d47042",
+                            ConcurrencyStamp = "543416d0-6818-4179-9a11-f8ecbeb999b0",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "elizabeth.holmes@example.com",
                             EmailConfirmed = true,
@@ -488,9 +493,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "ELIZABETH.HOLMES@EXAMPLE.COM",
                             NormalizedUserName = "ELIZABETH.HOLMES@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDEBimZT7N7VdN2TofTr7ihIc3pAsIRc3tnHxLTfBI8Y4dpaLhOX383ouVBNagFVWA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELBzXPaUAp9oQKM35uTOK4A9zbuIyQ78mBovRML9rcBeKaERhdOaodAUt1YxO34c2A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b0ee025b-3cda-4601-8df5-6c8a1807dab6",
+                            SecurityStamp = "adec1a07-884c-46cf-8a42-679633446304",
                             TwoFactorEnabled = false,
                             UserName = "elizabeth.holmes@example.com"
                         },
@@ -498,7 +503,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "115",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4e2df634-c2df-4dbe-9cd8-b4bd290749ae",
+                            ConcurrencyStamp = "9abe64c5-b49d-4fc1-ba42-2adab615bd42",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "susan.wojcicki@example.com",
                             EmailConfirmed = true,
@@ -512,9 +517,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "SUSAN.WOJCICKI@EXAMPLE.COM",
                             NormalizedUserName = "SUSAN.WOJCICKI@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAENNRCB5/rgAf9ppsUoRaFFXxGlmNmNjJ87OqhaDQeqpRAwZze2YdxFhoC+cHOCLlzg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEE8toDo9IR64lAzPwueSdiwT4htWHWeoSjJ9pLWW0xi1G0+iBOukbd8dqoj/bPmmMA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fcfaf410-0bd0-4386-8a78-ec639e979368",
+                            SecurityStamp = "dd8be479-7797-44b5-9257-df42ad006f88",
                             TwoFactorEnabled = false,
                             UserName = "susan.wojcicki@example.com"
                         },
@@ -522,7 +527,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "116",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9a935e84-b1d4-4813-9753-ecc2e5d2cf7e",
+                            ConcurrencyStamp = "a84e0d51-3523-4e3e-bf8e-ef1ae58b4607",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "tim.arnold@example.com",
                             EmailConfirmed = true,
@@ -536,9 +541,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "TIM.ARNOLD@EXAMPLE.COM",
                             NormalizedUserName = "TIM.ARNOLD@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO5Tnq22Uer1Zryz/zgob+L7+jtD2bucUcjN9K0wyiACcXh1FkxQ2fLaSW7LjBltwg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKrgn+WwIHQ/vukLzmJC7KoOj9qyDkMEyPhzqp4gHymwan0mN2sKHr194qKLMm11/g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "26a8b97f-92df-442d-b8fb-79392d14211e",
+                            SecurityStamp = "e53306d4-14db-47a7-9713-2ffbbef5c4c6",
                             TwoFactorEnabled = false,
                             UserName = "tim.arnold@example.com"
                         },
@@ -546,7 +551,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "117",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "be144641-0e19-4823-98e7-85746ec02527",
+                            ConcurrencyStamp = "50f05342-6170-4510-9bbb-37eb4e58a56a",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "bob.iger@example.com",
                             EmailConfirmed = true,
@@ -560,9 +565,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "BOB.IGER@EXAMPLE.COM",
                             NormalizedUserName = "BOB.IGER@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAsgD8lJlNfru/vl/u1H6bo1W+ImA9jOfKUxLtd/BsXVqdCWzSHFqy3zbTBlzkaMBQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHRQkErJtN1d2sH0XYT+c/Z4fWqQibjcLYDhzBXGNPKkS1TXY3TVLfnfZimgo+JAew==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "53887977-3aad-4062-9a0c-4d60eeaa5f4f",
+                            SecurityStamp = "64da48f7-aacb-43aa-900c-f39de4afc588",
                             TwoFactorEnabled = false,
                             UserName = "bob.iger@example.com"
                         },
@@ -570,7 +575,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "118",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1db7454c-1c2d-4926-b80b-4ee9d376d6d9",
+                            ConcurrencyStamp = "697e4b94-eed8-4dda-a551-097db7789999",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "larry.ellison@example.com",
                             EmailConfirmed = true,
@@ -584,9 +589,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "LARRY.ELLISON@EXAMPLE.COM",
                             NormalizedUserName = "LARRY.ELLISON@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMfQ3jGAVQQpIuSdUs6vbe+33Wti4WMjbFQxtTQZqEjMzxPwn4kbOB4mZSf++jzpNg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPDK/o4Lsk5yUn6sSOf1b9TGexYT8duSk98twXZ7eq5ffDqvyBwnUV2ibn8dHwrOSw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "141dc520-f0d2-42a3-8378-267a0aa941d5",
+                            SecurityStamp = "29aec057-303f-4458-be02-3a21763abddf",
                             TwoFactorEnabled = false,
                             UserName = "larry.ellison@example.com"
                         },
@@ -594,7 +599,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "119",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4da0216e-6bb6-47f1-8741-1cf06487f79f",
+                            ConcurrencyStamp = "9e076114-539b-49c6-b75b-27cb66df84e3",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "richard.branson@example.com",
                             EmailConfirmed = true,
@@ -608,9 +613,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "RICHARD.BRANSON@EXAMPLE.COM",
                             NormalizedUserName = "RICHARD.BRANSON@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGKfbR6yI8vNJRExHHAEoKX8/Gdy/nTvdXkMsTGGOeXOg/xkDvwDChWtM5gZLNpNVw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOkXf//W7WzAA0zbVyMIL1kK+m0N6sVb3zQvTDbl5higkT7qkwceSy2uQat6CD0fcA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b13d862e-a8b4-43d3-a8dc-dbc10d0cbdb7",
+                            SecurityStamp = "9f35aaf8-ecdd-45c7-b0cc-91e1facb3b1f",
                             TwoFactorEnabled = false,
                             UserName = "richard.branson@example.com"
                         },
@@ -618,7 +623,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "120",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "57755983-78cf-4d92-8082-c04e9b7209b2",
+                            ConcurrencyStamp = "5bbe580a-a83d-4d45-b2bd-6868709db028",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "jack.ma@example.com",
                             EmailConfirmed = true,
@@ -632,9 +637,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "JACK.MA@EXAMPLE.COM",
                             NormalizedUserName = "JACK.MA@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO/9wewmRo106FqpHKLxGEmTv5bu2BU7ZR5pIMFBqQSySrql98dT8NwOFsO1Xs3Ltw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEvUr+uolsPJX2p8H05Vx/a0DY0wJuqxWWzYBk9/PJAhWC0b7B4KIRib+yzWSkNiIA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "07c5800c-aeb4-4305-a67e-ef1788024294",
+                            SecurityStamp = "c4d29559-c81b-4882-a8c8-61c5c3fa23f2",
                             TwoFactorEnabled = false,
                             UserName = "jack.ma@example.com"
                         },
@@ -642,7 +647,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "121",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "566ae742-f4b7-401c-980c-b0e198701086",
+                            ConcurrencyStamp = "b4a2cc40-5c1c-4bad-844e-8f8212c5bae6",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "warren.buffett@example.com",
                             EmailConfirmed = true,
@@ -656,9 +661,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "WARREN.BUFFETT@EXAMPLE.COM",
                             NormalizedUserName = "WARREN.BUFFETT@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAELzGX80PP9D25kVBr6nB6+TLfxuD6SqAJQ90bbWTMm6u8puirt3/55jNYWuGPkjS4w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOBGALVAVGAvhXQAu0ftFFG2sRiT3yuDo2VIOi8fgJUb/gOzfm4Mnzh2QkczrTYw1Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "97532ef8-a067-4297-a708-185391e3740a",
+                            SecurityStamp = "eaf30c30-e7c9-4407-8811-03b77b1f1ef4",
                             TwoFactorEnabled = false,
                             UserName = "warren.buffett@example.com"
                         },
@@ -666,7 +671,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "122",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "62f06fba-3c07-4ecf-8ca8-e773d0bd880b",
+                            ConcurrencyStamp = "064b2a35-7594-4012-b0f0-8e97dca9c4d6",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "mary.barrett@example.com",
                             EmailConfirmed = true,
@@ -680,9 +685,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "MARY.BARRETT@EXAMPLE.COM",
                             NormalizedUserName = "MARY.BARRETT@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAmz5vrxcdHgEQ2W9SDd11RHcby56TOKuPZ8SeCkGsuFO+76qFocnIbhRdx6cvAO3A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJLwo2pKULB7Zb1YgX3SIJrpl9kOL1KvkMnsg4MxDFjbUJCd3sMK8+zdvbWB2AGyqg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "eb17de9f-65b0-41dd-8478-70721d3423be",
+                            SecurityStamp = "f36618e2-d4b0-4bcf-937c-04d3e22134c5",
                             TwoFactorEnabled = false,
                             UserName = "mary.barrett@example.com"
                         },
@@ -690,7 +695,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "123",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3f743fc9-e976-4f68-a3fc-1dac6c106789",
+                            ConcurrencyStamp = "0ff0b86b-36db-4dd4-a774-7047ba780473",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "ginni.rometty@example.com",
                             EmailConfirmed = true,
@@ -704,9 +709,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "GINNI.ROMETTY@EXAMPLE.COM",
                             NormalizedUserName = "GINNI.ROMETTY@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ1ZWnWB4MKSgEqBlUdHYRrCG9OMZMhlMBGkSHz5pbqGKF24hNw8kNENx6NMoEzeTw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAESNVaW/ze9Lmlu97oS0QDmaWAEMOa9kt7o6idyROiwU43u4fFmwte6mRmZJaoFRg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "299ed35e-7701-4c8c-b48c-0f26015d8dd7",
+                            SecurityStamp = "329a54cf-1bfd-43f5-9380-1ec63a6fa430",
                             TwoFactorEnabled = false,
                             UserName = "ginni.rometty@example.com"
                         },
@@ -714,7 +719,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "124",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fa7ff4c8-3963-4a8a-a5af-c6f7d0323871",
+                            ConcurrencyStamp = "37dcbb2e-bff7-4126-aa22-d32ad352b013",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "mark.benioff@example.com",
                             EmailConfirmed = true,
@@ -728,9 +733,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "MARK.BENIOFF@EXAMPLE.COM",
                             NormalizedUserName = "MARK.BENIOFF@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPrbTJt7CXC0FVxjIvHHUu1mPiLi8iiUCtPnk0c7+ts7W4ySpEkGXfuTVL2swhHAHw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECMDObOBu/32FuZk2NY3gU1VooFQIQZnIjTvLcywjaaia2jVkWHUhsny+wH8ClXKVA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b33c1ea0-6334-45ac-aefb-ba710d0aac68",
+                            SecurityStamp = "be4dfc77-b827-45c0-bb9f-f9369c8ae857",
                             TwoFactorEnabled = false,
                             UserName = "mark.benioff@example.com"
                         },
@@ -738,7 +743,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "125",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f27182f5-9349-4e8b-8ef0-bace7bca58e4",
+                            ConcurrencyStamp = "03078619-10fd-4e9e-8050-dfbbd32e52cf",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "kevin.systrom@example.com",
                             EmailConfirmed = true,
@@ -752,9 +757,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "KEVIN.SYSTROM@EXAMPLE.COM",
                             NormalizedUserName = "KEVIN.SYSTROM@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDEpJA8q5bRTjXsw7wowY/rNgw/dzLglHfHi51BnVUrTFo+oREwJE6IuPWe9SqL76g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENYMEqyGI3/xKZfexiT0pn6OsT2Zc1WE4pvDgJPYDjet+DOWgA+WVWvdHAOfAjPgMA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9339148c-4a05-4d2b-a37a-472fc62940aa",
+                            SecurityStamp = "fdae9e4f-b89c-4205-834f-c53804b31a13",
                             TwoFactorEnabled = false,
                             UserName = "kevin.systrom@example.com"
                         },
@@ -762,7 +767,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "126",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e9b44445-3129-48dc-ab38-e7737c209cb7",
+                            ConcurrencyStamp = "58fdc678-3021-4438-9df7-67fa6b253175",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "evan.spiegel@example.com",
                             EmailConfirmed = true,
@@ -776,9 +781,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "EVAN.SPIEGEL@EXAMPLE.COM",
                             NormalizedUserName = "EVAN.SPIEGEL@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJRz9/GaAp3c+KHfrM/z0VkAaOnOigydpO7H8D+jclnxltYbc5RDQXn55f8Lm3ORsQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMag4LwCq50kj5a8u3cSYAyvvA6xWEJUNQxdjG78kwy9PD+ofVSj+dRwvx0xcZ20AQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "cb219761-7bd9-4413-a139-e7444cc2d180",
+                            SecurityStamp = "7333c08f-19fb-4b5f-a227-3d966971a8ac",
                             TwoFactorEnabled = false,
                             UserName = "evan.spiegel@example.com"
                         },
@@ -786,7 +791,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "127",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2fa58269-58dc-462e-807a-f303980e8055",
+                            ConcurrencyStamp = "41f14f35-6db1-44fb-9398-ea67fd19a487",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "jan.koum@example.com",
                             EmailConfirmed = true,
@@ -800,9 +805,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "JAN.KOUM@EXAMPLE.COM",
                             NormalizedUserName = "JAN.KOUM@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEd3uyjNCdZOiE/RAXYgu8b/ifMu6iOn6OTqgmC0sazBvXMZ0PH9XO0zv7KKALvk9g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMeQsOwcn3JU8pZryLKzSpECRjtD3NHc518AgEE9Co0XaKTR8Zbm60OP8etC+Z5w9A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f8b2e591-161e-469b-92e1-a3cb6aa12ed8",
+                            SecurityStamp = "59a92561-88ba-4c5d-afb8-9972c5a776d9",
                             TwoFactorEnabled = false,
                             UserName = "jan.koum@example.com"
                         },
@@ -810,7 +815,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "128",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2aa611cc-5af8-4cc8-89a6-664e346a3326",
+                            ConcurrencyStamp = "1d9a0e0d-2ae5-467c-9969-98dbd6b71c7e",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "janice.fang@example.com",
                             EmailConfirmed = true,
@@ -824,9 +829,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "JANICE.FANG@EXAMPLE.COM",
                             NormalizedUserName = "JANICE.FANG@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHwqLeAtYmyMqfm7yCJ6Zqxs7vMl9mLOQwN4v4UveMQcl6s1abp7ninm9kWiTI1M8A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOFhxOPfBDJIoudFjw/9lAkkapiSTKHZbmR7Yrpc6GdItZqhSLM7kPncBSPWf1E5HQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e76663b1-68e3-459b-9afe-9713169126cb",
+                            SecurityStamp = "9a74a432-4bb7-462c-8b3b-3f11f94fd5e7",
                             TwoFactorEnabled = false,
                             UserName = "janice.fang@example.com"
                         },
@@ -834,7 +839,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "129",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c09d131a-f259-45b5-b1dd-d4111d2e08da",
+                            ConcurrencyStamp = "2cc43315-31fc-446a-8a02-c43745c6538a",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "sergey.gladkikh@example.com",
                             EmailConfirmed = true,
@@ -848,9 +853,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "SERGEY.GLADKIKH@EXAMPLE.COM",
                             NormalizedUserName = "SERGEY.GLADKIKH@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECUHqwO4inBQWPYc+h6adNyCXcAgfqbG7QFwPxGkcX+hXi6jv+Y3hpWhwwxDmMLHHw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENWsAvGthFbJ9TmVVP9NopdIFU2Le2yo2prtj7/RAjUpabJlRXktLuUFeBrk8QWD7Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fc63c093-d498-4ea9-9a2b-68561f39c547",
+                            SecurityStamp = "5bf47ac6-d799-465d-9655-10df433307f5",
                             TwoFactorEnabled = false,
                             UserName = "sergey.gladkikh@example.com"
                         },
@@ -858,7 +863,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "130",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b17fe5d7-b13b-4c94-a86b-e0618735caf7",
+                            ConcurrencyStamp = "4535cd25-2e44-4a21-894d-c2836c970eea",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "tony.hsieh@example.com",
                             EmailConfirmed = true,
@@ -872,9 +877,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "TONY.HSIEH@EXAMPLE.COM",
                             NormalizedUserName = "TONY.HSIEH@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGZIejPWb2jkJm1Pjk3TWR9PByni1pZWjtrkuLSMVMc40fIFtkFcpWKj1mLgAmkAnA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEApNAYjOgsOEH9SOY5dCQBMv7MG8+KQv+1ad7tTxW2+DAMeRwKxcSQPZESUGwhM63A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "25c108c6-e5f2-4ce3-95af-02f948fc34eb",
+                            SecurityStamp = "8883960f-0031-4520-94a1-458891fdd98c",
                             TwoFactorEnabled = false,
                             UserName = "tony.hsieh@example.com"
                         },
@@ -882,7 +887,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "131",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fe5c42e6-683f-4c61-9292-afdb1d4024d2",
+                            ConcurrencyStamp = "09c79613-7904-498f-b75b-8cc1b5bad0ea",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "richard.hyne@example.com",
                             EmailConfirmed = true,
@@ -896,9 +901,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "RICHARD.HYNE@EXAMPLE.COM",
                             NormalizedUserName = "RICHARD.HYNE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJqkG5z/MwB/NgGYlhtY1G0HPMoGTsLpPJeHqfmgDliXaL3oOR5tIK9UWW1dEVL77g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELP1TF5gPudw2lHwFtRHWpIyUYNXzdNh2Em82F2p+gzaxfx7kEd+h81/Tzil+jb/9Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "052dd975-711d-45b2-ad52-cb0b889c8e80",
+                            SecurityStamp = "fd8a3d26-3d62-4b73-b29e-5fa403d51651",
                             TwoFactorEnabled = false,
                             UserName = "richard.hyne@example.com"
                         },
@@ -906,7 +911,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "132",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b3ba2114-886e-42eb-a5bf-d108402f1f5a",
+                            ConcurrencyStamp = "1d54f5c7-7bb7-413c-8615-354dd53be8de",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "peter.thiel@example.com",
                             EmailConfirmed = true,
@@ -920,9 +925,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "PETER.THIEL@EXAMPLE.COM",
                             NormalizedUserName = "PETER.THIEL@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAENrduczDmBB5F0USs/iCUJZ0kPqozEHM0pu5CSWjdv8lpGuCqAYE3gt0bIYqPKv1qA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP1NtYaMwlLjzxdWDCZzwvR0G3w86X6PMV442zT+S0mN260vHb3tlO+CGWQN7tumVw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "30de53ce-17c9-483a-b316-4218c63325ba",
+                            SecurityStamp = "38273b19-dbe5-4633-87f6-68a38aeee573",
                             TwoFactorEnabled = false,
                             UserName = "peter.thiel@example.com"
                         },
@@ -930,7 +935,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "133",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2ce90a29-9bce-4081-b4e9-e395a7344a5d",
+                            ConcurrencyStamp = "1665f853-91bc-4c90-acd4-49c306a06563",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "steve.wozniak@example.com",
                             EmailConfirmed = true,
@@ -944,9 +949,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "STEVE.WOZNIAK@EXAMPLE.COM",
                             NormalizedUserName = "STEVE.WOZNIAK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO9Y3eGeBgglyfelV2jeLoL+suaTmOT7+McSIiIf9uz9NZXEq99XwPVtFK2igwgNlw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGR/v2e63hWTjCjxP2QYyRIPJKIUTOleduTPxVBX4jvOd5LmOe9zNyTd7Z7iVBdmnA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "93a818e9-e2d1-4c90-b89a-2f2453104818",
+                            SecurityStamp = "3c39db95-cb8f-4831-b67d-fbbd32106bd4",
                             TwoFactorEnabled = false,
                             UserName = "steve.wozniak@example.com"
                         },
@@ -954,7 +959,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "134",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "58336c98-67d7-494f-bad8-31dbbc2ff30e",
+                            ConcurrencyStamp = "4bd6078b-dffb-4bea-add9-52c4a698a0c1",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "john.carmack@example.com",
                             EmailConfirmed = true,
@@ -968,9 +973,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "JOHN.CARMACK@EXAMPLE.COM",
                             NormalizedUserName = "JOHN.CARMACK@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKXIhviRxpv+5J3kC91Oe5xFvhGi1SdjS/k4qpsQWekmFDRKwxxT6u5aeMEJCGu9Jg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIhnrHzjhbnrQgkCmP/XMI/SWQiR84EFztxGurBrsEUfHgJNTsTPMG/PuxVWCYUaQQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "91a1216c-8504-4070-a1fb-f2a802d8a241",
+                            SecurityStamp = "d8c3924d-3983-48d5-857e-658bf641c36d",
                             TwoFactorEnabled = false,
                             UserName = "john.carmack@example.com"
                         },
@@ -978,7 +983,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "135",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "eb78e9f1-5952-446e-9cec-b02509cc82f3",
+                            ConcurrencyStamp = "c317fc55-29e6-4373-9351-98441e45eb98",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "mike.zyda@example.com",
                             EmailConfirmed = true,
@@ -992,9 +997,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "MIKE.ZYDA@EXAMPLE.COM",
                             NormalizedUserName = "MIKE.ZYDA@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEETKOfyPZa1yC0FQ0/FFr0/3RFCufKnZIGEdoVeHsosZ5Kmi1un38ipkLyB6kmuRsg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKQ9B4gh5DFTYCJrLn1f00JVu+9XfBylYC69HgpzZuTEqVpCrFLAST18J2xbbhCujg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d28aecf4-c290-4fee-abc4-8a8e59d36ca7",
+                            SecurityStamp = "bf691683-abe1-4e75-bcf4-2c17d2418682",
                             TwoFactorEnabled = false,
                             UserName = "mike.zyda@example.com"
                         },
@@ -1002,7 +1007,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "136",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e1140f90-89d6-47db-95d6-d577d3c55583",
+                            ConcurrencyStamp = "17da5071-798e-4cb8-8dfc-ba08611d75d9",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "cheryl.sandberg@example.com",
                             EmailConfirmed = true,
@@ -1016,9 +1021,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "CHERYL.SANDBERG@EXAMPLE.COM",
                             NormalizedUserName = "CHERYL.SANDBERG@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDpijIH4W/CXvY6jg/5yTww1S9zG/pfp4seA4xkhf2gofX+UL0Y/4FK1pJvZGjvQWw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENXNTx6n4ZtpeE2Gecud+HsEbYQXqULhkYEX1gnY14EZaVIu+2i/fyLs6lBSaonmlw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "271f80f2-b5d3-4fea-8ad3-11426ce31b60",
+                            SecurityStamp = "9a2dc903-a410-4a91-ad31-45730430c029",
                             TwoFactorEnabled = false,
                             UserName = "cheryl.sandberg@example.com"
                         },
@@ -1026,7 +1031,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "137",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "84b4c115-d947-4fab-9b06-bdc9211bcc51",
+                            ConcurrencyStamp = "af35a8ac-993a-4728-ab17-9db62f9874ae",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "karen.smith@example.com",
                             EmailConfirmed = true,
@@ -1040,9 +1045,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "KAREN.SMITH@EXAMPLE.COM",
                             NormalizedUserName = "KAREN.SMITH@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEdA+9tJbfMpQqsAgS8Xaarj+WAvwZ61yU1hL/xW5ThJWrtUHiDvfkRCdsZGMdxxbA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJ/7zr/xLtqdOmsN/XnBDBy03ARzy7WSoi4SpL4eelG22XA31rL+lRSRwRDpTu26hA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7fdc24a8-daa3-48d4-a6fa-351877b95e80",
+                            SecurityStamp = "34a4f2ce-6c0f-46bb-931d-a18025ddd589",
                             TwoFactorEnabled = false,
                             UserName = "karen.smith@example.com"
                         },
@@ -1050,7 +1055,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "138",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "bab97621-87a4-4c43-8341-86b7975c52eb",
+                            ConcurrencyStamp = "2813d7c3-2c80-4039-a7e9-e01de5bd17c7",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "david.lee@example.com",
                             EmailConfirmed = true,
@@ -1064,9 +1069,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "DAVID.LEE@EXAMPLE.COM",
                             NormalizedUserName = "DAVID.LEE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAELipO6bb59P0g8bbNazymcoA6uKFD9TAYu/DrXUgyO8uxM63YtEzJe8zQdevyG+LfQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPObxbTaE34o8H+lFmGauGy4CMmSjBFT+qV2tE75cvVokqXpfqhtViMcYKx6IRLDhQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9c5514b0-e5e6-41d4-b54c-9fd43a0af860",
+                            SecurityStamp = "33b19ee2-53d7-4639-ad09-1826f337ad97",
                             TwoFactorEnabled = false,
                             UserName = "david.lee@example.com"
                         },
@@ -1074,7 +1079,7 @@ namespace Hometown_Application.Migrations
                         {
                             Id = "139",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "be02348e-3bfe-4c14-9368-555ba7f7b267",
+                            ConcurrencyStamp = "744cee08-d4a5-4822-8ed4-80b3abdbec7c",
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "james.taylor@example.com",
                             EmailConfirmed = true,
@@ -1088,9 +1093,9 @@ namespace Hometown_Application.Migrations
                             MakeFacebookPublic = false,
                             NormalizedEmail = "JAMES.TAYLOR@EXAMPLE.COM",
                             NormalizedUserName = "JAMES.TAYLOR@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEENqS87UOW3ZrUKMtaGy+SRZTFsk2Rv4Tektj12Mpc2etlkfsYlkAarnMYv5PGPdkA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEYkj1Qc1ZrVivTWOHJfVttX4w+0Cbw3HHyOXiQrPHG/Ms/f2ZtwfJ0tgkPRb8cAYg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2a8c320f-0542-4d46-9018-1086f29b4261",
+                            SecurityStamp = "53afc29d-fc48-42d5-b65c-d8be19d91b19",
                             TwoFactorEnabled = false,
                             UserName = "james.taylor@example.com"
                         });
@@ -1125,32 +1130,67 @@ namespace Hometown_Application.Migrations
                     b.ToTable("AdminProfiles");
                 });
 
-            modelBuilder.Entity("Hometown_Application.Models.BillAccountModel", b =>
+            modelBuilder.Entity("Hometown_Application.Models.BillAssignModel", b =>
                 {
-                    b.Property<int>("BillAccountId")
+                    b.Property<int>("BillAssignId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillAccountId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillAssignId"));
+
+                    b.Property<string>("AddedBy")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("BillName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("OutstandingBalance")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime>("IssuedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("BillAccountId");
+                    b.HasKey("BillAssignId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BillAccounts");
+                    b.ToTable("BillAssign");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.BillAssignmentModel", b =>
@@ -1221,40 +1261,36 @@ namespace Hometown_Application.Migrations
                     b.ToTable("BillAssignment");
                 });
 
-            modelBuilder.Entity("Hometown_Application.Models.BillDetailModel", b =>
+            modelBuilder.Entity("Hometown_Application.Models.BillFeeModel", b =>
                 {
-                    b.Property<int>("BillDetailId")
+                    b.Property<int>("BillFeeID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillDetailId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillFeeID"));
 
-                    b.Property<decimal>("ActualAmount")
+                    b.Property<decimal>("AmountPaid")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("BillId")
+                    b.Property<int>("BillAssignmentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("BillItemsID")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("CustomAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
+                    b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("BillDetailId");
+                    b.Property<string>("ReferenceNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("BillId");
+                    b.HasKey("BillFeeID");
 
-                    b.HasIndex("BillItemsID");
+                    b.HasIndex("BillAssignmentId");
 
-                    b.ToTable("BillDetail");
+                    b.ToTable("BillFee");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.BillItemsModel", b =>
@@ -1307,9 +1343,9 @@ namespace Hometown_Application.Migrations
                         new
                         {
                             BillItemsID = 1,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(2949),
-                            Amount = 3500.00m,
-                            Description = "Monthly HOA dues covering maintenance, security, and amenities.",
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2764),
+                            Amount = 2000.00m,
+                            Description = "Monthly HOA dues for maintenance, security, and amenities.",
                             IsDeleted = false,
                             PaymentDuration = "Monthly",
                             PaymentName = "Homeowners Association (HOA) Fees",
@@ -1318,8 +1354,8 @@ namespace Hometown_Application.Migrations
                         new
                         {
                             BillItemsID = 2,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(2963),
-                            Amount = 100.00m,
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2777),
+                            Amount = 350.00m,
                             Description = "Monthly water consumption charges.",
                             IsDeleted = false,
                             PaymentDuration = "Monthly",
@@ -1328,20 +1364,9 @@ namespace Hometown_Application.Migrations
                         },
                         new
                         {
-                            BillItemsID = 3,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(2966),
-                            Amount = 2500.00m,
-                            Description = "Monthly payment for electricity consumption.",
-                            IsDeleted = false,
-                            PaymentDuration = "Monthly",
-                            PaymentName = "Electricity Bill",
-                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
                             BillItemsID = 4,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(3025),
-                            Amount = 300.00m,
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2780),
+                            Amount = 200.00m,
                             Description = "Monthly fee for waste disposal services.",
                             IsDeleted = false,
                             PaymentDuration = "Monthly",
@@ -1351,9 +1376,9 @@ namespace Hometown_Application.Migrations
                         new
                         {
                             BillItemsID = 5,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(3027),
-                            Amount = 1500.00m,
-                            Description = "Monthly fee for subdivision security services.",
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2783),
+                            Amount = 1000.00m,
+                            Description = "Monthly fee for 24/7 subdivision security services.",
                             IsDeleted = false,
                             PaymentDuration = "Monthly",
                             PaymentName = "Security Fee",
@@ -1362,9 +1387,9 @@ namespace Hometown_Application.Migrations
                         new
                         {
                             BillItemsID = 6,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(3029),
-                            Amount = 500.00m,
-                            Description = "Monthly fee for streetlight maintenance.",
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2785),
+                            Amount = 300.00m,
+                            Description = "Monthly fee for streetlight maintenance and electricity.",
                             IsDeleted = false,
                             PaymentDuration = "Monthly",
                             PaymentName = "Street Lighting Fee",
@@ -1373,55 +1398,55 @@ namespace Hometown_Application.Migrations
                         new
                         {
                             BillItemsID = 7,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(3031),
-                            Amount = 800.00m,
-                            Description = "Annual fee for maintaining the clubhouse and shared spaces.",
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2787),
+                            Amount = 500.00m,
+                            Description = "Monthly fee for clubhouse upkeep and utilities.",
                             IsDeleted = false,
-                            PaymentDuration = "Yearly",
+                            PaymentDuration = "Monthly",
                             PaymentName = "Clubhouse Maintenance Fee",
                             UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             BillItemsID = 8,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(3033),
-                            Amount = 5000.00m,
-                            Description = "Annual contribution for property tax remittance.",
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2788),
+                            Amount = 1000.00m,
+                            Description = "Monthly contribution toward shared property tax obligations.",
                             IsDeleted = false,
-                            PaymentDuration = "Yearly",
+                            PaymentDuration = "Monthly",
                             PaymentName = "Property Tax Contribution",
                             UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             BillItemsID = 9,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(3035),
-                            Amount = 1200.00m,
-                            Description = "Quarterly contribution for major subdivision repairs.",
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2790),
+                            Amount = 800.00m,
+                            Description = "Monthly contribution to the long-term repair and reserve fund.",
                             IsDeleted = false,
-                            PaymentDuration = "Quarterly",
+                            PaymentDuration = "Monthly",
                             PaymentName = "Sinking Fund Contribution",
                             UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             BillItemsID = 10,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(3039),
-                            Amount = 600.00m,
-                            Description = "Quarterly fee for pest control services in the subdivision.",
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2792),
+                            Amount = 250.00m,
+                            Description = "Monthly fee for regular pest control services.",
                             IsDeleted = false,
-                            PaymentDuration = "Quarterly",
+                            PaymentDuration = "Monthly",
                             PaymentName = "Pest Control Fee",
                             UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             BillItemsID = 11,
-                            AddedOn = new DateTime(2025, 5, 8, 21, 0, 53, 452, DateTimeKind.Utc).AddTicks(3041),
-                            Amount = 1000.00m,
-                            Description = "Annual fee for road maintenance and repairs.",
+                            AddedOn = new DateTime(2025, 5, 9, 11, 56, 52, 106, DateTimeKind.Utc).AddTicks(2793),
+                            Amount = 700.00m,
+                            Description = "Monthly fee for road repair and upkeep.",
                             IsDeleted = false,
-                            PaymentDuration = "Yearly",
+                            PaymentDuration = "Monthly",
                             PaymentName = "Road Maintenance Fee",
                             UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -1478,7 +1503,16 @@ namespace Hometown_Application.Migrations
                     b.Property<decimal>("AmountPaid")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("BillId")
+                    b.Property<int?>("BillAssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BillAssignmentModelBillAssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BillId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BillModelBillId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsApproved")
@@ -1495,54 +1529,15 @@ namespace Hometown_Application.Migrations
 
                     b.HasKey("PaymentId");
 
+                    b.HasIndex("BillAssignmentId");
+
+                    b.HasIndex("BillAssignmentModelBillAssignmentId");
+
                     b.HasIndex("BillId");
 
+                    b.HasIndex("BillModelBillId");
+
                     b.ToTable("BillPayment");
-                });
-
-            modelBuilder.Entity("Hometown_Application.Models.BillTransactionModel", b =>
-                {
-                    b.Property<int>("BillTransactionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillTransactionId"));
-
-                    b.Property<decimal>("AmountPaid")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("BillItemsId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PaidBy")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentReference")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("BillTransactionId");
-
-                    b.HasIndex("BillItemsId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("BillTransactions");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ChatMessageModel", b =>
@@ -1817,6 +1812,9 @@ namespace Hometown_Application.Migrations
                     b.Property<string>("OtherType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("RatePerHour")
+                        .HasColumnType("int");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -1952,378 +1950,378 @@ namespace Hometown_Application.Migrations
                         new
                         {
                             HomeownerId = 1,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1467),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9724),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1466),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1466),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1468),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9722),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9723),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9724),
                             UserId = "111"
                         },
                         new
                         {
                             HomeownerId = 2,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1474),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9727),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1473),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1474),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1475),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9726),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9727),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9728),
                             UserId = "112"
                         },
                         new
                         {
                             HomeownerId = 3,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1485),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9730),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1477),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1484),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1486),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9729),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9729),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9730),
                             UserId = "113"
                         },
                         new
                         {
                             HomeownerId = 4,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1488),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9732),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1487),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1488),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1489),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9731),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9732),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9733),
                             UserId = "114"
                         },
                         new
                         {
                             HomeownerId = 5,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1491),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9735),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1490),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1491),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1492),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9734),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9734),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9735),
                             UserId = "115"
                         },
                         new
                         {
                             HomeownerId = 6,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1494),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9737),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1493),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1493),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1495),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9736),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9737),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9738),
                             UserId = "116"
                         },
                         new
                         {
                             HomeownerId = 7,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1497),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9740),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1496),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1496),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1498),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9739),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9739),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9740),
                             UserId = "117"
                         },
                         new
                         {
                             HomeownerId = 8,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1500),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9742),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1499),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1499),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1501),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9741),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9741),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9742),
                             UserId = "118"
                         },
                         new
                         {
                             HomeownerId = 9,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1503),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9744),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1502),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1502),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1503),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9743),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9744),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9745),
                             UserId = "119"
                         },
                         new
                         {
                             HomeownerId = 10,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1506),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9747),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1505),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1505),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1506),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9746),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9746),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9747),
                             UserId = "120"
                         },
                         new
                         {
                             HomeownerId = 11,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1509),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9749),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1507),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1508),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1509),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9748),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9748),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9749),
                             UserId = "121"
                         },
                         new
                         {
                             HomeownerId = 12,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1512),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9751),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1510),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1511),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1512),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9750),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9751),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9752),
                             UserId = "122"
                         },
                         new
                         {
                             HomeownerId = 13,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1514),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9754),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1513),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1514),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1515),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9753),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9753),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9754),
                             UserId = "123"
                         },
                         new
                         {
                             HomeownerId = 14,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1562),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9756),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1561),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1562),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1563),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9755),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9755),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9756),
                             UserId = "124"
                         },
                         new
                         {
                             HomeownerId = 15,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1566),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9758),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1565),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1565),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1567),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9757),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9758),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9759),
                             UserId = "125"
                         },
                         new
                         {
                             HomeownerId = 16,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1569),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9760),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1568),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1568),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1570),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9759),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9760),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9761),
                             UserId = "126"
                         },
                         new
                         {
                             HomeownerId = 17,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1572),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9763),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1571),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1571),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1572),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9762),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9762),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9763),
                             UserId = "127"
                         },
                         new
                         {
                             HomeownerId = 18,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1575),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9765),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1574),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1574),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1575),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9764),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9764),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9765),
                             UserId = "128"
                         },
                         new
                         {
                             HomeownerId = 19,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1578),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9767),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1576),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1577),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1578),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9766),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9767),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9768),
                             UserId = "129"
                         },
                         new
                         {
                             HomeownerId = 20,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1580),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9770),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1579),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1580),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1581),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9769),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9769),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9770),
                             UserId = "130"
                         },
                         new
                         {
                             HomeownerId = 21,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1583),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9907),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1582),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1583),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1584),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9906),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9906),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9907),
                             UserId = "131"
                         },
                         new
                         {
                             HomeownerId = 22,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1586),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9910),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1585),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1585),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1587),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9909),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9909),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9910),
                             UserId = "132"
                         },
                         new
                         {
                             HomeownerId = 23,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1589),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9912),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1588),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1588),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1590),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9911),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9911),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9912),
                             UserId = "133"
                         },
                         new
                         {
                             HomeownerId = 24,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1592),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9914),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1591),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1591),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1592),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9913),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9913),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9914),
                             UserId = "134"
                         },
                         new
                         {
                             HomeownerId = 25,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1595),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9920),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1593),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1594),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1595),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9919),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9919),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9920),
                             UserId = "135"
                         },
                         new
                         {
                             HomeownerId = 26,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1598),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9925),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1596),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1597),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1598),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9924),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9924),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9925),
                             UserId = "136"
                         },
                         new
                         {
                             HomeownerId = 27,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1600),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9927),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1599),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1600),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1601),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9926),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9927),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9928),
                             UserId = "137"
                         },
                         new
                         {
                             HomeownerId = 28,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1603),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9930),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1602),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1603),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1604),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9929),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9929),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9930),
                             UserId = "138"
                         },
                         new
                         {
                             HomeownerId = 29,
-                            ApprovedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1609),
+                            ApprovedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9932),
                             IsApproved = true,
                             IsBanned = false,
                             IsPromotedToAdmin = false,
                             IsPromotedToStaff = false,
-                            MoveInDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1606),
-                            MoveOutDate = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1608),
-                            RegisteredOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1610),
+                            MoveInDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9931),
+                            MoveOutDate = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9931),
+                            RegisteredOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9932),
                             UserId = "139"
                         });
                 });
@@ -3180,7 +3178,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 1,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1280),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9384),
                             Address = "123 Main St",
                             Department = 6,
                             EmergencyContactName = "Jane Doe",
@@ -3199,7 +3197,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 2,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1294),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9396),
                             Address = "456 Oak St",
                             Department = 5,
                             EmergencyContactName = "John Smith",
@@ -3218,7 +3216,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 3,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1305),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9409),
                             Address = "789 Pine St",
                             Department = 3,
                             EmergencyContactName = "Alice Brown",
@@ -3237,7 +3235,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 4,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1314),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9418),
                             Address = "987 Cedar St",
                             Department = 2,
                             EmergencyContactName = "Bob White",
@@ -3256,7 +3254,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 5,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1323),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9426),
                             Address = "654 Birch St",
                             Department = 0,
                             EmergencyContactName = "Chris Green",
@@ -3275,7 +3273,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 6,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1331),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9434),
                             Address = "321 Maple St",
                             Department = 1,
                             EmergencyContactName = "Diana Blue",
@@ -3294,7 +3292,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 7,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1339),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9441),
                             Address = "159 Elm St",
                             Department = 4,
                             EmergencyContactName = "Evan Red",
@@ -3313,7 +3311,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 8,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1346),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9447),
                             Address = "123 Main St",
                             Department = 6,
                             EmergencyContactName = "Jane Doe",
@@ -3332,7 +3330,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 9,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1368),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9455),
                             Address = "456 Oak St",
                             Department = 5,
                             EmergencyContactName = "John Smith",
@@ -3351,7 +3349,7 @@ namespace Hometown_Application.Migrations
                         {
                             StaffId = 10,
                             AccountCreatedBy = "admin",
-                            AccountCreatedOn = new DateTime(2025, 5, 8, 21, 0, 56, 383, DateTimeKind.Utc).AddTicks(1392),
+                            AccountCreatedOn = new DateTime(2025, 5, 9, 11, 56, 54, 231, DateTimeKind.Utc).AddTicks(9650),
                             Address = "789 Pine St",
                             Department = 3,
                             EmergencyContactName = "Alice Brown",
@@ -3526,9 +3524,15 @@ namespace Hometown_Application.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("ArrivalDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ContactNumber")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ExitDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ExpectedArrivalTime")
                         .HasColumnType("datetime2");
@@ -3542,7 +3546,13 @@ namespace Hometown_Application.Migrations
                     b.Property<bool?>("IsApproved")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("IsArrived")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsExited")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsRejected")
@@ -3950,6 +3960,10 @@ namespace Hometown_Application.Migrations
                         .WithMany()
                         .HasForeignKey("AdminProfilesAdminId");
 
+                    b.HasOne("Hometown_Application.Models.BillAssignModel", null)
+                        .WithMany("Users")
+                        .HasForeignKey("BillAssignModelBillAssignId");
+
                     b.HasOne("Hometown_Application.Models.BillAssignmentModel", null)
                         .WithMany("Users")
                         .HasForeignKey("BillAssignmentModelBillAssignmentId");
@@ -3980,7 +3994,7 @@ namespace Hometown_Application.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("Hometown_Application.Models.BillAccountModel", b =>
+            modelBuilder.Entity("Hometown_Application.Models.BillAssignModel", b =>
                 {
                     b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
@@ -4009,23 +4023,15 @@ namespace Hometown_Application.Migrations
                     b.Navigation("Bill");
                 });
 
-            modelBuilder.Entity("Hometown_Application.Models.BillDetailModel", b =>
+            modelBuilder.Entity("Hometown_Application.Models.BillFeeModel", b =>
                 {
-                    b.HasOne("Hometown_Application.Models.BillModel", "Bill")
+                    b.HasOne("Hometown_Application.Models.BillAssignmentModel", "BillAssignment")
                         .WithMany()
-                        .HasForeignKey("BillId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("BillAssignmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Hometown_Application.Models.BillItemsModel", "BillItemType")
-                        .WithMany()
-                        .HasForeignKey("BillItemsID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bill");
-
-                    b.Navigation("BillItemType");
+                    b.Navigation("BillAssignment");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.BillItemsModel", b =>
@@ -4048,32 +4054,27 @@ namespace Hometown_Application.Migrations
 
             modelBuilder.Entity("Hometown_Application.Models.BillPaymentModel", b =>
                 {
-                    b.HasOne("Hometown_Application.Models.BillModel", "Bill")
+                    b.HasOne("Hometown_Application.Models.BillAssignmentModel", "BillAssignment")
+                        .WithMany()
+                        .HasForeignKey("BillAssignmentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Hometown_Application.Models.BillAssignmentModel", null)
                         .WithMany("Payments")
+                        .HasForeignKey("BillAssignmentModelBillAssignmentId");
+
+                    b.HasOne("Hometown_Application.Models.BillModel", "Bill")
+                        .WithMany()
                         .HasForeignKey("BillId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Hometown_Application.Models.BillModel", null)
+                        .WithMany("Payments")
+                        .HasForeignKey("BillModelBillId");
 
                     b.Navigation("Bill");
-                });
 
-            modelBuilder.Entity("Hometown_Application.Models.BillTransactionModel", b =>
-                {
-                    b.HasOne("Hometown_Application.Models.BillItemsModel", "BillItemsModel")
-                        .WithMany()
-                        .HasForeignKey("BillItemsId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Hometown_Application.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("BillItemsModel");
+                    b.Navigation("BillAssignment");
                 });
 
             modelBuilder.Entity("Hometown_Application.Models.ChatMessageModel", b =>
@@ -4418,8 +4419,15 @@ namespace Hometown_Application.Migrations
                     b.Navigation("SentMessages");
                 });
 
+            modelBuilder.Entity("Hometown_Application.Models.BillAssignModel", b =>
+                {
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("Hometown_Application.Models.BillAssignmentModel", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("Users");
                 });
 

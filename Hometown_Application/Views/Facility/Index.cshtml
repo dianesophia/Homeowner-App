@@ -95,11 +95,14 @@
             border-radius: 3px;
         }
 
+
     .page-header {
-        position: relative;
+        display: flex;
+        justify-content: space-between;
         margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
         margin-top: auto;
-        min-height: 60px;
     }
 
     .page-subtitle {
@@ -190,9 +193,6 @@
         gap: 10px;
         text-decoration: none;
         box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-        position: absolute;
-        top: 0;
-        right: 0;
     }
 
         .create-btn:hover {
@@ -244,19 +244,31 @@
         border-radius: var(--border-radius);
         border: 1px solid var(--primary-light);
         transition: var(--transition);
-        max-width: 100px; /* Reduced from default or previous size */
-        max-height: 100px; /* Added to maintain aspect ratio */
     }
 
         .img-thumbnail:hover {
             transform: scale(1.05);
         }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: auto;
+    }
 </style>
 
 <div class="content">
     <div class="page-header">
-        <h1 class="page-title">Manage Facilities</h1>
-        <a asp-action="CreateOrEditFacility" class="create-btn"><i class="fas fa-plus"></i> Create New Facility</a>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="page-title">Manage Facilities</h1>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <a asp-action="CreateOrEditFacility" class="create-btn"><i class="fas fa-plus"></i> Create New Facility</a>
+        </div>
     </div>
 
     <div class="facilities-container">

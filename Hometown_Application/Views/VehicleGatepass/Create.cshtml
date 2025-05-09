@@ -1,56 +1,277 @@
 ﻿@model Hometown_Application.Models.VehicleGatepassModel
-
 @{
     ViewData["Title"] = "Create Vehicle Gate Pass";
 }
 
-<h1>@ViewData["Title"]</h1>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
 
-<form method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        min-height: 100px;
+        padding: 15px 20px;
+        font-family: 'Marcellus', serif;
+    }
 
-    <div class="form-group">
-        <label asp-for="VehicleType" class="control-label"></label>
-        <select asp-for="VehicleType" class="form-control">
-            <option value="">-- Select Vehicle Type --</option>
-            <option value="Van">Van</option>
-            <option value="Sedan">Sedan</option>
-            <option value="SUV">SUV</option>
-            <option value="Motorcycle">Motorcycle</option>
-            <option value="Truck">Truck</option>
-        </select>
-        <span asp-validation-for="VehicleType" class="text-danger"></span>
+    .navbar-brand {
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: white;
+    }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+    .navbar-nav .nav-link {
+        color: white;
+        font-weight: 500;
+        margin: 0 10px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+        .navbar-nav .nav-link:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .user-info {
+        background: var(--primary-light);
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .user-info i {
+            font-size: 1.2rem;
+        }
+
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: auto;
+    }
+
+    .page-subtitle {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+    }
+
+    .form-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 100%;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-color);
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 8px 20px;
+        transition: var(--transition);
+    }
+
+    .custom-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+    }
+
+        .custom-btn:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+    .btn-secondary {
+        background-color: var(--secondary-color);
+        color: white;
+    }
+
+    .section-title {
+        color: var(--text-color);
+        font-size: 1.5rem;
+        margin: 25px 0 15px 0;
+        font-weight: 500;
+        border-bottom: 2px solid var(--primary-light);
+        padding-bottom: 6px;
+        display: inline-block;
+    }
+
+    .back-link {
+        display: inline-block;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        margin-top: 20px;
+        transition: var(--transition);
+    }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+            transform: translateX(-3px);
+        }
+
+        .back-link:before {
+            content: '←';
+            margin-right: 5px;
+        }
+</style>
+
+<div class="content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Create Vehicle Gate Pass</h1>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label asp-for="VehicleBrand" class="control-label"></label>
-        <input asp-for="VehicleBrand" class="form-control" />
-        <span asp-validation-for="VehicleBrand" class="text-danger"></span>
+    <div class="form-card">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <!-- Vehicle Type -->
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VehicleType" class="form-label">Vehicle Type</label>
+                    <select asp-for="VehicleType" class="form-control">
+                        <option value="">-- Select Vehicle Type --</option>
+                        <option value="Van">Van</option>
+                        <option value="Sedan">Sedan</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Motorcycle">Motorcycle</option>
+                        <option value="Truck">Truck</option>
+                    </select>
+                    <span asp-validation-for="VehicleType" class="text-danger"></span>
+                </div>
+                <!-- Vehicle Brand -->
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VehicleBrand" class="form-label">Vehicle Brand</label>
+                    <input asp-for="VehicleBrand" class="form-control" />
+                    <span asp-validation-for="VehicleBrand" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Vehicle Color -->
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VehicleColor" class="form-label">Vehicle Color</label>
+                    <input asp-for="VehicleColor" class="form-control" />
+                    <span asp-validation-for="VehicleColor" class="text-danger"></span>
+                </div>
+                <!-- Vehicle Plate Number -->
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VehiclePlateNumber" class="form-label">Vehicle Plate Number</label>
+                    <input asp-for="VehiclePlateNumber" class="form-control" />
+                    <span asp-validation-for="VehiclePlateNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Vehicle Image Section -->
+            <h3 class="section-title">Vehicle Image</h3>
+
+            <div class="row">
+                <!-- Upload Vehicle Image -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicleImage" class="form-label">Upload Vehicle Image</label>
+                    <input type="file" name="vehicleImage" class="form-control" accept="image/*" required />
+                </div>
+            </div>
+
+            <!-- Display uploaded image if available -->
+            @if (Model?.VehicleImage != null)
+            {
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h3 class="section-title">Uploaded Image</h3>
+                        <img src="data:image/png;base64,@Convert.ToBase64String(Model.VehicleImage)" alt="Vehicle Image" class="img-fluid" style="max-width: 200px; border-radius: 8px;" />
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="submit" class="btn custom-btn">Create Vehicle Gate Pass</button>
+                <a href="@Url.Action("Index", "VehicleGatePass")" class="btn custom-btn btn-secondary">Cancel</a>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger mt-3">
+                    <ul>
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </form>
     </div>
 
-    <div class="form-group">
-        <label asp-for="VehicleColor" class="control-label"></label>
-        <input asp-for="VehicleColor" class="form-control" />
-        <span asp-validation-for="VehicleColor" class="text-danger"></span>
-    </div>
+    <a asp-action="Index" class="back-link">Back to List</a>
+</div>
 
-    <div class="form-group">
-        <label asp-for="VehiclePlateNumber" class="control-label"></label>
-        <input asp-for="VehiclePlateNumber" class="form-control" />
-        <span asp-validation-for="VehiclePlateNumber" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label for="vehicleImage" class="control-label">Upload Vehicle Image</label>
-        <input type="file" name="vehicleImage" class="form-control" accept="image/*" required />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Create Vehicle Gate Pass</button>
-    <a href="@Url.Action("Index", "VehicleGatePass")" class="btn btn-secondary">Cancel</a>
-</form>
-
-@if (Model?.VehicleImage != null)
-{
-    <h3>Uploaded Image</h3>
-    <img src="data:image/png;base64,@Convert.ToBase64String(Model.VehicleImage)" alt="Vehicle Image" width="200" />
-}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

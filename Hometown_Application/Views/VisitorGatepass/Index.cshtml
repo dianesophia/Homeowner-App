@@ -1,205 +1,820 @@
 ﻿@model IEnumerable<Hometown_Application.Models.VisitorGatepassModel>
+@using Hometown_Application.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Visitor Gatepass List";
 }
 
-<div class="container py-4">
-    <h2 class="mb-4 text-center">Visitor Gatepass List</h2>
+<style>
+    :root {
+        --primary-color: #6F754E;
+        --primary-light: #8a916a;
+        --primary-dark: #5a6040;
+        --secondary-color: #A08D67;
+        --secondary-light: #b8a787;
+        --background-color: #E6DDC4;
+        --text-color: #2F3A31;
+        --card-bg: #FFFFFF;
+        --danger-color: #dc3545;
+        --success-color: #198754;
+        --warning-color: #5a6040;
+        ;
+        --info-color: #0dcaf0;
+        --border-radius: 16px;
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    /* Page title and header */
+    .page-title {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 8px;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* Action buttons */
+    .action-button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+        .action-button:hover {
+            background-color: var(--secondary-light);
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+
+        .action-button.primary {
+            background-color: var(--primary-color);
+        }
+
+            .action-button.primary:hover {
+                background-color: var(--primary-light);
+            }
+
+        .action-button.success {
+            background-color: var(--success-color);
+        }
+
+            .action-button.success:hover {
+                background-color: #157347;
+            }
+
+        .action-button.secondary {
+            background-color: #6c757d;
+        }
+
+            .action-button.secondary:hover {
+                background-color: #5c636a;
+            }
+
+        .action-button i {
+            font-size: 1.1rem;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* Stats cards */
+    .stat-cards-container {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        gap: 20px;
+    }
+
+    .stat-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 15px 20px;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 15px;
+        flex-grow: 1;
+        flex: 1;
+        max-width: 30%;
+        min-width: 250px;
+        position: relative;
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .stat-card.pending::before {
+            background-color: var(--warning-color);
+        }
+
+        .stat-card.approved::before {
+            background-color: var(--success-color);
+        }
+
+        .stat-card.rejected::before {
+            background-color: var(--danger-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+    .stat-icon {
+        font-size: 1.5rem;
+        background-color: rgba(0,0,0,0.05);
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .pending-icon {
+        color: var(--warning-color);
+    }
+
+    .approved-icon {
+        color: var(--success-color);
+    }
+
+    .rejected-icon {
+        color: var(--danger-color);
+    }
+
+    .stat-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Search container */
+    .search-container {
+        display: flex;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid #eee;
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        font-size: 1rem;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--primary-light);
+        }
+
+    .search-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        padding: 0 25px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+        .search-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+    /* Tab container */
+    .tab-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+
+    .nav-tabs {
+        display: flex;
+        gap: 0;
+        padding: 15px 15px 0;
+        background-color: var(--primary-color);
+        border-bottom: none;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+        .nav-tabs .nav-item {
+            margin-right: 4px;
+            margin-bottom: 0;
+        }
+
+        .nav-tabs .nav-link {
+            color: rgba(255,255,255,0.8);
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            transition: var(--transition);
+            background-color: rgba(255,255,255,0.1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .nav-tabs .nav-link:hover {
+                color: white;
+                background-color: rgba(255,255,255,0.2);
+            }
+
+            .nav-tabs .nav-link.active {
+                color: var(--text-color);
+                background-color: white;
+                box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            }
+
+            .nav-tabs .nav-link i {
+                margin-right: 8px;
+                font-size: 1rem;
+            }
+
+    .tab-content {
+        padding: 25px;
+        background-color: var(--card-bg);
+    }
+
+    /* Table styling */
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+
+        .custom-table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            border: none;
+        }
+
+        .custom-table tbody tr {
+            background-color: white;
+            transition: var(--transition);
+        }
+
+            .custom-table tbody tr:hover {
+                background-color: rgba(0,0,0,0.02);
+            }
+
+        .custom-table tbody td {
+            padding: 15px;
+            text-align: center;
+            vertical-align: middle;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .custom-table.approved thead th {
+            background-color: var(--success-color);
+        }
+
+        .custom-table.rejected thead th {
+            background-color: var(--danger-color);
+        }
+
+        .custom-table.pending thead th {
+            background-color: var(--warning-color);
+        }
+
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+    }
+
+        .empty-state i {
+            color: var(--secondary-color);
+            opacity: 0.7;
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+    /* Button styling */
+    .btn-action {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: var(--transition);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin: 0 3px;
+    }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-action i {
+            margin-right: 5px;
+        }
+
+    .btn-edit {
+        background-color: var(--warning-color);
+        color: white;
+        border: none;
+    }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+            color: white;
+        }
+
+    .btn-approve {
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+    }
+
+        .btn-approve:hover {
+            background-color: #157347;
+            color: white;
+        }
+
+    .btn-reject {
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+    }
+
+        .btn-reject:hover {
+            background-color: #bb2d3b;
+            color: white;
+        }
+
+    .btn-download {
+        background-color: var(--info-color);
+        color: white;
+        border: none;
+    }
+
+        .btn-download:hover {
+            background-color: #0bacce;
+            color: white;
+        }
+
+    .btn-arrived {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+    }
+
+        .btn-arrived:hover {
+            background-color: var(--secondary-light);
+            color: white;
+        }
+
+    /* Alert styling */
+    .custom-alert {
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 15px 20px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .alert-info {
+        background-color: rgba(13, 202, 240, 0.15);
+        border-left: 4px solid var(--info-color);
+        color: var(--text-color);
+    }
+
+    .btn-close {
+        background: transparent;
+        border: none;
+        font-size: 1.2rem;
+        color: var(--text-color);
+        opacity: 0.6;
+        cursor: pointer;
+    }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
+    /* Footer button container */
+    .footer-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+</style>
+
+<div class="content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Visitor Gatepass List</h1>
+        <div class="action-buttons">
+            <a asp-action="Create" class="action-button success">
+                <i class="bi bi-plus-circle"></i>
+                <span>Create New Gatepass</span>
+            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="VisitorLogs" class="action-button secondary">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Visitor Logs</span>
+                </a>
+            }
+        </div>
+    </div>
 
     @if (TempData["Message"] != null)
     {
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-            @TempData["Message"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="custom-alert alert-info" role="alert">
+            <span>@TempData["Message"]</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                <i class="bi bi-x"></i>
+            </button>
         </div>
     }
 
-    <!-- Nav Tabs -->
-    <ul class="nav nav-tabs" id="gatepassTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
-                    type="button" role="tab" aria-controls="pending" aria-selected="true">
-                Pending
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved"
-                    type="button" role="tab" aria-controls="approved" aria-selected="false">
-                Approved
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected"
-                    type="button" role="tab" aria-controls="rejected" aria-selected="false">
-                Rejected
-            </button>
-        </li>
-    </ul>
+    <!-- Statistics Cards 
+    <div class="stat-cards-container">
+        <div class="stat-card pending">
+            <div class="stat-icon pending-icon">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@Model.Count(v => v.ApprovalStatus == "Pending")</div>
+                <div class="stat-label">Pending Gatepasses</div>
+            </div>
+        </div>
+        <div class="stat-card approved">
+            <div class="stat-icon approved-icon">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@Model.Count(v => v.ApprovalStatus == "Approved")</div>
+                <div class="stat-label">Approved Gatepasses</div>
+            </div>
+        </div>
+        <div class="stat-card rejected">
+            <div class="stat-icon rejected-icon">
+                <i class="bi bi-x-circle"></i>
+            </div>
+            <div class="stat-text">
+                <div class="stat-number">@Model.Count(v => v.ApprovalStatus == "Rejected")</div>
+                <div class="stat-label">Rejected Gatepasses</div>
+            </div>
+        </div>
+    </div>-->
 
-    <div class="tab-content pt-4">
-        <!-- Pending Tab -->
-        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Pending Approvals</h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Visitor Name</th>
-                                    <th>Purpose</th>
-                                    <th>Visit Date</th>
-                                    <th>No. of Visitors</th>
-                                    <th>Contact</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Pending"))
+    <!-- Search bar -->
+    <div class="search-container">
+        <input type="text" class="search-input" id="gatepassSearch" placeholder="Search by visitor name, purpose, or contact...">
+        <button class="search-button">
+            <i class="bi bi-search"></i>
+        </button>
+    </div>
+
+    <!-- Tab Container -->
+    <div class="tab-container">
+        <ul class="nav nav-tabs" id="gatepassTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
+                        type="button" role="tab" aria-controls="pending" aria-selected="true">
+                    <i class="bi bi-hourglass-split"></i> Pending
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved"
+                        type="button" role="tab" aria-controls="approved" aria-selected="false">
+                    <i class="bi bi-check-circle"></i> Approved
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected"
+                        type="button" role="tab" aria-controls="rejected" aria-selected="false">
+                    <i class="bi bi-x-circle"></i> Rejected
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Pending Tab -->
+            <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                <div class="table-responsive">
+                    <table class="custom-table pending" id="pendingTable">
+                        <thead>
+                            <tr>
+                                <th>Visitor Name</th>
+                                <th>Purpose</th>
+                                <th>Visit Date</th>
+                                <th>No. of Visitors</th>
+                                <th>Contact</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var pendingItems = Model.Where(v => v.ApprovalStatus == "Pending").ToList();
+                                if (pendingItems.Any())
                                 {
-                                    <tr>
-                                        <td>@item.VisitorName</td>
-                                        <td>@item.Purpose</td>
-                                        <td>@item.VisitDate:yyyy-MM-dd</td>
-                                        <td>@item.NumberOfVisitors</td>
-                                        <td>@item.ContactNumber</td>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group">
-                                                <a asp-action="Edit" asp-route-id="@item.VisitorId" class="btn btn-warning btn-sm">
+                                    foreach (var item in pendingItems)
+                                    {
+                                        <tr>
+                                            <td>@item.VisitorName</td>
+                                            <td>@item.Purpose</td>
+                                            <td>@item.VisitDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.NumberOfVisitors</td>
+                                            <td>@item.ContactNumber</td>
+                                            <td class="text-center">
+                                                <a asp-action="Edit" asp-route-id="@item.VisitorId" class="btn-action btn-edit">
                                                     <i class="bi bi-pencil-square"></i> Edit
                                                 </a>
 
                                                 @if (User.IsInRole("Admin"))
                                                 {
                                                     <form asp-action="Approve" asp-route-id="@item.VisitorId" method="post" class="d-inline">
-                                                        <button type="submit" class="btn btn-outline-success btn-sm" title="Approve this visitor">
-                                                            <i class="bi bi-check-circle"></i>
+                                                        <button type="submit" class="btn-action btn-approve" title="Approve this visitor">
+                                                            <i class="bi bi-check-circle"></i> Approve
                                                         </button>
                                                     </form>
 
                                                     <form asp-action="Reject" asp-route-id="@item.VisitorId" method="post" class="d-inline">
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Reject this visitor">
-                                                            <i class="bi bi-x-circle"></i>
+                                                        <button type="submit" class="btn-action btn-reject" title="Reject this visitor">
+                                                            <i class="bi bi-x-circle"></i> Reject
                                                         </button>
                                                     </form>
                                                 }
-                                            </div>
 
-                                            @if (User.IsInRole("Homeowner"))
-                                            {
-                                                <div class="text-muted fst-italic mt-2">Awaiting Admin Review</div>
-                                            }
+                                                @if (User.IsInRole("Homeowner"))
+                                                {
+                                                    <div class="text-muted fst-italic mt-2">Awaiting Admin Review</div>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                <i class="bi bi-hourglass"></i>
+                                                <p>No pending gatepasses found.</p>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
 
-        <!-- Approved Tab -->
-        <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Approved Gatepasses</h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Visitor Name</th>
-                                    <th>Purpose</th>
-                                    <th>Visit Date</th>
-                                    <th>No. of Visitors</th>
-                                    <th>Contact</th>
-                                    <th>Approved By</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Approved"))
+            <!-- Approved Tab -->
+            <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+                <div class="table-responsive">
+                    <table class="custom-table approved" id="approvedTable">
+                        <thead>
+                            <tr>
+                                <th>Visitor Name</th>
+                                <th>Purpose</th>
+                                <th>Visit Date</th>
+                                <th>No. of Visitors</th>
+                                <th>Contact</th>
+                                <th>Approved By</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var approvedItems = Model.Where(v => v.ApprovalStatus == "Approved").ToList();
+                                if (approvedItems.Any())
                                 {
-                                    <tr>
-                                        <td>@item.VisitorName</td>
-                                        <td>@item.Purpose</td>
-                                        <td>@item.VisitDate:yyyy-MM-dd</td>
-                                        <td>@item.NumberOfVisitors</td>
-                                        <td>@item.ContactNumber</td>
-                                        <td>@(item.ApprovedBy ?? "N/A")</td>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group">
-                                                <a asp-action="DownloadVisitorGatePass" asp-route-id="@item.VisitorId" class="btn btn-primary btn-sm">
+                                    foreach (var item in approvedItems)
+                                    {
+                                        <tr>
+                                            <td>@item.VisitorName</td>
+                                            <td>@item.Purpose</td>
+                                            <td>@item.VisitDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.NumberOfVisitors</td>
+                                            <td>@item.ContactNumber</td>
+                                            <td>@(item.ApprovedBy ?? "N/A")</td>
+                                            <td class="text-center">
+                                                <a asp-action="DownloadVisitorGatePass" asp-route-id="@item.VisitorId" class="btn-action btn-download">
                                                     <i class="bi bi-download"></i> PDF
                                                 </a>
 
                                                 @if (User.IsInRole("Admin"))
                                                 {
                                                     <form asp-action="Arrived" asp-route-id="@item.VisitorId" method="post" class="d-inline">
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Mark as Arrived">
+                                                        <button type="submit" class="btn-action btn-arrived" title="Mark as Arrived">
                                                             <i class="bi bi-check-circle"></i> Arrived
                                                         </button>
                                                     </form>
                                                 }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="empty-state">
+                                                <i class="bi bi-check-circle"></i>
+                                                <p>No approved gatepasses found.</p>
                                             </div>
                                         </td>
                                     </tr>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
 
-        <!-- Rejected Tab -->
-        <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Rejected Gatepasses</h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Visitor Name</th>
-                                    <th>Purpose</th>
-                                    <th>Visit Date</th>
-                                    <th>No. of Visitors</th>
-                                    <th>Contact</th>
-                                    <th>Admin Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Where(v => v.ApprovalStatus == "Rejected"))
+            <!-- Rejected Tab -->
+            <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+                <div class="table-responsive">
+                    <table class="custom-table rejected" id="rejectedTable">
+                        <thead>
+                            <tr>
+                                <th>Visitor Name</th>
+                                <th>Purpose</th>
+                                <th>Visit Date</th>
+                                <th>No. of Visitors</th>
+                                <th>Contact</th>
+                                <th>Admin Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var rejectedItems = Model.Where(v => v.ApprovalStatus == "Rejected").ToList();
+                                if (rejectedItems.Any())
+                                {
+                                    foreach (var item in rejectedItems)
+                                    {
+                                        <tr>
+                                            <td>@item.VisitorName</td>
+                                            <td>@item.Purpose</td>
+                                            <td>@item.VisitDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.NumberOfVisitors</td>
+                                            <td>@item.ContactNumber</td>
+                                            <td>@(item.AdminNotes ?? "No notes provided")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
                                 {
                                     <tr>
-                                        <td>@item.VisitorName</td>
-                                        <td>@item.Purpose</td>
-                                        <td>@item.VisitDate:yyyy-MM-dd</td>
-                                        <td>@item.NumberOfVisitors</td>
-                                        <td>@item.ContactNumber</td>
-                                        <td>@(item.AdminNotes ?? "No notes provided")</td>
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                <i class="bi bi-x-circle"></i>
+                                                <p>No rejected gatepasses found.</p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="mt-4 d-flex justify-content-between">
-        @if (User.IsInRole("Admin"))
-        {
-            <a asp-action="VisitorLogs" class="btn btn-secondary">
-                <i class="bi bi-clock-history"></i> Visitor Logs
-            </a>
-        }
-
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Create New Gatepass
-        </a>
-    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('gatepassSearch');
+            const pendingTable = document.getElementById('pendingTable');
+            const approvedTable = document.getElementById('approvedTable');
+            const rejectedTable = document.getElementById('rejectedTable');
+
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = this.value.toLowerCase();
+
+                // Search in pending table
+                if (pendingTable) {
+                    const pendingRows = pendingTable.querySelectorAll('tbody tr');
+                    searchInTable(pendingRows, searchTerm);
+                }
+
+                // Search in approved table
+                if (approvedTable) {
+                    const approvedRows = approvedTable.querySelectorAll('tbody tr');
+                    searchInTable(approvedRows, searchTerm);
+                }
+
+                // Search in rejected table
+                if (rejectedTable) {
+                    const rejectedRows = rejectedTable.querySelectorAll('tbody tr');
+                    searchInTable(rejectedRows, searchTerm);
+                }
+            });
+
+            function searchInTable(rows, searchTerm) {
+                rows.forEach(row => {
+                    if (row.querySelector('.empty-state')) return; // Skip empty state rows
+
+                    const rowText = row.innerText.toLowerCase();
+                    if (rowText.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+}
